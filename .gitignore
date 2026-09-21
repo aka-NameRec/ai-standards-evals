@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+build/
+dist/
+
+# Tooling caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Inspect AI run logs (reports/ holds the curated, versioned results)
+logs/
+.eval/
+
+# OS noise
+.DS_Store
