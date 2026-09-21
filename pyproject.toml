@@ -35,3 +35,4 @@ files = ["evals", "scorers", "agents", "scripts"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["."]

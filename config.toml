@@ -1,0 +1,9 @@
+# Pinned standards revision consumed by the eval runner.
+[standards]
+repo = "~/workspace/myself/ai-standards"
+revision = "2.5.0-2026-09-21"
+
+[runner]
+# Model is pinned for baseline/candidate comparability.
+model = "zai-coding-plan/glm-5.3-flash"
+timeout_seconds = 900

@@ -56,9 +56,23 @@ docs/        — cross-repo flow, авторство evals, guidelines для sc
 
 ## Статус
 
-Каркас репозитория (v0.1 в работе). Далее по milestone #18: один рабочий адаптер агента,
-9 сценариев code review (`CR-001`–`CR-009`) + `TRG-001`, детерминированный scoring,
-baseline-прогон на 2.5.0.
+Рабочий контур v0.1 — детерминированный сквозной прогон одного сценария:
+
+- пин ревизии стандартов (`config.toml`) → временный worktree (`scripts/standards.py`);
+- разбор контрактов сценариев и `rule_map.toml` запиненной ревизии;
+- рендер `AGENTS.md` фикстуры через `ai-sync` (features/stacks из манифеста фикстуры);
+- детерминированные фикстуры `CR-001`–`CR-003` — реальные Git-репозитории с историей
+  base → candidate + Git-oracle «внесено ли изменение» (`scripts/fixtures.py`, `scripts/oracle.py`);
+- адаптер Kilo (`kilo run --format json`), CLI `python -m scripts.run_scenario`,
+  Inspect-обвязка `evals/code_review.py`;
+- двуязычный (EN/RU) механический скорер формы отчёта (`scorers/report_shape.py`).
+
+`CR-002` (no-padding control) проходит сквозной прогон; эталонные артефакты —
+`reports/20260921-063453-CR-002/`.
+
+Дальше: скоринг находок CR-001/CR-003 (структурированный грейдер), исполнение TRG-001
+(деплой skill в фикстуру), контракты `CR-004`–`CR-009` в `ai-standards` через cross-repo
+flow, baseline-отчёт по всем сценариям на 2.5.0.
 
 ## Инструменты
 

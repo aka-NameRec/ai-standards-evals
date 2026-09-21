@@ -15,5 +15,8 @@ dist/
 logs/
 .eval/
 
+# Fixtures are rebuilt deterministically; only the run artifacts are versioned
+reports/*/fixture/
+
 # OS noise
 .DS_Store
