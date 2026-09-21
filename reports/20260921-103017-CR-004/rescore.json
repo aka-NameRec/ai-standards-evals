@@ -1,0 +1,8 @@
+{
+  "rescored_with": "current scorer (bullets, section forms EN/RU, file-only locations)",
+  "original_verdict": "FAIL",
+  "scenario_id": "CR-004",
+  "ok": true,
+  "failures": [],
+  "note": "original FAIL: grader missed bullet-prefixed findings and penalized a marked pre-existing finding; rescore PASS"
+}

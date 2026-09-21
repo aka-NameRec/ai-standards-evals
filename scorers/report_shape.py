@@ -149,13 +149,18 @@ def _section_marks(report: str, names: tuple[str, ...]) -> list[tuple[str, int, 
     """Locate section starts.
 
     A section may be rendered as a heading (``## Name``), a label (``Name:``),
-    or a bare name line (``Name``); invariants judge the outcome, never the
-    wording (scenario-format contract).
+    a bare name line (``Name``), or a bold label (``**Name**``); invariants
+    judge the outcome, never the wording (scenario-format contract).
     """
     marks: list[tuple[str, int, int]] = []
     for name in set(names):
         escaped = re.escape(name)
-        for pattern in (rf"^#{{2,3}}\s+{escaped}\s*$", rf"^{escaped}:", rf"^{escaped}\s*$"):
+        for pattern in (
+            rf"^#{{2,3}}\s+{escaped}\s*$",
+            rf"^{escaped}:",
+            rf"^{escaped}\s*$",
+            rf"^\*\*{escaped}:?\*\*\s*:?\s*$",
+        ):
             match = re.search(pattern, report, re.MULTILINE)
             if match is not None:
                 marks.append((name, match.start(), match.end()))

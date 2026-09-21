@@ -1,0 +1,10 @@
+{
+  "rescored_with": "current scorer (bullets, section forms EN/RU, file-only locations)",
+  "original_verdict": "FAIL",
+  "scenario_id": "CR-005",
+  "ok": false,
+  "failures": [
+    "required sections are out of order"
+  ],
+  "note": "original FAIL, rescore FAIL: the report places Reuse before Correctness, violating the canonical section order (genuine behavioral signal)"
+}

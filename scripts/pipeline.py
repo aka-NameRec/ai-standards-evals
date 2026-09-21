@@ -15,6 +15,18 @@ from scripts.standards import Scenario
 NO_FIXTURE_NOTE = "scenario has no deterministic fixture builder yet"
 
 
+_SCENARIO_CHECKS = {
+    "CR-001": review_findings.check_cr001,
+    "CR-003": review_findings.check_cr003,
+    "CR-004": review_findings.check_cr004,
+    "CR-005": review_findings.check_cr005,
+    "CR-006": review_findings.check_cr006,
+    "CR-007": review_findings.check_cr007,
+    "CR-008": review_findings.check_cr008,
+    "CR-009": review_findings.check_cr009,
+}
+
+
 def score_scenario(
     scenario_id: str,
     report: str,
@@ -23,10 +35,9 @@ def score_scenario(
     """Dispatch the strongest mechanical scorer available for the scenario."""
     if scenario_id == "CR-002":
         return report_shape.check_no_padding(report)
-    if scenario_id == "CR-001" and fixture_path is not None:
-        return review_findings.check_cr001(report, fixture_path)
-    if scenario_id == "CR-003" and fixture_path is not None:
-        return review_findings.check_cr003(report, fixture_path)
+    check = _SCENARIO_CHECKS.get(scenario_id)
+    if check is not None and fixture_path is not None:
+        return check(report, fixture_path)
     return report_shape.check(report)
 
 

@@ -1,0 +1,26 @@
+{
+  "scenario_id": "CR-004",
+  "ok": false,
+  "failures": [
+    "correctness defect in src/account.py is not flagged"
+  ],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 152.2,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "rules-change/18-eval-scenario-contracts",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/tmp/kilo/runs/20260921-103017-CR-004/fixture/cr-004-real-correctness-defect",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CR-004",
+    "code review"
+  ]
+}

@@ -69,21 +69,30 @@ docs/        — cross-repo flow, авторство evals, guidelines для sc
 - структурный грейдер находок (маркеры, локации, границы диффа, pre-existing-метки)
   и двуязычный (EN/RU) механический скорер формы отчёта (`scorers/`).
 
-Результаты baseline-прогона на 2.5.0 (модель `zai-coding-plan/glm-5.3-flash`):
+Результаты baseline-прогонов (модель `zai-coding-plan/glm-5.3-flash`; CR-004–CR-009 —
+на ветке контрактов `rules-change/18-eval-scenario-contracts`):
 
 | Сценарий | Вердикт | Артефакты |
 |---|---|---|
-| CR-002 no-padding control | PASS | `reports/20260921-063453-CR-002` |
 | CR-001 reuse | PASS (1 из 3 прогонов — промах по находке: `reports/20260921-065815-CR-001`) | `reports/20260921-070237-CR-001` |
+| CR-002 no-padding control | PASS | `reports/20260921-063453-CR-002` |
 | CR-003 pre-existing defect | PASS | `reports/20260921-071158-CR-003` |
+| CR-004 correctness defect | PASS | `reports/20260921-103017-CR-004` |
+| CR-005 internal duplication | FAIL — порядок секций нарушен (Reuse раньше Корректности) | `reports/20260921-103251-CR-005` |
+| CR-006 architecture decision | PASS | `reports/20260921-103413-CR-006` |
+| CR-007 apparent violation | PASS | `reports/20260921-103614-CR-007` |
+| CR-008 verification honesty | PASS | `reports/20260921-103830-CR-008` |
+| CR-009 error-path coverage | PASS | `reports/20260921-104040-CR-009` |
 | TRG-001 активация skill | 12/12 PASS | `reports/20260921-072206-TRG-001` |
 
-Замечен сигнал: форма отчёта дрейфует между прогонами (заголовки/метки/порядок
-секций) — порядок секций проверяется строго, оформление принимается в трёх формах.
+Сигналы baseline: дрейф формы отчёта между прогонами (четыре формы рендера секций;
+порядок секций проверяется строго — CR-005 поймал реальное нарушение); в CR-009 агент
+применил small-fix политику (добавил тест, записал ✅ с прогоном); в CR-006/CR-008
+находки ссылаются на ADR-004 и честно сообщают о неисполняемом наборе тестов.
 
-Дальше: контракты `CR-004`–`CR-009` в `ai-standards` (ветка
-`rules-change/18-eval-scenario-contracts`) и их реализация здесь, Inspect-интеграция
-полного набора, cross-agent проверка.
+Дальше: Inspect-интеграция полного набора с повторными trials, cross-agent проверка,
+слияние ветки контрактов `CR-004`–`CR-009` в `main` `ai-standards` по решению
+пользователя.
 
 ## Инструменты
 

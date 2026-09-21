@@ -167,6 +167,40 @@ BARE_FORM_REPORT = """ai-standards v2.5.0
 """
 
 
+BOLD_FORM_REPORT = """ai-standards v2.5.0
+
+## Код-ревью
+
+**Что сделано**
+Добавлена функция parse_timeout в src/config.py.
+
+**Как сделано**
+Повторяет проверенный паттерн parse_setting.
+
+### Корректность
+Не найдено.
+
+### Архитектура и конвенции
+Не найдено.
+
+### Переиспользование
+Не найдено.
+
+### Эффективность
+Не найдено.
+
+### Качество
+- ✅ tests/test_config.py:18 — error path не покрыт → исправлено: тест добавлен.
+
+### Проверки
+Все 4 теста проходят (запускались напрямую).
+"""
+
+
+def test_bold_form_report_passes() -> None:
+    assert check(BOLD_FORM_REPORT).ok
+
+
 def test_bare_form_report_with_findings_passes() -> None:
     assert check(BARE_FORM_REPORT).ok
 

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+from dataclasses import replace
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -19,9 +20,16 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("scenario_id", help="Scenario ID from the standards docs, e.g. CR-002")
     parser.add_argument("--config", type=Path, default=Path("config.toml"))
     parser.add_argument("--reports-dir", type=Path, default=Path("reports"))
+    parser.add_argument(
+        "--revision",
+        default=None,
+        help="Override the pinned standards revision (tag, branch, or commit)",
+    )
     args = parser.parse_args(argv)
 
     config = load_config(args.config)
+    if args.revision is not None:
+        config = replace(config, standards_revision=args.revision)
     adapter = KiloAdapter(model=config.model, timeout_seconds=config.timeout_seconds)
     with resolve_standards_checkout(config) as worktree:
         scenarios = index_scenarios(worktree)

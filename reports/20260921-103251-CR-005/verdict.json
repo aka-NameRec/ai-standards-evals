@@ -1,0 +1,26 @@
+{
+  "scenario_id": "CR-005",
+  "ok": false,
+  "failures": [
+    "required sections are out of order"
+  ],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 81.4,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "rules-change/18-eval-scenario-contracts",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/tmp/kilo/runs/20260921-103251-CR-005/fixture/cr-005-new-internal-duplication",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CR-005",
+    "code review"
+  ]
+}

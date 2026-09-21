@@ -46,6 +46,12 @@ def build_fixture(
         "CR-001": build_cr001,
         "CR-002": build_cr002,
         "CR-003": build_cr003,
+        "CR-004": build_cr004,
+        "CR-005": build_cr005,
+        "CR-006": build_cr006,
+        "CR-007": build_cr007,
+        "CR-008": build_cr008,
+        "CR-009": build_cr009,
     }
     builder = builders.get(scenario_id)
     if builder is None:
@@ -223,6 +229,310 @@ def build_cr003(worktree: Path, parent: Path, revision: str, render: RenderFn) -
     _write(repo / "src" / "reader.ts", _READER_CANDIDATE)
     _git(repo, "add", "-A")
     return repo
+
+
+def build_cr004(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
+    """Inverted withdrawal boundary the fixture's own tests never touch."""
+    repo = parent / "cr-004-real-correctness-defect"
+    _init_repo(repo, worktree, revision, features=["code-review"], stacks=["python"], render=render)
+    _write(repo / "conftest.py", "")
+    _write(
+        repo / "README.md",
+        "# ledger-lite\n\nToy ledger used for boundary-condition experiments.\n",
+    )
+    _write(
+        repo / "src" / "account.py",
+        '"""Account withdrawal rules."""\n'
+        "\n"
+        "\n"
+        "def can_withdraw(balance: int, amount: int) -> bool:\n"
+        '    """Return whether ``amount`` may be withdrawn from ``balance``."""\n'
+        "    return amount <= balance\n",
+    )
+    _write(
+        repo / "tests" / "test_account.py",
+        "from account import can_withdraw\n"
+        "\n"
+        "\n"
+        "def test_routine_withdrawal():\n"
+        "    assert can_withdraw(100, 40) is True\n",
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feat: withdrawal rule")
+
+    _write(
+        repo / "src" / "account.py",
+        '"""Account withdrawal rules."""\n'
+        "\n"
+        "\n"
+        "def can_withdraw(balance: int, amount: int) -> bool:\n"
+        '    """Return whether ``amount`` may be withdrawn from ``balance``."""\n'
+        "    return amount >= balance\n",
+    )
+    _git(repo, "add", "-A")
+    return repo
+
+
+def build_cr005(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
+    """Two new modules carry identical helpers; no reusable abstraction exists."""
+    repo = parent / "cr-005-new-internal-duplication"
+    _init_repo(repo, worktree, revision, features=["code-review"], stacks=["python"], render=render)
+    _write(repo / "conftest.py", "")
+    _write(
+        repo / "src" / "rows.py",
+        '"""Tabular helpers for report modules."""\n'
+        "\n"
+        "\n"
+        "def to_rows(records):\n"
+        '    return [[record.get("name", "")] for record in records]\n',
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feat: reporting scaffolding")
+
+    _format_period = (
+        'def format_period(start: str, end: str) -> str:\n'
+        '    """Render a reporting period label."""\n'
+        "    if start > end:\n"
+        "        start, end = end, start\n"
+        '    return f"{start}..{end}"\n'
+    )
+    _csv_header = '"""CSV export for period reports."""\n\n\n'
+    _json_header = '"""JSON export for period reports."""\n\n\n'
+    _write(repo / "src" / "csv_export.py", _csv_header + _format_period)
+    _write(repo / "src" / "json_export.py", _json_header + _format_period)
+    _git(repo, "add", "-A")
+    return repo
+
+
+def build_cr006(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
+    """API handler writes the repository directly despite the accepted decision."""
+    repo = parent / "cr-006-architecture-decision-violation"
+    _init_repo(repo, worktree, revision, features=["code-review"], stacks=["python"], render=render)
+    _write(repo / "conftest.py", "")
+    _write(
+        repo / "docs" / "decisions" / "ADR-004.md",
+        "# ADR-004: inventory writes go through the reservation service\n"
+        "\n"
+        "All inventory writes must go through `InventoryReservationService`.\n"
+        "Direct repository writes from API handlers are prohibited.\n",
+    )
+    _write(
+        repo / "inventory_service.py",
+        '"""Inventory reservation service."""\n'
+        "\n"
+        "\n"
+        "class InventoryReservationService:\n"
+        '    """Single write path for inventory mutations."""\n'
+        "\n"
+        "    def __init__(self, repository):\n"
+        "        self._repository = repository\n"
+        "\n"
+        "    def save(self, item: dict) -> None:\n"
+        "        self._repository.save(item)\n",
+    )
+    _write(
+        repo / "inventory_repository.py",
+        '"""Low-level inventory storage."""\n'
+        "\n"
+        "\n"
+        "class InventoryRepository:\n"
+        '    """Direct storage access; not for API handlers."""\n'
+        "\n"
+        "    def save(self, item: dict) -> None:\n"
+        "        ...",
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feat: inventory write path with ADR-004")
+
+    _write(
+        repo / "api_handler.py",
+        '"""API handler for stock adjustments."""\n'
+        "\n"
+        "from inventory_repository import InventoryRepository\n"
+        "\n"
+        "\n"
+        "def adjust_stock(sku: str, qty: int) -> None:\n"
+        "    repository = InventoryRepository()\n"
+        "    repository.save({\"sku\": sku, \"qty\": qty})\n",
+    )
+    _git(repo, "add", "-A")
+    return repo
+
+
+def build_cr007(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
+    """New endpoint looks unvalidated in the diff; the router wrapper validates it."""
+    repo = parent / "cr-007-apparent-violation-disproved"
+    _init_repo(repo, worktree, revision, features=["code-review"], stacks=["python"], render=render)
+    _write(repo / "conftest.py", "")
+    _write(
+        repo / "validation.py",
+        '"""Payload validation boundary."""\n'
+        "\n"
+        "\n"
+        "def validate_input(schema, payload):\n"
+        '    """Validate ``payload`` against ``schema``; raises on violations."""\n'
+        "    if not isinstance(payload, dict):\n"
+        '        raise TypeError("payload must be a dict")\n'
+        "    return payload\n",
+    )
+    _write(
+        repo / "src" / "register.py",
+        '"""Registration endpoints."""\n'
+        "\n"
+        "from validation import validate_input\n"
+        "\n"
+        "\n"
+        "class RegisterSchema:\n"
+        '    """Payload schema for registration requests."""\n'
+        "\n"
+        "\n"
+        "ROUTES = []\n"
+        "\n"
+        "\n"
+        "def route(schema):\n"
+        '    """Register a handler under the module-wide validation boundary."""\n'
+        "\n"
+        "    def wrap(handler):\n"
+        "        def wrapped(payload):\n"
+        "            return handler(validate_input(schema, payload))\n"
+        "\n"
+        "        ROUTES.append(wrapped)\n"
+        "        return wrapped\n"
+        "\n"
+        "    return wrap\n"
+        "\n"
+        "\n"
+        "@route(RegisterSchema)\n"
+        "def register_user(payload):\n"
+        '    return {"ok": True, "user": payload}\n',
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feat: registration endpoints with validation boundary")
+
+    _write(
+        repo / "src" / "register.py",
+        _read(repo / "src" / "register.py")
+        + "\n\n"
+        + "@route(RegisterSchema)\n"
+        + "def resend_confirmation(payload):\n"
+        + '    return {"ok": True, "queued": True}\n',
+    )
+    _git(repo, "add", "-A")
+    return repo
+
+
+def build_cr008(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
+    """Test suite cannot execute (missing driver); the diff is a pure refactor."""
+    repo = parent / "cr-008-verification-unavailable"
+    _init_repo(repo, worktree, revision, features=["code-review"], stacks=["python"], render=render)
+    _write(repo / "conftest.py", "")
+    _write(
+        repo / "src" / "formatting.py",
+        '"""Report formatting helpers."""\n'
+        "\n"
+        "\n"
+        "def format_title(name: str) -> str:\n"
+        "    return name.strip().title()\n",
+    )
+    _write(
+        repo / "tests" / "test_formatting.py",
+        "import pytest\n"
+        "\n"
+        "from formatting import format_title\n"
+        "\n"
+        "\n"
+        "def test_title():\n"
+        '    assert format_title("report q3") == "Report Q3"\n'
+        "\n"
+        "\n"
+        "def test_db_backed_titles(db):\n"
+        "    assert db\n",
+    )
+    _write(
+        repo / "tests" / "conftest.py",
+        "import psycopg2  # noqa: F401 — database driver, absent from the eval environment\n",
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feat: title formatting with db-backed suite")
+
+    _write(
+        repo / "src" / "formatting.py",
+        '"""Report formatting helpers."""\n'
+        "\n"
+        "\n"
+        "def format_title(name: str) -> str:\n"
+        "    return _title(name)\n"
+        "\n"
+        "\n"
+        "def _title(name: str) -> str:\n"
+        "    return name.strip().title()\n",
+    )
+    _git(repo, "add", "-A")
+    return repo
+
+
+def build_cr009(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
+    """New parser gains an error branch; tests cover only the success path."""
+    repo = parent / "cr-009-missing-error-path-test"
+    _init_repo(repo, worktree, revision, features=["code-review"], stacks=["python"], render=render)
+    _write(repo / "conftest.py", "")
+    _write(
+        repo / "src" / "config.py",
+        '"""Config parsing helpers."""\n'
+        "\n"
+        "\n"
+        "def parse_setting(raw: str) -> int:\n"
+        '    """Parse a positive integer setting."""\n'
+        "    value = int(raw)\n"
+        "    if value <= 0:\n"
+        '        raise ValueError("must be positive")\n'
+        "    return value\n",
+    )
+    _write(
+        repo / "tests" / "test_config.py",
+        "import pytest\n"
+        "\n"
+        "from config import parse_setting\n"
+        "\n"
+        "\n"
+        "def test_setting():\n"
+        '    assert parse_setting("5") == 5\n'
+        "\n"
+        "\n"
+        "def test_setting_rejects_zero():\n"
+        "    with pytest.raises(ValueError):\n"
+        '        parse_setting("0")\n',
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feat: setting parsing with coverage")
+
+    _write(
+        repo / "src" / "config.py",
+        _read(repo / "src" / "config.py")
+        + "\n\n"
+        + "def parse_timeout(text: str) -> int:\n"
+        + '    """Parse a timeout in seconds; raises ValueError for non-positive input."""\n'
+        + "    value = int(text)\n"
+        + "    if value <= 0:\n"
+        + '        raise ValueError("timeout must be positive")\n'
+        + "    return value\n",
+    )
+    _write(
+        repo / "tests" / "test_config.py",
+        _read(repo / "tests" / "test_config.py")
+        + "\n\n"
+        + "from config import parse_timeout\n"
+        + "\n"
+        + "\n"
+        + "def test_timeout():\n"
+        + '    assert parse_timeout("30") == 30\n',
+    )
+    _git(repo, "add", "-A")
+    return repo
+
+
+def _read(path: Path) -> str:
+    return path.read_text(encoding="utf-8")
 
 
 def build_trg001(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
