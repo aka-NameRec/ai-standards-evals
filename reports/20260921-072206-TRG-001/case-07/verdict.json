@@ -1,0 +1,10 @@
+{
+  "index": 7,
+  "prompt": "«проверь этот файл»",
+  "expected_should_trigger": false,
+  "engaged": true,
+  "skill_seen": false,
+  "ok": true,
+  "note": "",
+  "duration_seconds": 211.0
+}

@@ -1,0 +1,7 @@
+{
+  "rescored_with": "current scorer (multi-line findings, section forms EN/RU)",
+  "original_verdict": "FAIL (scorer at run time did not accept the label-form report)",
+  "scenario_id": "CR-003",
+  "ok": true,
+  "failures": []
+}

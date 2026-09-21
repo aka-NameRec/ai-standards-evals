@@ -1,0 +1,9 @@
+{
+  "trigger_set": "TRG-001",
+  "cases": 12,
+  "passed": 12,
+  "failed": 0,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "2.5.0-2026-09-21",
+  "failures": []
+}

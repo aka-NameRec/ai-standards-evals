@@ -87,3 +87,21 @@ def extract_answer(stdout: str) -> str:
         if isinstance(part, dict) and isinstance(part.get("text"), str):
             parts.append(part["text"])
     return "\n".join(parts)
+
+
+def skill_invoked(stdout: str) -> bool:
+    """Detect a skill tool invocation in ``kilo run --format json`` events."""
+    for line in stdout.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue
+        try:
+            event = json.loads(stripped)
+        except json.JSONDecodeError:
+            continue
+        if event.get("type") != "tool_use":
+            continue
+        part = event.get("part")
+        if isinstance(part, dict) and str(part.get("tool", "")).lower() == "skill":
+            return True
+    return False

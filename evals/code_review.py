@@ -11,9 +11,8 @@ from inspect_ai.scorer import CORRECT, INCORRECT, Score, Scorer, Target, accurac
 from inspect_ai.solver import Generate, Solver, TaskState, solver
 
 from agents.kilo import KiloAdapter
-from scorers import report_shape
 from scripts.config import EvalConfig, load_config
-from scripts.pipeline import run_scenario
+from scripts.pipeline import run_scenario, score_scenario
 from scripts.standards import index_scenarios, resolve_standards_checkout
 
 DEFAULT_SCENARIO = "CR-002"
@@ -46,6 +45,9 @@ def _review_solver(config: EvalConfig, scenario_id: str) -> Solver:
             verdict = run_scenario(config, worktree, adapter, scenario, run_dir)
         state.output.completion = verdict.report_path.read_text(encoding="utf-8")
         state.metadata["verdict"] = {"ok": verdict.ok, "failures": list(verdict.failures)}
+        state.metadata["fixture_path"] = (
+            str(verdict.fixture_path) if verdict.fixture_path else None
+        )
         return state
 
     return solve
@@ -54,12 +56,9 @@ def _review_solver(config: EvalConfig, scenario_id: str) -> Solver:
 @scorer(metrics=[accuracy()])
 def _report_scorer(scenario_id: str) -> Scorer:
     async def score(state: TaskState, target: Target) -> Score:
-        completion = state.output.completion
-        check = (
-            report_shape.check_no_padding(completion)
-            if scenario_id == "CR-002"
-            else report_shape.check(completion)
-        )
+        fixture_raw = state.metadata.get("fixture_path")
+        fixture_path = Path(fixture_raw) if fixture_raw else None
+        check = score_scenario(scenario_id, state.output.completion, fixture_path)
         return Score(
             value=CORRECT if check.ok else INCORRECT,
             answer="shape satisfied" if check.ok else "; ".join(check.failures),

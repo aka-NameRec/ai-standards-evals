@@ -64,15 +64,26 @@ docs/        — cross-repo flow, авторство evals, guidelines для sc
 - детерминированные фикстуры `CR-001`–`CR-003` — реальные Git-репозитории с историей
   base → candidate + Git-oracle «внесено ли изменение» (`scripts/fixtures.py`, `scripts/oracle.py`);
 - адаптер Kilo (`kilo run --format json`), CLI `python -m scripts.run_scenario`,
-  Inspect-обвязка `evals/code_review.py`;
-- двуязычный (EN/RU) механический скорер формы отчёта (`scorers/report_shape.py`).
+  раннер триггер-сетов `python -m scripts.run_triggers`, Inspect-обвязка
+  `evals/code_review.py`;
+- структурный грейдер находок (маркеры, локации, границы диффа, pre-existing-метки)
+  и двуязычный (EN/RU) механический скорер формы отчёта (`scorers/`).
 
-`CR-002` (no-padding control) проходит сквозной прогон; эталонные артефакты —
-`reports/20260921-063453-CR-002/`.
+Результаты baseline-прогона на 2.5.0 (модель `zai-coding-plan/glm-5.3-flash`):
 
-Дальше: скоринг находок CR-001/CR-003 (структурированный грейдер), исполнение TRG-001
-(деплой skill в фикстуру), контракты `CR-004`–`CR-009` в `ai-standards` через cross-repo
-flow, baseline-отчёт по всем сценариям на 2.5.0.
+| Сценарий | Вердикт | Артефакты |
+|---|---|---|
+| CR-002 no-padding control | PASS | `reports/20260921-063453-CR-002` |
+| CR-001 reuse | PASS (1 из 3 прогонов — промах по находке: `reports/20260921-065815-CR-001`) | `reports/20260921-070237-CR-001` |
+| CR-003 pre-existing defect | PASS | `reports/20260921-071158-CR-003` |
+| TRG-001 активация skill | 12/12 PASS | `reports/20260921-072206-TRG-001` |
+
+Замечен сигнал: форма отчёта дрейфует между прогонами (заголовки/метки/порядок
+секций) — порядок секций проверяется строго, оформление принимается в трёх формах.
+
+Дальше: контракты `CR-004`–`CR-009` в `ai-standards` (ветка
+`rules-change/18-eval-scenario-contracts`) и их реализация здесь, Inspect-интеграция
+полного набора, cross-agent проверка.
 
 ## Инструменты
 

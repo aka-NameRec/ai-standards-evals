@@ -17,6 +17,7 @@ logs/
 
 # Fixtures are rebuilt deterministically; only the run artifacts are versioned
 reports/*/fixture/
+reports/*/case-*/fixture/
 
 # OS noise
 .DS_Store

@@ -1,0 +1,10 @@
+{
+  "index": 6,
+  "prompt": "review this file",
+  "expected_should_trigger": false,
+  "engaged": true,
+  "skill_seen": false,
+  "ok": true,
+  "note": "",
+  "duration_seconds": 150.3
+}

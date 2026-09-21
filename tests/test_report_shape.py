@@ -108,6 +108,73 @@ Not run.
 """
 
 
+LABEL_FORM_REPORT = """ai-standards v2.5.0
+
+## Код-ревью
+
+Что сделано: добавлен новый файл src/pricing.ts с функцией formatPrice.
+
+Как сделано: логика написана с нуля; изменения только в индексе.
+
+### Корректность
+Не найдено.
+
+### Архитектура и конвенции
+Не найдено.
+
+### Переиспользование
+🟡 src/pricing.ts:1 — formatPrice является копией formatMoney из src/money.ts:1 —
+нарушает: DRY.
+
+### Эффективность
+Не найдено.
+
+### Качество
+Не найдено.
+
+### Проверки
+`npm test` — не выполнено: vitest не установлен. Проверено чтением.
+"""
+
+
+BARE_FORM_REPORT = """ai-standards v2.5.0
+
+## Код-ревью
+
+Что сделано
+Добавлен новый модуль src/pricing.ts с функцией formatPrice.
+
+Как сделано
+Семантика повторяет существующий formatMoney из src/money.ts.
+
+Корректность
+Не найдено.
+
+Архитектура и конвенции
+Не найдено.
+
+Переиспользование
+🟡 src/pricing.ts:1 — formatPrice дублирует formatMoney — нарушает: DRY.
+
+Эффективность
+Не найдено.
+
+Качество
+Не найдено.
+
+Проверки
+Тесты не запускались; проверено чтением.
+"""
+
+
+def test_bare_form_report_with_findings_passes() -> None:
+    assert check(BARE_FORM_REPORT).ok
+
+
+def test_label_form_report_with_findings_passes() -> None:
+    assert check(LABEL_FORM_REPORT).ok
+
+
 def test_english_clean_report_passes() -> None:
     assert check(GOOD_REPORT).ok
     assert check_no_padding(GOOD_REPORT).ok

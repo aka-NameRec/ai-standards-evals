@@ -1,0 +1,10 @@
+{
+  "index": 5,
+  "prompt": "code review",
+  "expected_should_trigger": false,
+  "engaged": true,
+  "skill_seen": false,
+  "ok": true,
+  "note": "",
+  "duration_seconds": 145.8
+}

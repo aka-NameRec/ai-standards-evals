@@ -1,0 +1,8 @@
+{
+  "rescored_with": "current scorer (multi-line findings, section forms EN/RU)",
+  "original_verdict": "FAIL",
+  "scenario_id": "CR-001",
+  "ok": false,
+  "failures": ["duplication with the existing helper is not flagged as a Reuse issue"],
+  "note": "genuine behavioral miss: reuse finding absent from the report"
+}

@@ -10,7 +10,7 @@ from pathlib import Path
 from agents.kilo import KiloAdapter
 from scripts.config import load_config
 from scripts.pipeline import run_scenario
-from scripts.standards import index_scenarios, resolve_standards_checkout
+from scripts.standards import KIND_TRIGGER_SET, index_scenarios, resolve_standards_checkout
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -29,6 +29,11 @@ def main(argv: list[str] | None = None) -> int:
             known = ", ".join(sorted(scenarios))
             parser.error(f"unknown scenario {args.scenario_id!r}; known: {known}")
         scenario = scenarios[args.scenario_id]
+        if scenario.kind == KIND_TRIGGER_SET:
+            parser.error(
+                f"{args.scenario_id} is an activation trigger set; "
+                "run it with `python -m scripts.run_triggers` instead"
+            )
         stamp = datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
         run_dir = args.reports_dir / f"{stamp}-{args.scenario_id}"
         verdict = run_scenario(config, worktree, adapter, scenario, run_dir)

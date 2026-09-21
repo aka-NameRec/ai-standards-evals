@@ -7,12 +7,27 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from agents.base import AgentAdapter
-from scorers import report_shape
+from scorers import report_shape, review_findings
 from scripts.config import EvalConfig
 from scripts.fixtures import build_fixture
 from scripts.standards import Scenario
 
 NO_FIXTURE_NOTE = "scenario has no deterministic fixture builder yet"
+
+
+def score_scenario(
+    scenario_id: str,
+    report: str,
+    fixture_path: Path | None,
+) -> report_shape.ShapeCheck:
+    """Dispatch the strongest mechanical scorer available for the scenario."""
+    if scenario_id == "CR-002":
+        return report_shape.check_no_padding(report)
+    if scenario_id == "CR-001" and fixture_path is not None:
+        return review_findings.check_cr001(report, fixture_path)
+    if scenario_id == "CR-003" and fixture_path is not None:
+        return review_findings.check_cr003(report, fixture_path)
+    return report_shape.check(report)
 
 
 @dataclass(frozen=True)
@@ -58,11 +73,7 @@ def run_scenario(
     report = result.answer.strip()
     report_path = run_dir / "report.md"
     report_path.write_text(report, encoding="utf-8")
-    check = (
-        report_shape.check_no_padding(report)
-        if scenario.scenario_id == "CR-002"
-        else report_shape.check(report)
-    )
+    check = score_scenario(scenario.scenario_id, report, fixture_path)
     verdict = ScenarioVerdict(
         scenario_id=scenario.scenario_id,
         ok=check.ok,

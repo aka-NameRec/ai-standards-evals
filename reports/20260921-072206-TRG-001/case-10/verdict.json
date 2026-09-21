@@ -1,0 +1,10 @@
+{
+  "index": 10,
+  "prompt": "code review по стандарту проекта",
+  "expected_should_trigger": true,
+  "engaged": true,
+  "skill_seen": true,
+  "ok": true,
+  "note": "",
+  "duration_seconds": 126.6
+}

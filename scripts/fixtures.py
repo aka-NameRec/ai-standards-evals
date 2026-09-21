@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from scripts.git_utils import GitError, run_git
-from scripts.render import render_agents_md
+from scripts.render import render_agents_md, sync_templates
 
 RenderFn = Callable[[Path, Path, str], Path]
 
@@ -225,6 +225,30 @@ def build_cr003(worktree: Path, parent: Path, revision: str, render: RenderFn) -
     return repo
 
 
+def build_trg001(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
+    """Tiny project with the standard-code-review skill deployed for activation cases."""
+    repo = parent / "trg-001-standard-code-review-triggers"
+    _init_repo(
+        repo,
+        worktree,
+        revision,
+        features=["code-review"],
+        stacks=["typescript"],
+        render=render,
+        agents=["kilo"],
+    )
+    _write(
+        repo / "src" / "greet.ts",
+        "export function greet(name: string): string {\n  return `Hello, ${name}!`;\n}\n",
+    )
+    _write(
+        repo / "src" / "volume.ts",
+        "export const shout = (text: string): string => text.toUpperCase();\n",
+    )
+    _git(repo, "add", "-A")
+    return repo
+
+
 def _init_repo(
     repo: Path,
     worktree: Path,
@@ -232,17 +256,20 @@ def _init_repo(
     features: list[str],
     stacks: list[str],
     render: RenderFn,
+    agents: list[str] | None = None,
 ) -> None:
     repo.mkdir(parents=True)
-    _write(repo / "ai.project.toml", _manifest(revision, features, stacks))
+    _write(repo / "ai.project.toml", _manifest(revision, features, stacks, agents or []))
     _write(repo / "ai" / "project-rules.md", _project_rules())
     render(worktree, repo, revision)
+    if agents:
+        sync_templates(worktree, repo, revision)
     _git(repo, "init", "-q", "-b", "main")
     _git(repo, "add", "-A")
     _git(repo, "commit", "-q", "-m", "chore: project scaffolding")
 
 
-def _manifest(revision: str, features: list[str], stacks: list[str]) -> str:
+def _manifest(revision: str, features: list[str], stacks: list[str], agents: list[str]) -> str:
     return (
         f'ai_standards_version = "{revision}"\n'
         "\n"
@@ -255,7 +282,7 @@ def _manifest(revision: str, features: list[str], stacks: list[str]) -> str:
         f"local_overrides = {json.dumps(['ai/project-rules.md'])}\n"
         "\n"
         "[tooling]\n"
-        "agents = []\n"
+        f"agents = {json.dumps(agents)}\n"
         "\n"
         "[metadata]\n"
         'project_name = "eval-fixture"\n'

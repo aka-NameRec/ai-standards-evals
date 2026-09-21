@@ -1,0 +1,10 @@
+{
+  "index": 12,
+  "prompt": "code review, but skip the standard stuff",
+  "expected_should_trigger": false,
+  "engaged": false,
+  "skill_seen": false,
+  "ok": true,
+  "note": "",
+  "duration_seconds": 114.3
+}

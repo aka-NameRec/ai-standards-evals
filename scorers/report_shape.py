@@ -93,15 +93,17 @@ def check(report: str) -> ShapeCheck:
     """Check the invariants every review report must satisfy."""
     locale = _select_locale(report)
     failures: list[str] = []
-    headings = [match.group(1).strip() for match in _HEADING.finditer(report)]
+    marks = _section_marks(report, locale.required_sections)
+    found = {name for name, _, _ in marks}
     positions: list[int] = []
     for section in locale.required_sections:
-        if section not in headings:
+        if section not in found:
             failures.append(f"missing section: {section}")
         else:
-            positions.append(headings.index(section))
+            positions.append(next(pos for name, pos, _ in marks if name == section))
     if positions != sorted(positions):
         failures.append("required sections are out of order")
+    headings = [match.group(1).strip() for match in _HEADING.finditer(report)]
     for heading in headings:
         if locale.forbidden_heading.search(heading):
             failures.append(f"forbidden heading: {heading}")
@@ -115,8 +117,10 @@ def check_no_padding(report: str) -> ShapeCheck:
     locale = _select_locale(report)
     base = check(report)
     failures = list(base.failures)
+    section_names = set(locale.required_sections) | set(locale.finding_sections)
+    marks = _section_marks(report, tuple(section_names))
     for section in locale.finding_sections:
-        body = _section_body(report, section)
+        body = _body(report, marks, section)
         if not body.strip():
             failures.append(f"empty section body: {section}")
             continue
@@ -126,25 +130,56 @@ def check_no_padding(report: str) -> ShapeCheck:
         if locale.honest_empty not in body:
             failures.append(f"{section} does not state '{locale.honest_empty}' for a clean change")
     for section in locale.prose_sections:
-        if not _section_body(report, section).strip():
+        if not _body(report, marks, section).strip():
             failures.append(f"empty section body: {section}")
     return ShapeCheck(ok=not failures, failures=tuple(failures))
 
 
 def _select_locale(report: str) -> _Locale:
     """Pick the locale whose section vocabulary matches the report best."""
-    headings = {match.group(1).strip() for match in _HEADING.finditer(report)}
+    names = set(_LOCALE_EN.required_sections) | set(_LOCALE_RU.required_sections)
+    found = {name for name in names if _section_marks(report, (name,))}
     return max(
         _LOCALES,
-        key=lambda locale: sum(section in headings for section in locale.required_sections),
+        key=lambda locale: sum(section in found for section in locale.required_sections),
     )
 
 
-def _section_body(report: str, section: str) -> str:
-    pattern = re.compile(rf"^#{{2,3}}\s+{re.escape(section)}\s*$", re.MULTILINE)
-    match = pattern.search(report)
+def _section_marks(report: str, names: tuple[str, ...]) -> list[tuple[str, int, int]]:
+    """Locate section starts.
+
+    A section may be rendered as a heading (``## Name``), a label (``Name:``),
+    or a bare name line (``Name``); invariants judge the outcome, never the
+    wording (scenario-format contract).
+    """
+    marks: list[tuple[str, int, int]] = []
+    for name in set(names):
+        escaped = re.escape(name)
+        for pattern in (rf"^#{{2,3}}\s+{escaped}\s*$", rf"^{escaped}:", rf"^{escaped}\s*$"):
+            match = re.search(pattern, report, re.MULTILINE)
+            if match is not None:
+                marks.append((name, match.start(), match.end()))
+    return sorted(marks, key=lambda mark: mark[1])
+
+
+def _body(report: str, marks: list[tuple[str, int, int]], section: str) -> str:
+    match = next(((start, end) for name, start, end in marks if name == section), None)
     if match is None:
         return ""
-    next_heading = _ANY_HEADING.search(report, match.end())
-    end = next_heading.start() if next_heading else len(report)
-    return report[match.end() : end]
+    _, end = match
+    following = [start for _, start, _ in marks if start > end]
+    next_heading = _ANY_HEADING.search(report, end)
+    if next_heading is not None:
+        following.append(next_heading.start())
+    boundary = min(following) if following else len(report)
+    return report[end:boundary]
+
+
+def _section_body(report: str, section: str) -> str:
+    locale = _select_locale(report)
+    names = tuple(
+        dict.fromkeys(
+            locale.required_sections + locale.finding_sections + locale.prose_sections
+        )
+    )
+    return _body(report, _section_marks(report, names), section)

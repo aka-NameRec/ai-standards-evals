@@ -1,0 +1,10 @@
+{
+  "index": 3,
+  "prompt": "«сделай ревью по стандарту»",
+  "expected_should_trigger": true,
+  "engaged": true,
+  "skill_seen": true,
+  "ok": true,
+  "note": "",
+  "duration_seconds": 168.2
+}
