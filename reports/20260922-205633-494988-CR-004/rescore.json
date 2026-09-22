@@ -1,0 +1,8 @@
+{
+  "rescored_with": "current scorer (pre-run diff snapshot)",
+  "original_verdict": "FAIL",
+  "scenario_id": "CR-004",
+  "ok": true,
+  "failures": [],
+  "note": "grader compared scope against the post-agent tree; the agent's compliant small fix reverted the file to its HEAD state, emptying the working diff"
+}

@@ -83,15 +83,16 @@ def run_scenario(
             report_path=report_path,
             fixture_path=None,
         )
+    # Snapshot the reviewed diff BEFORE the agent runs: a compliant agent may
+    # mutate the tree (small fixes revert files to their HEAD state), and the
+    # scope judgment must stay anchored to the diff the agent was given.
+    reviewed_diff = changed_files(fixture_path)
     result = adapter.run(scenario.prompt, fixture_path, scenario.scenario_id)
     (run_dir / "agent-stdout.jsonl").write_text(result.stdout, encoding="utf-8")
     (run_dir / "agent-stderr.log").write_text(result.stderr, encoding="utf-8")
     report = result.answer.strip()
     report_path = run_dir / "report.md"
     report_path.write_text(report, encoding="utf-8")
-    # Snapshot the reviewed diff BEFORE scoring: the agent may mutate the tree
-    # (small fixes, git operations), and scope judgments must not move with it.
-    reviewed_diff = changed_files(fixture_path)
     check = score_scenario(scenario.scenario_id, report, reviewed_diff)
     verdict = ScenarioVerdict(
         scenario_id=scenario.scenario_id,
