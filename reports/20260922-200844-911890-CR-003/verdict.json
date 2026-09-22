@@ -1,0 +1,24 @@
+{
+  "scenario_id": "CR-003",
+  "ok": true,
+  "failures": [],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 108.4,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "rules-change/18-m1-skill-reference-procedure",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/20260922-200844-911890-CR-003/fixture/cr-003-pre-existing-defect-in-fixture",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CR-003",
+    "code review"
+  ]
+}

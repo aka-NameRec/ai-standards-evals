@@ -1,0 +1,66 @@
+{
+  "kind": "run-comparison",
+  "baseline_revision": "rules-change/18-eval-scenario-contracts",
+  "candidate_revision": "rules-change/18-m1-skill-reference-procedure",
+  "generated": "20260922-202347",
+  "verdict": "REJECT",
+  "downgrades": [
+    "CR-009: PASS -> NO RUNS"
+  ],
+  "rows": [
+    {
+      "scenario": "CR-001",
+      "baseline": "PASS",
+      "candidate": "PASS",
+      "delta": "same"
+    },
+    {
+      "scenario": "CR-002",
+      "baseline": "PASS",
+      "candidate": "PASS",
+      "delta": "same"
+    },
+    {
+      "scenario": "CR-003",
+      "baseline": "PASS",
+      "candidate": "PASS",
+      "delta": "same"
+    },
+    {
+      "scenario": "CR-004",
+      "baseline": "PASS",
+      "candidate": "PASS",
+      "delta": "same"
+    },
+    {
+      "scenario": "CR-005",
+      "baseline": "MIXED",
+      "candidate": "PASS",
+      "delta": "upgrade"
+    },
+    {
+      "scenario": "CR-006",
+      "baseline": "MIXED",
+      "candidate": "PASS",
+      "delta": "upgrade"
+    },
+    {
+      "scenario": "CR-007",
+      "baseline": "PASS",
+      "candidate": "PASS",
+      "delta": "same"
+    },
+    {
+      "scenario": "CR-008",
+      "baseline": "MIXED",
+      "candidate": "PASS",
+      "delta": "upgrade"
+    },
+    {
+      "scenario": "CR-009",
+      "baseline": "PASS",
+      "candidate": "NO RUNS",
+      "delta": "downgrade"
+    }
+  ]
+}
