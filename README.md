@@ -70,9 +70,9 @@ docs/        — cross-repo flow, авторство evals, guidelines для sc
   и двуязычный (EN/RU) механический скорер формы отчёта (`scorers/`).
 
 Результаты baseline: **2 эпохи × 9 сценариев** (18 прогонов, модель
-`zai-coding-plan/glm-5.3-flash`, ревизия — ветка контрактов
-`rules-change/18-eval-scenario-contracts`; эпоха 1 — прогон через Inspect,
-добор эпохи 2 — тем же пайплайном после прерывания процесса средой):
+`zai-coding-plan/glm-5.3-flash`, ревизия — контракты CR-004+ из
+`ai-standards@main`; эпоха 1 — прогон через Inspect, добор эпохи 2 — тем же
+пайплайном после прерывания процесса средой):
 
 | Сценарий | Эпохи | Итог |
 |---|---|---|
@@ -97,8 +97,7 @@ CR-004/CR-009; форма отчёта дрейфует (четыре приня
 дня — `reports/20260921-*`.
 
 Дальше: cross-agent колонки (claude/codex/cursor) включатся автоматически при
-установке соответствующих CLI; слияние ветки контрактов в `main`
-`ai-standards`.
+установке соответствующих CLI.
 
 ## Запуск
 
@@ -112,13 +111,13 @@ uv run python -m scripts.run_scenario CR-002
 
 ```bash
 uv run inspect eval evals/code_review.py::code_review_suite \
-  -T revision=rules-change/18-eval-scenario-contracts \
+  -T revision=main \
   --epochs 2 --model mockllm/model
 ```
 
 Ревизия по умолчанию берётся из `config.toml` (пин релиза); на пине 2.5.0 набор
 покрывает CR-001..CR-003, полные девять сценариев требуют ревизии с контрактами
-CR-004+ (ветка контрактов и потомки). Активационные триггер-сеты:
+CR-004+ (в `ai-standards@main` с 5c12483). Активационные триггер-сеты:
 
 ```bash
 uv run python -m scripts.run_triggers TRG-001
