@@ -1,0 +1,92 @@
+{
+  "kind": "release-report",
+  "verdict": "FAIL",
+  "standards_revision": "rules-change/18-eval-scenario-contracts",
+  "min_runs": 1,
+  "blocking": [
+    {
+      "scenario_id": "CR-005",
+      "verdict": "MIXED",
+      "runs": 3,
+      "required_min_runs": 1
+    },
+    {
+      "scenario_id": "CR-006",
+      "verdict": "MIXED",
+      "runs": 3,
+      "required_min_runs": 1
+    },
+    {
+      "scenario_id": "CR-008",
+      "verdict": "MIXED",
+      "runs": 3,
+      "required_min_runs": 1
+    }
+  ],
+  "waivers": {},
+  "scenarios": {
+    "CR-001": {
+      "verdict": "PASS",
+      "runs": 2,
+      "passed": 2,
+      "waived": null,
+      "ok": true
+    },
+    "CR-002": {
+      "verdict": "PASS",
+      "runs": 2,
+      "passed": 2,
+      "waived": null,
+      "ok": true
+    },
+    "CR-003": {
+      "verdict": "PASS",
+      "runs": 2,
+      "passed": 2,
+      "waived": null,
+      "ok": true
+    },
+    "CR-004": {
+      "verdict": "PASS",
+      "runs": 3,
+      "passed": 3,
+      "waived": null,
+      "ok": true
+    },
+    "CR-005": {
+      "verdict": "MIXED",
+      "runs": 3,
+      "passed": 2,
+      "waived": null,
+      "ok": false
+    },
+    "CR-006": {
+      "verdict": "MIXED",
+      "runs": 3,
+      "passed": 1,
+      "waived": null,
+      "ok": false
+    },
+    "CR-007": {
+      "verdict": "PASS",
+      "runs": 3,
+      "passed": 3,
+      "waived": null,
+      "ok": true
+    },
+    "CR-008": {
+      "verdict": "MIXED",
+      "runs": 3,
+      "passed": 2,
+      "waived": null,
+      "ok": false
+    },
+    "CR-009": {
+      "verdict": "PASS",
+      "runs": 3,
+      "passed": 3,
+      "waived": null,
+      "ok": true
+    }
+  }
+}

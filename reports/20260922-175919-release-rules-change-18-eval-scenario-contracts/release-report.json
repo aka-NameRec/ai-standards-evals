@@ -1,0 +1,77 @@
+{
+  "kind": "release-report",
+  "verdict": "PASS",
+  "standards_revision": "rules-change/18-eval-scenario-contracts",
+  "min_runs": 1,
+  "blocking": [],
+  "waivers": {
+    "CR-005": "section-order drift, tracked as CR-006 class signal",
+    "CR-006": "section-order drift, systematic; fix planned",
+    "CR-008": "fabricated verification claim; grader update planned"
+  },
+  "scenarios": {
+    "CR-001": {
+      "verdict": "PASS",
+      "runs": 2,
+      "passed": 2,
+      "waived": null,
+      "ok": true
+    },
+    "CR-002": {
+      "verdict": "PASS",
+      "runs": 2,
+      "passed": 2,
+      "waived": null,
+      "ok": true
+    },
+    "CR-003": {
+      "verdict": "PASS",
+      "runs": 2,
+      "passed": 2,
+      "waived": null,
+      "ok": true
+    },
+    "CR-004": {
+      "verdict": "PASS",
+      "runs": 3,
+      "passed": 3,
+      "waived": null,
+      "ok": true
+    },
+    "CR-005": {
+      "verdict": "MIXED",
+      "runs": 3,
+      "passed": 2,
+      "waived": "section-order drift, tracked as CR-006 class signal",
+      "ok": true
+    },
+    "CR-006": {
+      "verdict": "MIXED",
+      "runs": 3,
+      "passed": 1,
+      "waived": "section-order drift, systematic; fix planned",
+      "ok": true
+    },
+    "CR-007": {
+      "verdict": "PASS",
+      "runs": 3,
+      "passed": 3,
+      "waived": null,
+      "ok": true
+    },
+    "CR-008": {
+      "verdict": "MIXED",
+      "runs": 3,
+      "passed": 2,
+      "waived": "fabricated verification claim; grader update planned",
+      "ok": true
+    },
+    "CR-009": {
+      "verdict": "PASS",
+      "runs": 3,
+      "passed": 3,
+      "waived": null,
+      "ok": true
+    }
+  }
+}
