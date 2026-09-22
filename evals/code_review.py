@@ -1,47 +1,113 @@
-"""Inspect AI task wiring for the code-review behavioral suite (v0.1 slice)."""
+"""Inspect AI task wiring for the code-review behavioral suite."""
 
 from __future__ import annotations
 
+import sys
+from dataclasses import replace
 from datetime import UTC, datetime
 from pathlib import Path
 
-from inspect_ai import Task, task
-from inspect_ai.dataset import Sample
-from inspect_ai.scorer import CORRECT, INCORRECT, Score, Scorer, Target, accuracy, scorer
-from inspect_ai.solver import Generate, Solver, TaskState, solver
+_BOOTSTRAP = Path(__file__).resolve().parents[1]
+if str(_BOOTSTRAP) not in sys.path:
+    sys.path.insert(0, str(_BOOTSTRAP))
 
-from agents.kilo import KiloAdapter
-from scripts.config import EvalConfig, load_config
-from scripts.pipeline import run_scenario, score_scenario
-from scripts.standards import index_scenarios, resolve_standards_checkout
+from inspect_ai import Task, task  # noqa: E402
+from inspect_ai.dataset import Sample  # noqa: E402
+from inspect_ai.scorer import (  # noqa: E402
+    CORRECT,
+    INCORRECT,
+    Score,
+    Scorer,
+    Target,
+    accuracy,
+    scorer,
+)
+from inspect_ai.solver import Generate, Solver, TaskState, solver  # noqa: E402
 
-DEFAULT_SCENARIO = "CR-002"
+from agents.kilo import KiloAdapter  # noqa: E402
+from scripts.config import EvalConfig, load_config  # noqa: E402
+from scripts.pipeline import run_scenario  # noqa: E402
+from scripts.standards import (  # noqa: E402
+    KIND_BEHAVIOR,
+    index_scenarios,
+    resolve_standards_checkout,
+)
 
 
 @task
-def code_review(scenario_id: str = DEFAULT_SCENARIO, config_path: str = "config.toml") -> Task:
-    """Run one behavioral scenario through the Kilo adapter and score the report shape."""
-    config = load_config(Path(config_path))
+def code_review(
+    scenario_id: str = "CR-002",
+    config_path: str = "config.toml",
+    revision: str | None = None,
+) -> Task:
+    """Run one behavioral scenario through the Kilo adapter."""
+    config = _config(config_path, revision)
     return Task(
         dataset=[
             Sample(
                 input=f"Execute behavioral scenario {scenario_id} against the pinned standards.",
+                id=scenario_id,
                 metadata={"scenario_id": scenario_id},
             )
         ],
-        solver=_review_solver(config, scenario_id),
-        scorer=_report_scorer(scenario_id),
+        solver=_review_solver(config),
+        scorer=_verdict_scorer(),
     )
 
 
+@task
+def code_review_suite(config_path: str = "config.toml", revision: str | None = None) -> Task:
+    """Run every CR behavior scenario of the revision; pass --epochs for trials.
+
+    Note: scenarios CR-004 and later exist only in revisions that carry the
+    eval-scenario contracts (branch ``rules-change/18-eval-scenario-contracts``
+    and descendants); the released 2.5.0 pin covers CR-001..CR-003.
+    """
+    config = _config(config_path, revision)
+    with resolve_standards_checkout(config) as worktree:
+        scenarios = sorted(
+            (
+                scenario
+                for scenario in index_scenarios(worktree).values()
+                if scenario.kind == KIND_BEHAVIOR and scenario.scenario_id.startswith("CR-")
+            ),
+            key=lambda scenario: scenario.scenario_id,
+        )
+    if not scenarios:
+        msg = "no CR behavior scenarios found in the revision"
+        raise ValueError(msg)
+    dataset = [
+        Sample(
+            input=f"Execute behavioral scenario {scenario.scenario_id}.",
+            id=scenario.scenario_id,
+            metadata={"scenario_id": scenario.scenario_id},
+        )
+        for scenario in scenarios
+    ]
+    return Task(dataset=dataset, solver=_review_solver(config), scorer=_verdict_scorer())
+
+
+def _config(config_path: str, revision: str | None) -> EvalConfig:
+    path = Path(config_path)
+    if not path.is_absolute():
+        # inspect changes cwd to the task file's directory during loading;
+        # keep configuration and artifacts anchored at the repository root.
+        path = _BOOTSTRAP / path
+    config = load_config(path)
+    if revision is not None:
+        config = replace(config, standards_revision=revision)
+    return config
+
+
 @solver
-def _review_solver(config: EvalConfig, scenario_id: str) -> Solver:
+def _review_solver(config: EvalConfig) -> Solver:
     async def solve(state: TaskState, generate: Generate) -> TaskState:
+        scenario_id = str(state.metadata["scenario_id"])
         adapter = KiloAdapter(model=config.model, timeout_seconds=config.timeout_seconds)
         with resolve_standards_checkout(config) as worktree:
             scenario = index_scenarios(worktree)[scenario_id]
-            stamp = datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
-            run_dir = Path("reports") / f"{stamp}-{scenario_id}"
+            stamp = datetime.now(UTC).strftime("%Y%m%d-%H%M%S-%f")
+            run_dir = _BOOTSTRAP / "reports" / f"{stamp}-{scenario_id}"
             verdict = run_scenario(config, worktree, adapter, scenario, run_dir)
         state.output.completion = verdict.report_path.read_text(encoding="utf-8")
         state.metadata["verdict"] = {"ok": verdict.ok, "failures": list(verdict.failures)}
@@ -54,18 +120,16 @@ def _review_solver(config: EvalConfig, scenario_id: str) -> Solver:
 
 
 @scorer(metrics=[accuracy()])
-def _report_scorer(scenario_id: str) -> Scorer:
+def _verdict_scorer() -> Scorer:
     async def score(state: TaskState, target: Target) -> Score:
-        fixture_raw = state.metadata.get("fixture_path")
-        fixture_path = Path(fixture_raw) if fixture_raw else None
-        check = score_scenario(scenario_id, state.output.completion, fixture_path)
+        verdict = state.metadata.get("verdict", {})
+        ok = bool(verdict.get("ok"))
+        failures = list(verdict.get("failures", []))
         return Score(
-            value=CORRECT if check.ok else INCORRECT,
-            answer="shape satisfied" if check.ok else "; ".join(check.failures),
+            value=CORRECT if ok else INCORRECT,
+            answer="shape satisfied" if ok else "; ".join(failures),
             explanation=(
-                "; ".join(check.failures)
-                if check.failures
-                else "report shape satisfies the scenario invariants"
+                "; ".join(failures) if failures else "report satisfies the scenario invariants"
             ),
         )
 

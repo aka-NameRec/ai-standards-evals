@@ -3,15 +3,10 @@
 from __future__ import annotations
 
 import json
-import subprocess
-import time
+import shutil
 from pathlib import Path
 
-from agents.base import AgentResult
-
-
-class AgentRunError(RuntimeError):
-    """Raised when the agent invocation fails to complete."""
+from agents.base import AgentResult, AgentRunError, run_agent_command
 
 
 class KiloAdapter:
@@ -23,6 +18,11 @@ class KiloAdapter:
         self.model = model
         self.variant = variant
         self.timeout_seconds = timeout_seconds
+
+    @staticmethod
+    def is_available() -> bool:
+        """True when the CLI is installed and on PATH."""
+        return shutil.which("kilo") is not None
 
     def build_command(self, prompt: str, cwd: Path, scenario_id: str) -> list[str]:
         """Build the argv for one non-interactive run."""
@@ -46,26 +46,17 @@ class KiloAdapter:
     def run(self, prompt: str, cwd: Path, scenario_id: str) -> AgentResult:
         """Execute the prompt and capture stdout, stderr, and the extracted answer."""
         command = self.build_command(prompt, cwd, scenario_id)
-        started = time.monotonic()
-        try:
-            result = subprocess.run(
-                command,
-                capture_output=True,
-                text=True,
-                timeout=self.timeout_seconds,
-                check=False,
-            )
-        except subprocess.TimeoutExpired as error:
-            msg = f"kilo run timed out after {self.timeout_seconds}s in {cwd}"
-            raise AgentRunError(msg) from error
-        duration = time.monotonic() - started
+        result = run_agent_command(self.name, command, cwd, self.timeout_seconds)
+        if result.returncode != 0 and not result.stdout:
+            msg = f"kilo run failed with code {result.returncode}: {result.stderr[:400]}"
+            raise AgentRunError(msg)
         return AgentResult(
-            adapter=self.name,
-            command=tuple(command),
+            adapter=result.adapter,
+            command=result.command,
             returncode=result.returncode,
             stdout=result.stdout,
             stderr=result.stderr,
-            duration_seconds=duration,
+            duration_seconds=result.duration_seconds,
             answer=extract_answer(result.stdout),
         )
 

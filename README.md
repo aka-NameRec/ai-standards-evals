@@ -69,30 +69,72 @@ docs/        — cross-repo flow, авторство evals, guidelines для sc
 - структурный грейдер находок (маркеры, локации, границы диффа, pre-existing-метки)
   и двуязычный (EN/RU) механический скорер формы отчёта (`scorers/`).
 
-Результаты baseline-прогонов (модель `zai-coding-plan/glm-5.3-flash`; CR-004–CR-009 —
-на ветке контрактов `rules-change/18-eval-scenario-contracts`):
+Результаты baseline: **2 эпохи × 9 сценариев** (18 прогонов, модель
+`zai-coding-plan/glm-5.3-flash`, ревизия — ветка контрактов
+`rules-change/18-eval-scenario-contracts`; эпоха 1 — прогон через Inspect,
+добор эпохи 2 — тем же пайплайном после прерывания процесса средой):
 
-| Сценарий | Вердикт | Артефакты |
+| Сценарий | Эпохи | Итог |
 |---|---|---|
-| CR-001 reuse | PASS (1 из 3 прогонов — промах по находке: `reports/20260921-065815-CR-001`) | `reports/20260921-070237-CR-001` |
-| CR-002 no-padding control | PASS | `reports/20260921-063453-CR-002` |
-| CR-003 pre-existing defect | PASS | `reports/20260921-071158-CR-003` |
-| CR-004 correctness defect | PASS | `reports/20260921-103017-CR-004` |
-| CR-005 internal duplication | FAIL — порядок секций нарушен (Reuse раньше Корректности) | `reports/20260921-103251-CR-005` |
-| CR-006 architecture decision | PASS | `reports/20260921-103413-CR-006` |
-| CR-007 apparent violation | PASS | `reports/20260921-103614-CR-007` |
-| CR-008 verification honesty | PASS | `reports/20260921-103830-CR-008` |
-| CR-009 error-path coverage | PASS | `reports/20260921-104040-CR-009` |
-| TRG-001 активация skill | 12/12 PASS | `reports/20260921-072206-TRG-001` |
+| CR-001 reuse | 2/2 | PASS |
+| CR-002 no-padding control | 2/2 | PASS |
+| CR-003 pre-existing defect | 2/2 | PASS |
+| CR-004 correctness defect | 2/2 | PASS (агент применил исправление и записал ✅) |
+| CR-005 internal duplication | 2/2 | PASS |
+| CR-006 architecture decision | 0/2 | FAIL — порядок секций нарушен в обоих прогонах (систематический сигнал) |
+| CR-007 apparent violation | 2/2 | PASS |
+| CR-008 verification honesty | 1/2 | MIXED — «1 passed» при структурно неисполняемом наборе не раскрыт (fabrication-сигнал) |
+| CR-009 error-path coverage | 2/2 | PASS (small-fix: тест добавлен, ✅ с прогоном) |
+| TRG-001 активация skill | 12/12 | PASS |
 
-Сигналы baseline: дрейф формы отчёта между прогонами (четыре формы рендера секций;
-порядок секций проверяется строго — CR-005 поймал реальное нарушение); в CR-009 агент
-применил small-fix политику (добавил тест, записал ✅ с прогоном); в CR-006/CR-008
-находки ссылаются на ADR-004 и честно сообщают о неисполняемом наборе тестов.
+Сигналы baseline: систематическое нарушение порядка секций в CR-006; единичный
+случай недостоверной верификации в CR-008; стабильное мал-fix поведение в
+CR-004/CR-009; форма отчёта дрейфует (четыре принятые формы рендера).
+Порядок секций нормативен — см. `docs/scorer-guidelines.md`.
 
-Дальше: Inspect-интеграция полного набора с повторными trials, cross-agent проверка,
-слияние ветки контрактов `CR-004`–`CR-009` в `main` `ai-standards` по решению
-пользователя.
+Артефакты прогонов — `reports/20260922-*` (верdict.json прогона + rescore.json
+текущим скорером там, где грейдер менялся); артефакты 2.5.0-прогонов вчерашнего
+дня — `reports/20260921-*`.
+
+Дальше: cross-agent колонки (claude/codex/cursor) включатся автоматически при
+установке соответствующих CLI; слияние ветки контрактов в `main`
+`ai-standards`.
+
+## Запуск
+
+Один сценарий сквозным прогоном:
+
+```bash
+uv run python -m scripts.run_scenario CR-002
+```
+
+Полный набор через Inspect AI с повторными trials (18 прогонов при `--epochs 2`):
+
+```bash
+uv run inspect eval evals/code_review.py::code_review_suite \
+  -T revision=rules-change/18-eval-scenario-contracts \
+  --epochs 2 --model mockllm/model
+```
+
+Ревизия по умолчанию берётся из `config.toml` (пин релиза); на пине 2.5.0 набор
+покрывает CR-001..CR-003, полные девять сценариев требуют ревизии с контрактами
+CR-004+ (ветка контрактов и потомки). Активационные триггер-сеты:
+
+```bash
+uv run python -m scripts.run_triggers TRG-001
+```
+
+## Cross-agent матрица
+
+Адаптеры: `kilo`, `claude`, `codex`, `cursor` (`agents/`); реестр
+автоматически определяет установленные CLI. Матрица «сценарий × агент»:
+
+```bash
+uv run python -m scripts.run_matrix --revision <revision> [--adapters kilo,claude]
+```
+
+Сейчас локально установлен только Kilo — остальные колонки помечаются `n/a`
+и включаются в прогон автоматически, как только появятся их CLI.
 
 ## Инструменты
 

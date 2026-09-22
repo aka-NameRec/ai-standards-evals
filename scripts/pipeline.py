@@ -10,6 +10,7 @@ from agents.base import AgentAdapter
 from scorers import report_shape, review_findings
 from scripts.config import EvalConfig
 from scripts.fixtures import build_fixture
+from scripts.oracle import changed_files
 from scripts.standards import Scenario
 
 NO_FIXTURE_NOTE = "scenario has no deterministic fixture builder yet"
@@ -30,14 +31,18 @@ _SCENARIO_CHECKS = {
 def score_scenario(
     scenario_id: str,
     report: str,
-    fixture_path: Path | None,
+    changed: set[str],
 ) -> report_shape.ShapeCheck:
-    """Dispatch the strongest mechanical scorer available for the scenario."""
+    """Dispatch the strongest mechanical scorer available for the scenario.
+
+    ``changed`` is the reviewed diff snapshot taken before the agent runs, so
+    scope judgments never depend on tree mutations the agent may make.
+    """
     if scenario_id == "CR-002":
         return report_shape.check_no_padding(report)
     check = _SCENARIO_CHECKS.get(scenario_id)
-    if check is not None and fixture_path is not None:
-        return check(report, fixture_path)
+    if check is not None:
+        return check(report, changed)
     return report_shape.check(report)
 
 
@@ -84,7 +89,10 @@ def run_scenario(
     report = result.answer.strip()
     report_path = run_dir / "report.md"
     report_path.write_text(report, encoding="utf-8")
-    check = score_scenario(scenario.scenario_id, report, fixture_path)
+    # Snapshot the reviewed diff BEFORE scoring: the agent may mutate the tree
+    # (small fixes, git operations), and scope judgments must not move with it.
+    reviewed_diff = changed_files(fixture_path)
+    check = score_scenario(scenario.scenario_id, report, reviewed_diff)
     verdict = ScenarioVerdict(
         scenario_id=scenario.scenario_id,
         ok=check.ok,

@@ -1,0 +1,8 @@
+{
+  "rescored_with": "current scorer (diff snapshot, section forms EN/RU, bullets, file-only locations)",
+  "original_verdict": "FAIL",
+  "scenario_id": "CR-007",
+  "ok": true,
+  "failures": [],
+  "note": "original FAIL (missing sections), rescore PASS: bold-label section form with inline body"
+}

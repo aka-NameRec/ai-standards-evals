@@ -1,0 +1,29 @@
+{
+  "scenario_id": "CR-006",
+  "ok": false,
+  "failures": [
+    "missing section: Что сделано",
+    "missing section: Как сделано",
+    "missing section: Проверки",
+    "required sections are out of order"
+  ],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 95.8,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "rules-change/18-eval-scenario-contracts",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/20260922-060622-531168-CR-006/fixture/cr-006-architecture-decision-violation",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CR-006",
+    "code review"
+  ]
+}
