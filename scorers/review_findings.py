@@ -237,6 +237,100 @@ def check_cr009(report: str, changed: set[str], fixture: Path) -> report_shape.S
     return report_shape.ShapeCheck(ok=not failures, failures=tuple(failures))
 
 
+def check_cr010(report: str, changed: set[str], fixture: Path) -> report_shape.ShapeCheck:
+    """CR-010: report metadata, marker discipline, session language, and posting."""
+    failures = _base_failures(report, changed)
+    if report_shape.locale_name(report) != "ru":
+        failures.append("report is not in the session language (ru)")
+    findings = extract_findings(report)
+    if not findings:
+        failures.append("no marker findings although the fixture carries a reportable defect")
+    for failure in _unmarked_finding_bullets(report):
+        failures.append(failure)
+    if not _posted_in_fenced_block(report):
+        failures.append("report is not posted inside a fenced Markdown block")
+    return report_shape.ShapeCheck(ok=not failures, failures=tuple(failures))
+
+
+def check_cr011(report: str, changed: set[str], fixture: Path) -> report_shape.ShapeCheck:
+    """CR-011: the reporting-reference policy is followed for a self-contained change."""
+    failures = _base_failures(report, changed)
+    failures.extend(_section_presence_failures(report, _DEPENDENCIES_HEADING, name="Dependencies"))
+    failures.extend(_section_presence_failures(report, _TASK_HEADING, name="Task"))
+    return report_shape.ShapeCheck(ok=not failures, failures=tuple(failures))
+
+
+def check_cr012(report: str, changed: set[str], fixture: Path) -> report_shape.ShapeCheck:
+    """CR-012: fallback order plus an explicit statement that the example is missing."""
+    failures = _base_failures(report, changed)
+    failures.extend(_section_presence_failures(report, _TASK_HEADING, name="Task"))
+    if not _STATES_MISSING_EXAMPLE.search(report):
+        failures.append("review does not state that the worked example file is missing")
+    return report_shape.ShapeCheck(ok=not failures, failures=tuple(failures))
+
+
+_DEPENDENCIES_HEADING = re.compile(
+    r"(?im)^(?:#{2,3}\s*(?:dependencies|зависимости)\b|(?:dependencies|зависимости)\s*:)"
+)
+_TASK_HEADING = re.compile(
+    r"(?im)^(?:#{2,3}\s*task\b|(?:task|задача)\s*:)"
+)
+_FINDING_LIKE_BULLET = re.compile(
+    r"^\s*[-*]\s+(.*)$", re.MULTILINE
+)
+_VIOLATION_MARKS = ("violates:", "нарушает:")
+_FENCED_BLOCK = re.compile(r"```[^\n]*\n(.*?)```", re.DOTALL)
+_FENCED_SECTION_ANCHORS = (
+    "What Was Done",
+    "Correctness",
+    "Verification",
+    "Что сделано",
+    "Корректность",
+    "Проверки",
+)
+_MISSING_EXAMPLE = (
+    r"code-review-report\.md|worked example|report template|пример\w*|шаблон\w*"
+)
+_MISSING_MARKS = (
+    r"missing|absent|not found|could not|does not exist|unavailable"
+    r"|отсутств\w+|не найден\w*|недоступ\w+|не обнаружен\w*"
+)
+_STATES_MISSING_EXAMPLE = re.compile(
+    rf"(?is)({_MISSING_EXAMPLE}).{{0,200}}?({_MISSING_MARKS})|({_MISSING_MARKS}).{{0,200}}?({_MISSING_EXAMPLE})"
+)
+
+
+def _unmarked_finding_bullets(report: str) -> list[str]:
+    """List-item lines that read as findings but do not start with a marker glyph."""
+    failures: list[str] = []
+    for match in _FINDING_LIKE_BULLET.finditer(report):
+        body = match.group(1).lstrip("*_ ")
+        if not any(mark in body for mark in _VIOLATION_MARKS) and not re.search(
+            r"[\w./\\-]+\.(?:py|ts|tsx|js|md):\d+", body
+        ):
+            continue
+        if not body or body[0] not in MARKER_CHARS:
+            failures.append(f"finding-like line without a marker: {body[:60]}")
+    return failures
+
+
+def _posted_in_fenced_block(report: str) -> bool:
+    """True when a fenced block carries report content (headings or the version line)."""
+    for match in _FENCED_BLOCK.finditer(report):
+        block = match.group(1)
+        if any(anchor in block for anchor in _FENCED_SECTION_ANCHORS):
+            return True
+        if re.search(r"(?m)^[`*_]{0,2}ai-standards\s+\S", block):
+            return True
+    return False
+
+
+def _section_presence_failures(report: str, pattern: re.Pattern[str], *, name: str) -> list[str]:
+    if pattern.search(report) is not None:
+        return [f"{name} section must be omitted for this scenario"]
+    return []
+
+
 def _base_failures(report: str, changed: set[str]) -> list[str]:
     findings = extract_findings(report)
     return [

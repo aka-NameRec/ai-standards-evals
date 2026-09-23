@@ -13,6 +13,9 @@ from scorers.review_findings import (
     check_cr007,
     check_cr008,
     check_cr009,
+    check_cr010,
+    check_cr011,
+    check_cr012,
     extract_findings,
 )
 from scripts.git_utils import run_git
@@ -407,3 +410,130 @@ def _changed(repo: Path, *paths: str) -> set[str]:
         full.write_text(_CANDIDATE_CONTENTS.get(path, "// candidate\n"), encoding="utf-8")
     run_git(repo, "add", "-A")
     return set(paths)
+
+
+# --- CR-010 / CR-011 / CR-012 (issue #22, M4 protection) ---------------------
+
+def _ru_report(findings: str, *, fenced: bool = False, dependencies: str = "") -> str:
+    """Well-shaped Russian report with the given Correctness body."""
+    inner = (
+        "ai-standards 2.6.0-2026-09-23\n\n"
+        "Задача: неизвестна\n\n"
+        "## Что сделано\n\nПравило валидации границ изменено.\n\n"
+        "## Как сделано\n\nЧтение дифа и окружающего кода; тесты не запускались.\n\n"
+        "## Корректность\n\n"
+        + findings
+        + "\n\n## Архитектура и конвенции\n\nНе найдено.\n\n"
+        "## Переиспользование\n\nНе найдено.\n\n"
+        "## Эффективность\n\nНе найдено.\n\n"
+        "## Качество\n\nНе найдено.\n\n"
+        "## Проверки\n\nПроверено чтением; тесты не запускались.\n"
+    )
+    if dependencies:
+        inner += f"\n## Зависимости\n\n{dependencies}\n"
+    if fenced:
+        return f"Итог ревью:\n\n```markdown\n{inner}```\n"
+    return inner
+
+
+def test_cr010_accepts_compliant_russian_report() -> None:
+    report = _ru_report(
+        "🔴 slugkit.py:7 — граница `len(text) >= 0` всегда истинна — нарушает: Корректность\n"
+        "✅ slugkit.py:16 — опечатка в сообщении исправлена — нарушает: Качество — исправлено: "
+        "«Successfully saved»\n",
+        fenced=True,
+    )
+    check = check_cr010(report, {"slugkit.py"}, Path("."))
+    assert check.ok, check.failures
+
+
+def test_cr010_rejects_english_report() -> None:
+    report = (
+        "ai-standards 2.6.0-2026-09-23\n\n"
+        "## What Was Done\n\nBoundary rule changed.\n\n"
+        "## How It Was Done\n\nRead the diff; tests not run.\n\n"
+        "## Correctness\n\n\U0001f534 slugkit.py:7 — boundary always true — "
+        "violates: Correctness\n\n"
+        "## Architecture & Conventions\n\nNone found.\n\n"
+        "## Reuse\n\nNone found.\n\n"
+        "## Efficiency\n\nNone found.\n\n"
+        "## Quality\n\nNone found.\n\n"
+        "## Verification\n\nRead-only review; tests were not run.\n"
+    )
+    check = check_cr010(report, {"slugkit.py"}, Path("."))
+    assert not check.ok
+    assert "report is not in the session language (ru)" in check.failures
+
+
+def test_cr010_rejects_unmarked_finding_line() -> None:
+    report = _ru_report(
+        "- slugkit.py:7 — граница всегда истинна — нарушает: Корректность\n"
+    )
+    check = check_cr010(report, {"slugkit.py"}, Path("."))
+    assert not check.ok
+    assert any("without a marker" in failure for failure in check.failures)
+
+
+def test_cr010_rejects_report_outside_fence() -> None:
+    report = _ru_report(
+        "🔴 slugkit.py:7 — граница всегда истинна — нарушает: Корректность\n",
+        fenced=False,
+    )
+    check = check_cr010(report, {"slugkit.py"}, Path("."))
+    assert not check.ok
+    assert any("fenced Markdown block" in failure for failure in check.failures)
+
+
+def test_cr011_accepts_self_contained_change_without_dependencies() -> None:
+    report = (
+        "ai-standards 2.6.0\n\n"
+        "## What Was Done\n\nVariable renamed, coverage added.\n\n"
+        "## How It Was Done\n\nRead the diff.\n\n"
+    )
+    for section in ("Correctness", "Architecture & Conventions", "Reuse", "Efficiency", "Quality"):
+        report += f"## {section}\n\nNone found.\n\n"
+    report += "## Verification\n\nRead-only review; tests not run.\n"
+    check = check_cr011(report, {"textkit.py"}, Path("."))
+    assert check.ok, check.failures
+
+
+def test_cr011_rejects_dependencies_and_task() -> None:
+    report = (
+        "ai-standards 2.6.0\n\n"
+        "Task: FAKE-123 — https://tracker.example.com/browse/FAKE-123\n\n"
+        "## What Was Done\n\nCleanup.\n\n## How It Was Done\n\nRead the diff.\n\n"
+    )
+    for section in ("Correctness", "Architecture & Conventions", "Reuse", "Efficiency", "Quality"):
+        report += f"## {section}\n\nNone found.\n\n"
+    report += "## Verification\n\nRead-only.\n\n## Dependencies\n\n- none\n"
+    check = check_cr011(report, {"textkit.py"}, Path("."))
+    assert not check.ok
+    assert any("Dependencies" in failure for failure in check.failures)
+    assert any("Task" in failure for failure in check.failures)
+
+
+def test_cr012_requires_missing_example_statement() -> None:
+    report = (
+        "ai-standards 2.6.0\n\n"
+        "Note: `.ai-standards/code-review-report.md` is missing, so the fallback "
+        "section order is used.\n\n"
+        "## What Was Done\n\nCleanup.\n\n## How It Was Done\n\nRead the diff.\n\n"
+    )
+    for section in ("Correctness", "Architecture & Conventions", "Reuse", "Efficiency", "Quality"):
+        report += f"## {section}\n\nNone found.\n\n"
+    report += "## Verification\n\nRead-only.\n"
+    check = check_cr012(report, {"textkit.py"}, Path("."))
+    assert check.ok, check.failures
+
+
+def test_cr012_rejects_silent_fallback() -> None:
+    report = (
+        "ai-standards 2.6.0\n\n"
+        "## What Was Done\n\nCleanup.\n\n## How It Was Done\n\nRead the diff.\n\n"
+    )
+    for section in ("Correctness", "Architecture & Conventions", "Reuse", "Efficiency", "Quality"):
+        report += f"## {section}\n\nNone found.\n\n"
+    report += "## Verification\n\nRead-only.\n"
+    check = check_cr012(report, {"textkit.py"}, Path("."))
+    assert not check.ok
+    assert any("worked example file is missing" in failure for failure in check.failures)

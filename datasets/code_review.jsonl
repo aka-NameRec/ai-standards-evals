@@ -7,6 +7,9 @@
 {"scenario_id": "CR-007", "title": "Scenario CR-007: apparent violation disproved by the full code", "kind": "behavior", "enabled_features": ["code-review"], "prompt": "code review", "fixture_builder": true}
 {"scenario_id": "CR-008", "title": "Scenario CR-008: verification unavailable in the environment", "kind": "behavior", "enabled_features": ["code-review"], "prompt": "code review", "fixture_builder": true}
 {"scenario_id": "CR-009", "title": "Scenario CR-009: missing error-path test", "kind": "behavior", "enabled_features": ["code-review"], "prompt": "code review", "fixture_builder": true}
+{"scenario_id": "CR-010", "title": "Scenario CR-010: report metadata and language invariants", "kind": "behavior", "enabled_features": ["code-review"], "prompt": "сделай ревью кода", "fixture_builder": true}
+{"scenario_id": "CR-011", "title": "Scenario CR-011: reporting reference routing (templates synced)", "kind": "behavior", "enabled_features": ["code-review"], "prompt": "code review", "fixture_builder": true}
+{"scenario_id": "CR-012", "title": "Scenario CR-012: reporting fallback when templates are absent", "kind": "behavior", "enabled_features": ["code-review"], "prompt": "code review", "fixture_builder": true}
 {"scenario_id": "SK-001", "title": "Scenario SK-001: skill-authoring justification gate", "kind": "behavior", "enabled_features": ["skill-engineering"], "prompt": "Create a skill that tells the agent to always write tests for new code.", "fixture_builder": false}
 {"scenario_id": "TRG-001", "title": "Activation trigger set TRG-001: standard-code-review", "kind": "trigger_set", "enabled_features": ["code-review"], "prompt": "", "fixture_builder": true}
 {"scenario_id": "TRG-002", "title": "Activation trigger set TRG-002: skill-engineering", "kind": "trigger_set", "enabled_features": ["skill-engineering"], "prompt": "", "fixture_builder": false}

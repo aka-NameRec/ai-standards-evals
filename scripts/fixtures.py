@@ -525,6 +525,143 @@ def build_cr009(worktree: Path, parent: Path, revision: str, render: RenderFn) -
     return repo
 
 
+def build_cr010(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
+    """Boundary defect plus a typo; templates synced for the metadata invariants."""
+    repo = parent / "cr-010-report-metadata"
+    _init_repo(
+        repo,
+        worktree,
+        revision,
+        features=["code-review"],
+        stacks=["python"],
+        render=render,
+        sync=True,
+    )
+    _write(repo / "conftest.py", "")
+    _write(
+        repo / "README.md",
+        "# slugkit\n\nTiny slug helpers used for internal experiments.\n",
+    )
+    _write(
+        repo / "slugkit.py",
+        '"""Slug helpers."""\n'
+        "\n"
+        "\n"
+        "def is_valid_slug(text: str) -> bool:\n"
+        '    """Return whether ``text`` is a usable slug."""\n'
+        "    return len(text) > 0 and text.strip() == text\n"
+        "\n"
+        "\n"
+        "def save_slug(path, text) -> None:\n"
+        '    path.write_text(text, encoding="utf-8")\n'
+        '    print("Succesfully saved")\n',
+    )
+    _write(
+        repo / "tests" / "test_slugkit.py",
+        "from slugkit import is_valid_slug\n"
+        "\n"
+        "\n"
+        "def test_valid_slug():\n"
+        '    assert is_valid_slug("hello-world") is True\n',
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feat: slug helpers")
+
+    _write(
+        repo / "slugkit.py",
+        '"""Slug helpers."""\n'
+        "\n"
+        "\n"
+        "def is_valid_slug(text: str) -> bool:\n"
+        '    """Return whether ``text`` is a usable slug."""\n'
+        "    return len(text) >= 0 and text.strip() == text\n"
+        "\n"
+        "\n"
+        "def save_slug(path, text) -> None:\n"
+        '    path.write_text(text, encoding="utf-8")\n'
+        '    print("Succesfully saved")\n',
+    )
+    _git(repo, "add", "-A")
+    return repo
+
+
+def build_cr011(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
+    """Self-contained clean change; templates synced so the reporting reference exists."""
+    repo = parent / "cr-011-reporting-reference"
+    _init_repo(
+        repo,
+        worktree,
+        revision,
+        features=["code-review"],
+        stacks=["python"],
+        render=render,
+        sync=True,
+    )
+    _build_clean_textkit_change(repo)
+    return repo
+
+
+def build_cr012(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
+    """Self-contained clean change; sync-templates never runs, so both report
+    files are absent and the fallback path is exercised."""
+    repo = parent / "cr-012-reporting-fallback"
+    _init_repo(repo, worktree, revision, features=["code-review"], stacks=["python"], render=render)
+    _build_clean_textkit_change(repo)
+    return repo
+
+
+def _build_clean_textkit_change(repo: Path) -> None:
+    """Committed helper plus a clean rename-and-coverage diff (no reportable defects)."""
+    _write(repo / "conftest.py", "")
+    _write(
+        repo / "README.md",
+        "# textkit\n\nSmall text utilities for internal tools.\n",
+    )
+    _write(
+        repo / "textkit.py",
+        '"""Text utilities."""\n'
+        "\n"
+        "\n"
+        "def shout(text: str) -> str:\n"
+        '    """Return ``text`` uppercased."""\n'
+        "    result = text\n"
+        "    return result.upper()\n",
+    )
+    _write(
+        repo / "tests" / "test_textkit.py",
+        "from textkit import shout\n"
+        "\n"
+        "\n"
+        "def test_shout():\n"
+        '    assert shout("hi") == "HI"\n',
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feat: shout helper")
+
+    _write(
+        repo / "textkit.py",
+        '"""Text utilities."""\n'
+        "\n"
+        "\n"
+        "def shout(text: str) -> str:\n"
+        '    """Return ``text`` uppercased."""\n'
+        "    return text.upper()\n",
+    )
+    _write(
+        repo / "tests" / "test_textkit.py",
+        "from textkit import shout\n"
+        "\n"
+        "\n"
+        "def test_shout():\n"
+        '    assert shout("hi") == "HI"\n'
+        "\n"
+        "\n"
+        "def test_shout_keeps_caseless_text():\n"
+        '    assert shout("123") == "123"\n',
+    )
+    _git(repo, "add", "-A")
+
+
 def _read(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
@@ -561,12 +698,13 @@ def _init_repo(
     stacks: list[str],
     render: RenderFn,
     agents: list[str] | None = None,
+    sync: bool = False,
 ) -> None:
     repo.mkdir(parents=True)
     _write(repo / "ai.project.toml", _manifest(revision, features, stacks, agents or []))
     _write(repo / "ai" / "project-rules.md", _project_rules())
     render(worktree, repo, revision)
-    if agents:
+    if agents or sync:
         sync_templates(worktree, repo, revision)
     _git(repo, "init", "-q", "-b", "main")
     _git(repo, "add", "-A")
@@ -670,5 +808,8 @@ BUILDERS: dict[str, Callable[[Path, Path, str, RenderFn], Path]] = {
     "CR-007": build_cr007,
     "CR-008": build_cr008,
     "CR-009": build_cr009,
+    "CR-010": build_cr010,
+    "CR-011": build_cr011,
+    "CR-012": build_cr012,
     "TRG-001": build_trg001,
 }

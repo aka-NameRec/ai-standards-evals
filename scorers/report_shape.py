@@ -135,6 +135,11 @@ def check_no_padding(report: str) -> ShapeCheck:
     return ShapeCheck(ok=not failures, failures=tuple(failures))
 
 
+def locale_name(report: str) -> str:
+    """Public locale selector for scenario-specific language checks."""
+    return _select_locale(report).name
+
+
 def _select_locale(report: str) -> _Locale:
     """Pick the locale whose section vocabulary matches the report best."""
     names = set(_LOCALE_EN.required_sections) | set(_LOCALE_RU.required_sections)
