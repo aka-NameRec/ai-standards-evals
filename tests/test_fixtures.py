@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from scripts.fixtures import build_cr002, build_cr003, build_cr011, build_cr012
+from scripts.fixtures import build_cr002, build_cr003, build_cr010, build_cr011, build_cr012
 from scripts.git_utils import run_git
 from scripts.oracle import line_is_preexisting
 
@@ -70,3 +70,22 @@ def test_build_cr012_never_deploys_templates(tmp_path: Path, monkeypatch) -> Non
     assert not (repo / ".ai-standards").exists()
     staged = run_git(repo, "diff", "--cached", "--name-only", "HEAD").splitlines()
     assert "textkit.py" in staged
+
+
+def test_build_cr010_deploys_templates_and_stages_boundary_defect(
+    tmp_path: Path, monkeypatch
+) -> None:
+    synced: list[Path] = []
+
+    def _fake_sync(worktree: Path, target: Path, revision: str) -> None:
+        synced.append(target)
+
+    monkeypatch.setattr("scripts.fixtures.sync_templates", _fake_sync)
+    repo = build_cr010(tmp_path / "wt", tmp_path, "test-rev", _fake_render)
+
+    assert synced == [repo]
+    staged = run_git(repo, "diff", "--cached", "--name-only", "HEAD").splitlines()
+    assert staged == ["slugkit.py"]
+    content = (repo / "slugkit.py").read_text(encoding="utf-8")
+    assert "len(text) >= 0" in content
+    assert "Succesfully saved" in content

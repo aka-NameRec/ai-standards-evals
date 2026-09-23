@@ -1,0 +1,111 @@
+{
+  "generated": "20260923-182154",
+  "standards_revision": "rules-change/22-m4-reporting-reference",
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "adapters": [
+    "kilo"
+  ],
+  "scenarios": [
+    "CR-001",
+    "CR-002",
+    "CR-003",
+    "CR-004",
+    "CR-005",
+    "CR-006",
+    "CR-007",
+    "CR-008",
+    "CR-009",
+    "CR-010",
+    "CR-011",
+    "CR-012"
+  ],
+  "cells": {
+    "kilo|CR-001": {
+      "verdict": "FAIL",
+      "failures": [
+        "missing section: What Was Done",
+        "missing section: How It Was Done"
+      ]
+    },
+    "kilo|CR-002": {
+      "verdict": "FAIL",
+      "failures": [
+        "missing section: Что сделано",
+        "missing section: Как сделано",
+        "missing section: Переиспользование",
+        "missing section: Проверки",
+        "empty section body: Переиспользование",
+        "empty section body: Что сделано",
+        "empty section body: Как сделано",
+        "empty section body: Проверки"
+      ]
+    },
+    "kilo|CR-003": {
+      "verdict": "FAIL",
+      "failures": [
+        "missing section: What Was Done",
+        "missing section: How It Was Done",
+        "missing ai-standards version line or 'version is undetermined'"
+      ]
+    },
+    "kilo|CR-004": {
+      "verdict": "FAIL",
+      "failures": [
+        "missing section: What Was Done",
+        "missing section: How It Was Done"
+      ]
+    },
+    "kilo|CR-005": {
+      "verdict": "FAIL",
+      "failures": [
+        "missing section: What Was Done",
+        "missing section: How It Was Done"
+      ]
+    },
+    "kilo|CR-006": {
+      "verdict": "FAIL",
+      "failures": [
+        "missing section: What Was Done",
+        "missing section: How It Was Done"
+      ]
+    },
+    "kilo|CR-007": {
+      "verdict": "FAIL",
+      "failures": [
+        "missing section: What Was Done",
+        "missing section: How It Was Done"
+      ]
+    },
+    "kilo|CR-008": {
+      "verdict": "FAIL",
+      "failures": [
+        "missing section: Что сделано",
+        "missing section: Как сделано",
+        "missing section: Проверки"
+      ]
+    },
+    "kilo|CR-009": {
+      "verdict": "FAIL",
+      "failures": [
+        "missing section: Что сделано",
+        "missing section: Как сделано",
+        "missing section: Проверки"
+      ]
+    },
+    "kilo|CR-010": {
+      "verdict": "FAIL",
+      "failures": [
+        "finding outside the reviewed diff: tests/test_slugkit.py",
+        "report is not posted inside a fenced Markdown block"
+      ]
+    },
+    "kilo|CR-011": {
+      "verdict": "PASS",
+      "failures": []
+    },
+    "kilo|CR-012": {
+      "verdict": "PASS",
+      "failures": []
+    }
+  }
+}
