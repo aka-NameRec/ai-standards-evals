@@ -604,3 +604,18 @@ def test_scope_keeps_real_out_of_diff_findings() -> None:
 
     failures = _scope_failures(extract_findings(report), {"src/account.py"})
     assert failures == ["finding outside the reviewed diff: src/other.py"]
+
+
+def test_scope_recognizes_vitest_style_test_paths() -> None:
+    report = _report(
+        {
+            "Quality": (
+                "\U0001f7e1 test/reader.test.ts:1 — для новой экспортируемой функции нет "
+                "теста, кейс отсутствует — нарушает: core/base\n"
+            )
+        }
+    )
+    from scorers.review_findings import _scope_failures, extract_findings
+
+    failures = _scope_failures(extract_findings(report), {"src/reader.ts"})
+    assert failures == []

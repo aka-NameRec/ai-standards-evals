@@ -449,7 +449,13 @@ def _scope_failures(findings: tuple[Finding, ...], changed: set[str]) -> list[st
 
 def _is_test_path(path: str) -> bool:
     name = path.rsplit("/", 1)[-1]
-    return name.startswith("test_") or name.endswith("_test") or name == "tests"
+    return (
+        name.startswith("test_")
+        or name.endswith("_test")
+        or name == "tests"
+        or ".test." in name
+        or ".spec." in name
+    )
 
 
 def _names_missing_coverage(text: str) -> bool:
