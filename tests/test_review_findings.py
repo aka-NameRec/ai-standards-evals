@@ -537,3 +537,41 @@ def test_cr012_rejects_silent_fallback() -> None:
     check = check_cr012(report, {"textkit.py"}, Path("."))
     assert not check.ok
     assert any("worked example file is missing" in failure for failure in check.failures)
+
+
+def test_cr012_accepts_natural_russian_fallback_headings() -> None:
+    """Observed in the first CR-012 run: without the deployed legend the agent
+    translates headings naturally; invariants judge order and presence."""
+    report = (
+        "Заметка: `.ai-standards/code-review-report.md` отсутствует — использую "
+        "резервный формат.\n\n"
+        "ai-standards v2.6.0\n\n"
+        "### Что было сделано\n\nРефакторинг shout.\n\n"
+        "### Как это было сделано\n\nЧтение дифа.\n\n"
+        "### Корректность\n\nNone found.\n\n"
+        "### Архитектура и конвенции\n\nNone found.\n\n"
+        "### Переиспользование\n\nNone found.\n\n"
+        "### Эффективность\n\nNone found.\n\n"
+        "### Качество\n\nNone found.\n\n"
+        "### Проверка\n\npytest — 2 passed.\n"
+    )
+    check = check_cr012(report, {"textkit.py"}, Path("."))
+    assert check.ok, check.failures
+
+
+def test_cr012_rejects_wrong_fallback_order() -> None:
+    report = (
+        "ai-standards 2.6.0\n\n"
+        "The worked example is missing; fallback used.\n\n"
+        "## Correctness\n\nNone found.\n\n"
+        "## What Was Done\n\nCleanup.\n\n"
+        "## How It Was Done\n\nRead the diff.\n\n"
+        "## Architecture & Conventions\n\nNone found.\n\n"
+        "## Reuse\n\nNone found.\n\n"
+        "## Efficiency\n\nNone found.\n\n"
+        "## Quality\n\nNone found.\n\n"
+        "## Verification\n\nRead-only.\n"
+    )
+    check = check_cr012(report, {"textkit.py"}, Path("."))
+    assert not check.ok
+    assert "fallback sections are out of order" in check.failures

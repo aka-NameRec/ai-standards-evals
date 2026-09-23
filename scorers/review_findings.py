@@ -261,9 +261,16 @@ def check_cr011(report: str, changed: set[str], fixture: Path) -> report_shape.S
 
 
 def check_cr012(report: str, changed: set[str], fixture: Path) -> report_shape.ShapeCheck:
-    """CR-012: fallback order plus an explicit statement that the example is missing."""
-    failures = _base_failures(report, changed)
+    """CR-012: fallback order plus an explicit statement that the example is missing.
+
+    The fallback mode runs without the deployed template, so the localization
+    legend is unavailable by construction: invariants judge presence and order
+    of the sections (matched fuzzily, in either language), never the exact
+    heading wording.
+    """
+    failures = _version_and_verdict_failures(report)
     failures.extend(_section_presence_failures(report, _TASK_HEADING, name="Task"))
+    failures.extend(_fallback_section_failures(report))
     if not _STATES_MISSING_EXAMPLE.search(report):
         failures.append("review does not state that the worked example file is missing")
     return report_shape.ShapeCheck(ok=not failures, failures=tuple(failures))
@@ -329,6 +336,43 @@ def _section_presence_failures(report: str, pattern: re.Pattern[str], *, name: s
     if pattern.search(report) is not None:
         return [f"{name} section must be omitted for this scenario"]
     return []
+
+
+# Heading stems for the fallback mode: a heading matches when it carries the
+# stem, so natural translations («Что было сделано», «Проверка») stay compliant.
+_FALLBACK_SECTIONS: tuple[tuple[str, tuple[str, ...]], ...] = (
+    ("What Was Done", ("what was done", "что")),
+    ("How It Was Done", ("how it was done", "как")),
+    ("Correctness", ("correctness", "корректн")),
+    ("Architecture & Conventions", ("architecture", "conventions", "архитект", "конвенц")),
+    ("Reuse", ("reuse", "переиспольз", "повторн")),
+    ("Efficiency", ("efficiency", "эффективн")),
+    ("Quality", ("quality", "качеств")),
+    ("Verification", ("verification", "проверк", "верификац")),
+)
+_FALLBACK_HEADING = re.compile(r"^#{2,3}\s+(.+?)\s*$", re.MULTILINE)
+
+
+def _fallback_section_failures(report: str) -> list[str]:
+    headings = [match.group(1).lower() for match in _FALLBACK_HEADING.finditer(report)]
+    positions: list[int] = []
+    for name, stems in _FALLBACK_SECTIONS:
+        position = next(
+            (index for index, heading in enumerate(headings) if any(s in heading for s in stems)),
+            None,
+        )
+        if position is None:
+            failures = [f"missing fallback section: {name}"]
+            return failures
+        positions.append(position)
+    if positions != sorted(positions):
+        return ["fallback sections are out of order"]
+    return []
+
+
+def _version_and_verdict_failures(report: str) -> list[str]:
+    failures = report_shape.check(report).failures
+    return [failure for failure in failures if not failure.startswith("missing section")]
 
 
 def _base_failures(report: str, changed: set[str]) -> list[str]:

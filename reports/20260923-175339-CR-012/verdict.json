@@ -1,0 +1,29 @@
+{
+  "scenario_id": "CR-012",
+  "ok": false,
+  "failures": [
+    "missing section: Что сделано",
+    "missing section: Как сделано",
+    "missing section: Проверки"
+  ],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 82.2,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "rules-change/22-m4-reporting-reference",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/20260923-175339-CR-012/fixture/cr-012-reporting-fallback",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CR-012",
+    "code review"
+  ],
+  "judge": null
+}

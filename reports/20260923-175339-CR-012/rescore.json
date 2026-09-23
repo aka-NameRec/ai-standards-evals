@@ -1,0 +1,6 @@
+{
+  "scenario_id": "CR-012",
+  "ok": true,
+  "failures": [],
+  "note": "rescored with the fuzzy fallback matcher (issue #22)"
+}
