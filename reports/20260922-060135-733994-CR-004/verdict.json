@@ -22,5 +22,17 @@
     "--title",
     "eval-CR-004",
     "code review"
-  ]
+  ],
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The finding explicitly names the inverted boundary condition (`amount >= balance` replacing `amount <= balance`), explains both consequences with concrete examples — a normal withdrawal of 40 from a balance of 100 is rejected while an overdraft of 150 from 100 is allowed — grounds the expected behavior in the docstring contract («Return whether amount may be withdrawn from balance», src/account.py:5) and the existing test tests/test_account.py:5 rather than taste, and cites the exact location src/account.py:6. It further corroborates the defect with a failing test run before the fix and a passing run after, fully satisfying all four criteria.",
+    "criteria": {
+      "defect_named": true,
+      "consequence_explained": true,
+      "expected_behavior_sourced": true,
+      "location": true
+    }
+  }
 }

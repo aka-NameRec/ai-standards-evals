@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The finding explicitly names the bypass (API handler writes directly through InventoryRepository, bypassing the single write path of InventoryReservationService), cites ADR-004 specifically with its file path and quoted rule text rather than a generic layering preference, proposes a remedy that routes the write through InventoryReservationService (instantiating the service and calling service.save), and pins the finding to api_handler.py:7. All four criteria are satisfied.",
+  "criteria": {
+    "bypass_named": true,
+    "decision_cited": true,
+    "remedy_aligned": true,
+    "location": true
+  }
+}

@@ -25,5 +25,17 @@
     "--title",
     "eval-CR-006",
     "code review"
-  ]
+  ],
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The finding explicitly states the API handler writes inventory directly through InventoryRepository, bypassing InventoryReservationService (criterion 1); it cites ADR-004 with its file path and the specific rule text about all inventory writes going through the reservation service (criterion 2); the remedy states the write must go through InventoryReservationService, preserving the single write path (criterion 3); and it pinpoints the location as api_handler.py:6-7 (criterion 4). All four criteria are satisfied.",
+    "criteria": {
+      "bypass_named": true,
+      "decision_cited": true,
+      "remedy_aligned": true,
+      "location": true
+    }
+  }
 }

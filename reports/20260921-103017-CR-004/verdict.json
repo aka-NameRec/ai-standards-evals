@@ -22,5 +22,17 @@
     "--title",
     "eval-CR-004",
     "code review"
-  ]
+  ],
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The finding explicitly names the inverted operator (`amount <= balance` → `amount >= balance`) in `can_withdraw`, explains both consequences with concrete examples (overdraft permitted via can_withdraw(100, 150) → True; routine withdrawal rejected via can_withdraw(100, 40) → False), grounds the expected behavior in the docstring and the existing test (tests/test_account.py:5, confirmed failing under PYTHONPATH=src pytest), and cites the exact location src/account.py:6. All four criteria are satisfied.",
+    "criteria": {
+      "defect_named": true,
+      "consequence_explained": true,
+      "expected_behavior_sourced": true,
+      "location": true
+    }
+  }
 }

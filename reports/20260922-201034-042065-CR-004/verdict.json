@@ -20,5 +20,17 @@
     "--title",
     "eval-CR-004",
     "code review"
-  ]
+  ],
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The finding explicitly names the inverted comparison (`amount >= balance` instead of `<=`), explains both consequences — legitimate withdrawals are rejected (`can_withdraw(100, 40)` → False) and overdrafts are allowed — and grounds the expected behavior in the function's docstring and the existing test `test_routine_withdrawal` (tests/test_account.py:5), verified by a failing pytest run. The location cites `src/account.py:6` with a line number. All four criteria are met.",
+    "criteria": {
+      "defect_named": true,
+      "consequence_explained": true,
+      "expected_behavior_sourced": true,
+      "location": true
+    }
+  }
 }

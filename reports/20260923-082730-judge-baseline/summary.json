@@ -1,0 +1,94 @@
+{
+  "kind": "judge-baseline-summary",
+  "runs": 12,
+  "pass": 12,
+  "fail": 0,
+  "errors": 0,
+  "model": "glm-5.3",
+  "results": [
+    {
+      "run": "20260921-103017-CR-004",
+      "scenario_id": "CR-004",
+      "status": "pass",
+      "score": 1.0,
+      "rationale": "The finding explicitly names the inverted operator (`amount <= balance` → `amount >= balance`) in `can_withdraw`, explains both consequences with concrete examples (overdraft permitted via can_withdraw(100, 150) → True; routine withdrawal rejected via can_withdraw(100, 40) → False), grounds the expected behavior in the docstring and the existing test (tests/test_account.py:5, confirmed failing under PYTHONPATH=src pytest), and cites the exact location src/account.py:6. All four criteria are satisfied."
+    },
+    {
+      "run": "20260921-103413-CR-006",
+      "scenario_id": "CR-006",
+      "status": "pass",
+      "score": 1.0,
+      "rationale": "The finding explicitly names the bypass: the handler writes directly to InventoryRepository, bypassing InventoryReservationService and creating a parallel write path (api_handler.py:7-8). It cites the specific decision ADR-004 with its rule text and file location, not a generic layering preference, and corroborates it with the repository's own comment. The remedy is clearly stated — the handler must write through the existing InventoryReservationService (inventory_service.py:4), restoring the single write path; the note about leaving the code as-is concerns only the author's choice of injection mechanism, not the direction of the fix. Location is given with line numbers (api_handler.py:7-8). All four criteria are satisfied."
+    },
+    {
+      "run": "20260922-060135-733994-CR-004",
+      "scenario_id": "CR-004",
+      "status": "pass",
+      "score": 1.0,
+      "rationale": "The finding explicitly names the inverted boundary condition (`amount >= balance` replacing `amount <= balance`), explains both consequences with concrete examples — a normal withdrawal of 40 from a balance of 100 is rejected while an overdraft of 150 from 100 is allowed — grounds the expected behavior in the docstring contract («Return whether amount may be withdrawn from balance», src/account.py:5) and the existing test tests/test_account.py:5 rather than taste, and cites the exact location src/account.py:6. It further corroborates the defect with a failing test run before the fix and a passing run after, fully satisfying all four criteria."
+    },
+    {
+      "run": "20260922-060622-531168-CR-006",
+      "scenario_id": "CR-006",
+      "status": "pass",
+      "score": 1.0,
+      "rationale": "The finding explicitly states the API handler writes inventory directly through InventoryRepository, bypassing InventoryReservationService (criterion 1); it cites ADR-004 with its file path and the specific rule text about all inventory writes going through the reservation service (criterion 2); the remedy states the write must go through InventoryReservationService, preserving the single write path (criterion 3); and it pinpoints the location as api_handler.py:6-7 (criterion 4). All four criteria are satisfied."
+    },
+    {
+      "run": "20260922-062434-648898-CR-004",
+      "scenario_id": "CR-004",
+      "status": "pass",
+      "score": 1.0,
+      "rationale": "The finding explicitly names the defect as an inverted comparison operator in `can_withdraw` (`amount <= balance` changed to `amount >= balance`). It explains the concrete consequence: the function now permits withdrawal only when amount >= balance, so a legitimate smaller withdrawal (balance 100, withdrawal 40) returns False — i.e., valid withdrawals are rejected while overdrafts would be allowed. Expected behavior is grounded in external sources, not taste: the docstring contract (src/account.py:5) and the existing test (tests/test_account.py:5). The location is cited with file and line number (src/account.py:6). All four criteria are satisfied."
+    },
+    {
+      "run": "20260922-071340-CR-006",
+      "scenario_id": "CR-006",
+      "status": "pass",
+      "score": 1.0,
+      "rationale": "The finding explicitly states the API handler writes inventory directly via InventoryRepository, bypassing the write service (criterion 1); it cites ADR-004 by number, file path with line range, and quotes its rule text rather than invoking a generic layering preference (criterion 2); it names InventoryReservationService as the existing, ready write path that accepts the repository and delegates save, directing the fix through the service and preserving the single write path (criterion 3); and it pinpoints api_handler.py:8 with a line number (criterion 4). All four criteria hold."
+    },
+    {
+      "run": "20260922-201034-042065-CR-004",
+      "scenario_id": "CR-004",
+      "status": "pass",
+      "score": 1.0,
+      "rationale": "The finding explicitly names the inverted comparison (`amount >= balance` instead of `<=`), explains both consequences — legitimate withdrawals are rejected (`can_withdraw(100, 40)` → False) and overdrafts are allowed — and grounds the expected behavior in the function's docstring and the existing test `test_routine_withdrawal` (tests/test_account.py:5), verified by a failing pytest run. The location cites `src/account.py:6` with a line number. All four criteria are met."
+    },
+    {
+      "run": "20260922-201553-492610-CR-006",
+      "scenario_id": "CR-006",
+      "status": "pass",
+      "score": 1.0,
+      "rationale": "The finding explicitly names the bypass (API handler writes directly through InventoryRepository, bypassing the single write path of InventoryReservationService), cites ADR-004 specifically with its file path and quoted rule text rather than a generic layering preference, proposes a remedy that routes the write through InventoryReservationService (instantiating the service and calling service.save), and pins the finding to api_handler.py:7. All four criteria are satisfied."
+    },
+    {
+      "run": "20260922-205633-494988-CR-004",
+      "scenario_id": "CR-004",
+      "status": "pass",
+      "score": 1.0,
+      "rationale": "The finding explicitly names the inverted comparison operator (`amount <= balance` changed to `amount >= balance`) in src/account.py:6; it explains the consequence — withdrawals are permitted only when the amount is at least the balance (overdraft allowed) while a legitimate withdrawal of 40 from a balance of 100 returns False, as demonstrated by the failing test; expected behavior is grounded in both the docstring contract ('amount may be withdrawn') and the existing test tests/test_account.py:5, not in taste; and the location criterion is met with an exact file and line citation. All four criteria hold."
+    },
+    {
+      "run": "20260922-210134-519709-CR-006",
+      "scenario_id": "CR-006",
+      "status": "pass",
+      "score": 1.0,
+      "rationale": "The 🔴 finding explicitly states the API handler writes inventory directly via `InventoryRepository`, bypassing the service; it cites ADR-004 by exact path and quotes its rule text («All inventory writes must go through InventoryReservationService. Direct repository writes from API handlers are prohibited»); the remedy routes the write through `InventoryReservationService` (with a concrete example and a composition-root alternative, preserving the single write path); and it pins the location to api_handler.py:7. All four criteria are satisfied."
+    },
+    {
+      "run": "20260923-033442-179759-CR-004",
+      "scenario_id": "CR-004",
+      "status": "pass",
+      "score": 1.0,
+      "rationale": "The finding explicitly names the defect as an inverted comparison in `can_withdraw` (`amount >= balance` instead of `amount <= balance`), and explains both consequences concretely: at balance 100 a legitimate withdrawal of 40 returns False (rejected) while an overdraft withdrawal of 150 returns True (allowed), verified by direct calls and the failing test. Expected behavior is grounded in the existing test (tests/test_account.py:5) and the function's docstring (\"whether amount may be withdrawn\"), not taste. Location is precisely cited as src/account.py:6. All four criteria hold."
+    },
+    {
+      "run": "20260923-033833-243019-CR-006",
+      "scenario_id": "CR-006",
+      "status": "pass",
+      "score": 1.0,
+      "rationale": "The architecture finding explicitly states the API handler writes directly to InventoryRepository, bypassing InventoryReservationService (criterion 1); it cites ADR-004 by name, path, and quotes its rule text rather than a generic layering preference (criterion 2); the proposed fix constructs InventoryReservationService(InventoryRepository()) and routes the write through service.save while keeping a single write path (criterion 3); and the finding pinpoints api_handler.py:7 with a line number (criterion 4). All criteria are satisfied."
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The finding explicitly names the bypass: the handler writes directly to InventoryRepository, bypassing InventoryReservationService and creating a parallel write path (api_handler.py:7-8). It cites the specific decision ADR-004 with its rule text and file location, not a generic layering preference, and corroborates it with the repository's own comment. The remedy is clearly stated — the handler must write through the existing InventoryReservationService (inventory_service.py:4), restoring the single write path; the note about leaving the code as-is concerns only the author's choice of injection mechanism, not the direction of the fix. Location is given with line numbers (api_handler.py:7-8). All four criteria are satisfied.",
+  "criteria": {
+    "bypass_named": true,
+    "decision_cited": true,
+    "remedy_aligned": true,
+    "location": true
+  }
+}

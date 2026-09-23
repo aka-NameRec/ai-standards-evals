@@ -22,5 +22,17 @@
     "--title",
     "eval-CR-006",
     "code review"
-  ]
+  ],
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The architecture finding explicitly states the API handler writes directly to InventoryRepository, bypassing InventoryReservationService (criterion 1); it cites ADR-004 by name, path, and quotes its rule text rather than a generic layering preference (criterion 2); the proposed fix constructs InventoryReservationService(InventoryRepository()) and routes the write through service.save while keeping a single write path (criterion 3); and the finding pinpoints api_handler.py:7 with a line number (criterion 4). All criteria are satisfied.",
+    "criteria": {
+      "bypass_named": true,
+      "decision_cited": true,
+      "remedy_aligned": true,
+      "location": true
+    }
+  }
 }
