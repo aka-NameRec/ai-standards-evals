@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import sys
-from dataclasses import replace
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -93,10 +92,7 @@ def _config(config_path: str, revision: str | None) -> EvalConfig:
         # inspect changes cwd to the task file's directory during loading;
         # keep configuration and artifacts anchored at the repository root.
         path = _BOOTSTRAP / path
-    config = load_config(path)
-    if revision is not None:
-        config = replace(config, standards_revision=revision)
-    return config
+    return load_config(path, revision)
 
 
 @solver

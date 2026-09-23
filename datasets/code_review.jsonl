@@ -1,0 +1,12 @@
+{"scenario_id": "CR-001", "title": "Scenario CR-001: duplicate abstraction already exists", "kind": "behavior", "enabled_features": ["code-review"], "prompt": "code review", "fixture_builder": true}
+{"scenario_id": "CR-002", "title": "Scenario CR-002: code review with no valid findings", "kind": "behavior", "enabled_features": ["code-review"], "prompt": "code review", "fixture_builder": true}
+{"scenario_id": "CR-003", "title": "Scenario CR-003: pre-existing defect in review fixture", "kind": "behavior", "enabled_features": ["code-review"], "prompt": "code review", "fixture_builder": true}
+{"scenario_id": "CR-004", "title": "Scenario CR-004: real correctness defect", "kind": "behavior", "enabled_features": ["code-review"], "prompt": "code review", "fixture_builder": true}
+{"scenario_id": "CR-005", "title": "Scenario CR-005: new internal duplication without a prior helper", "kind": "behavior", "enabled_features": ["code-review"], "prompt": "code review", "fixture_builder": true}
+{"scenario_id": "CR-006", "title": "Scenario CR-006: architecture decision violation", "kind": "behavior", "enabled_features": ["code-review"], "prompt": "code review", "fixture_builder": true}
+{"scenario_id": "CR-007", "title": "Scenario CR-007: apparent violation disproved by the full code", "kind": "behavior", "enabled_features": ["code-review"], "prompt": "code review", "fixture_builder": true}
+{"scenario_id": "CR-008", "title": "Scenario CR-008: verification unavailable in the environment", "kind": "behavior", "enabled_features": ["code-review"], "prompt": "code review", "fixture_builder": true}
+{"scenario_id": "CR-009", "title": "Scenario CR-009: missing error-path test", "kind": "behavior", "enabled_features": ["code-review"], "prompt": "code review", "fixture_builder": true}
+{"scenario_id": "SK-001", "title": "Scenario SK-001: skill-authoring justification gate", "kind": "behavior", "enabled_features": ["skill-engineering"], "prompt": "Create a skill that tells the agent to always write tests for new code.", "fixture_builder": false}
+{"scenario_id": "TRG-001", "title": "Activation trigger set TRG-001: standard-code-review", "kind": "trigger_set", "enabled_features": ["code-review"], "prompt": "", "fixture_builder": true}
+{"scenario_id": "TRG-002", "title": "Activation trigger set TRG-002: skill-engineering", "kind": "trigger_set", "enabled_features": ["skill-engineering"], "prompt": "", "fixture_builder": false}

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import argparse
 import sys
-from dataclasses import replace
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -27,9 +26,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
 
-    config = load_config(args.config)
-    if args.revision is not None:
-        config = replace(config, standards_revision=args.revision)
+    config = load_config(args.config, args.revision)
     adapter = KiloAdapter(model=config.model, timeout_seconds=config.timeout_seconds)
     with resolve_standards_checkout(config) as worktree:
         scenarios = index_scenarios(worktree)

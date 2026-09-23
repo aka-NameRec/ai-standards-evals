@@ -34,6 +34,11 @@ class FixtureBuild:
     notes: tuple[str, ...] = ()
 
 
+def has_fixture_builder(scenario_id: str) -> bool:
+    """True when a deterministic fixture builder exists for the scenario."""
+    return scenario_id in BUILDERS
+
+
 def build_fixture(
     scenario_id: str,
     worktree: Path,
@@ -42,18 +47,7 @@ def build_fixture(
     render: RenderFn = render_agents_md,
 ) -> Path | None:
     """Build the fixture for a scenario; return None when the scenario has none."""
-    builders: dict[str, Callable[[Path, Path, str, RenderFn], Path]] = {
-        "CR-001": build_cr001,
-        "CR-002": build_cr002,
-        "CR-003": build_cr003,
-        "CR-004": build_cr004,
-        "CR-005": build_cr005,
-        "CR-006": build_cr006,
-        "CR-007": build_cr007,
-        "CR-008": build_cr008,
-        "CR-009": build_cr009,
-    }
-    builder = builders.get(scenario_id)
+    builder = BUILDERS.get(scenario_id)
     if builder is None:
         return None
     return builder(worktree, parent, revision, render)
@@ -664,3 +658,17 @@ _READER_CANDIDATE = _READER_OFF_BY_ONE.replace(
     "  }\n"
     "}\n"
 )
+
+
+BUILDERS: dict[str, Callable[[Path, Path, str, RenderFn], Path]] = {
+    "CR-001": build_cr001,
+    "CR-002": build_cr002,
+    "CR-003": build_cr003,
+    "CR-004": build_cr004,
+    "CR-005": build_cr005,
+    "CR-006": build_cr006,
+    "CR-007": build_cr007,
+    "CR-008": build_cr008,
+    "CR-009": build_cr009,
+    "TRG-001": build_trg001,
+}
