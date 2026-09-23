@@ -209,6 +209,14 @@ def test_label_form_report_with_findings_passes() -> None:
     assert check(LABEL_FORM_REPORT).ok
 
 
+def test_version_line_may_be_marked_up() -> None:
+    report = GOOD_REPORT.replace(
+        "ai-standards 2.5.0-2026-09-21", "`ai-standards v2.5.0`", 1
+    )
+
+    assert check(report).ok
+
+
 def test_english_clean_report_passes() -> None:
     assert check(GOOD_REPORT).ok
     assert check_no_padding(GOOD_REPORT).ok

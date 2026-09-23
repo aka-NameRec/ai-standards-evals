@@ -12,7 +12,7 @@ from dataclasses import dataclass
 
 FINDING_MARKERS = ("\U0001f534", "\U0001f7e1", "\U0001f535")
 
-_VERSION_LINE = re.compile(r"(?im)^ai-standards\s+\S")
+_VERSION_LINE = re.compile(r"^[`*_]{0,2}ai-standards\s+\S", re.MULTILINE)
 _VERSION_UNDETERMINED = re.compile(r"(?i)version is undetermined|версия не определена")
 _HEADING = re.compile(r"^#{2,3}\s+(.+?)\s*$", re.MULTILINE)
 _ANY_HEADING = re.compile(r"^#{2,3}\s+", re.MULTILINE)

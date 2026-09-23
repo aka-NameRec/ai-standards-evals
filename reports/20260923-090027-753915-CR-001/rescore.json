@@ -1,0 +1,8 @@
+{
+  "rescored_with": "current scorer (markup-tolerant version line)",
+  "original_verdict": "FAIL",
+  "scenario_id": "CR-001",
+  "ok": true,
+  "failures": [],
+  "note": "grader required a bare version line; the agent wrapped it in inline code — same rule, different markdown rendering"
+}
