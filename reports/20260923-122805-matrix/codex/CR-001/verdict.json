@@ -1,0 +1,22 @@
+{
+  "scenario_id": "CR-001",
+  "ok": true,
+  "failures": [],
+  "adapter": "codex",
+  "returncode": 0,
+  "duration_seconds": 49.5,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "main",
+  "command": [
+    "/home/shtirliz/.vscode/extensions/openai.chatgpt-26.5917.62051-linux-x64/bin/linux-x86_64/codex",
+    "exec",
+    "--cd",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/20260923-122805-matrix/codex/CR-001/fixture/cr-001-duplicate-abstraction-exists",
+    "--skip-git-repo-check",
+    "-s",
+    "danger-full-access",
+    "--json",
+    "code review"
+  ],
+  "judge": null
+}

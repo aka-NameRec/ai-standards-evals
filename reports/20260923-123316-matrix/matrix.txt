@@ -1,0 +1,3 @@
+scenario       codex
+--------------------
+CR-006          PASS

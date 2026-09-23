@@ -14,6 +14,7 @@ from scorers.llm_judge import JudgeError
 from scripts.config import load_config
 from scripts.judge_run import grade_run_dir
 from scripts.pipeline import JUDGE_SCENARIOS
+
 DEFAULT_KILO_AUTH = Path("~/.local/share/kilo/auth.json")
 DEFAULT_KILO_PROVIDER = "zai-coding-plan"
 

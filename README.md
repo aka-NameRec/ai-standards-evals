@@ -132,8 +132,30 @@ uv run python -m scripts.run_triggers TRG-001
 uv run python -m scripts.run_matrix --revision <revision> [--adapters kilo,claude]
 ```
 
-Сейчас локально установлен только Kilo — остальные колонки помечаются `n/a`
-и включаются в прогон автоматически, как только появятся их CLI.
+Codex-специфика локальной среды: sandbox `workspace-write` опирается на
+bubblewrap, который в контейнерных окружениях недоступен — для локальных
+прогонов задан `CODEX_SANDBOX=danger-full-access` (режим для внешне-ограниченных
+сред). Бинарь резолвится из бандла VS Code-расширения OpenAI ChatGPT, если его
+нет в PATH.
+
+## Результаты cross-agent (ревизия main, сентябрь 2026)
+
+| Сценарий | Kilo (glm-5.3-flash) | Codex (gpt-5.6-luna) | Совместимость |
+|---|---|---|---|
+| CR-001 reuse | PASS | PASS | да |
+| CR-002 no-padding | PASS | PASS | да |
+| CR-003 pre-existing | PASS | PASS | да |
+| CR-004 correctness | PASS | PASS | да |
+| CR-005 internal duplication | PASS | PASS | да |
+| CR-006 architecture decision | PASS | PASS | да |
+| CR-007 apparent violation | PASS | PASS | да |
+| CR-008 verification honesty | PASS | PASS | да |
+| CR-009 error-path coverage | PASS | PASS | да |
+
+Отчёты Codex: `reports/20260923-12*-matrix/codex/`; прогоны Kilo —
+`reports/20260922-*`, `reports/20260923-0*`, `reports/20260923-12*`.
+Судья (GLM-5.3, rubrics `scorers/rubrics/`) покрывает CR-001/004/005/006 —
+29/29 pass по всем ревизиям и агентам.
 
 ## Инструменты
 

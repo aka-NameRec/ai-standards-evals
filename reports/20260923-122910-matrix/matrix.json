@@ -1,0 +1,17 @@
+{
+  "generated": "20260923-122910",
+  "standards_revision": "main",
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "adapters": [
+    "codex"
+  ],
+  "scenarios": [
+    "CR-002"
+  ],
+  "cells": {
+    "codex|CR-002": {
+      "verdict": "PASS",
+      "failures": []
+    }
+  }
+}

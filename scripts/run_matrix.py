@@ -21,7 +21,8 @@ def main(argv: list[str] | None = None) -> int:
     """Run the scenario × adapter matrix; exit 1 when any cell fails."""
     parser = argparse.ArgumentParser(description="Cross-agent compatibility matrix.")
     parser.add_argument("--config", type=Path, default=Path("config.toml"))
-    parser.add_argument("--reports-dir", type=Path, default=Path("reports"))
+    parser.add_argument("--reports-dir", "--reports-root", type=Path, default=Path("reports"),
+                        dest="reports_root")
     parser.add_argument("--revision", default=None, help="Override the pinned revision")
     parser.add_argument(
         "--adapters",

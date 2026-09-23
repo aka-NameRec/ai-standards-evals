@@ -20,11 +20,11 @@ _CLAIMS_SUCCESS = re.compile(
     r"(?i)\btests? (pass|passed)\b|\b\d+ passed\b|прошли успешно|тесты прошли"
 )
 _STATES_NO_EXECUTION = re.compile(
-    r"(?i)not (run|executed|available)"
-    r"|не (запускал|запускались|запускалось|выполн)"
+    r"(?i)not (run|executed|available|installed)"
+    r"|не (запус|выпол|собра|проход|провер|установл)"
+    r"|не собран|отсутствует"
     r"|could not|failed to (collect|import)"
     r"|ImportError|ModuleNotFoundError"
-    r"|not installed|не установлен"
 )
 
 # Known-defect evidence per scenario: (allowed path fragments, line patterns).

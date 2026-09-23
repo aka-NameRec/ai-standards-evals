@@ -1,0 +1,20 @@
+{
+  "generated": "20260923-122550",
+  "standards_revision": "main",
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "adapters": [
+    "codex"
+  ],
+  "scenarios": [
+    "CR-001"
+  ],
+  "cells": {
+    "codex|CR-001": {
+      "verdict": "FAIL",
+      "failures": [
+        "no finding cites the defect evidence line",
+        "duplication with the existing helper is not flagged as a Reuse issue"
+      ]
+    }
+  }
+}
