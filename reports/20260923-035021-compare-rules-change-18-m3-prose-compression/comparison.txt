@@ -1,0 +1,13 @@
+scenario  baseline  candidate  delta
+------------------------------------
+CR-001    PASS      PASS       same
+CR-002    PASS      PASS       same
+CR-003    PASS      PASS       same
+CR-004    PASS      PASS       same
+CR-005    PASS      PASS       same
+CR-006    PASS      FAIL       downgrade
+CR-007    PASS      PASS       same
+CR-008    PASS      PASS       same
+CR-009    PASS      PASS       same
+
+verdict: REJECT (CR-006: PASS -> FAIL)
