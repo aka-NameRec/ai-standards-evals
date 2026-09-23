@@ -21,5 +21,16 @@
     "eval-CR-004",
     "code review"
   ],
-  "judge": null
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The finding explicitly names the inverted comparison (`<=` changed to `>=`, «условие инвертировано»), explains both consequences with concrete examples — legitimate withdrawals rejected (`can_withdraw(100, 40)` → `False`) and overdrafts allowed (`can_withdraw(100, 150)` → `True`) — grounds the expected behavior in the docstring contract («Return whether ``amount`` may be withdrawn from ``balance``») and the existing test (tests/test_account.py:5), which it also ran to reproduce the failure, and cites the precise location src/account.py:6.",
+    "criteria": {
+      "defect_named": true,
+      "consequence_explained": true,
+      "expected_behavior_sourced": true,
+      "location": true
+    }
+  }
 }

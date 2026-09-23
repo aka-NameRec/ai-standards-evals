@@ -21,5 +21,16 @@
     "eval-CR-005",
     "code review"
   ],
-  "judge": null
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The finding explicitly names `format_period` as fully duplicated between src/csv_export.py:4 and src/json_export.py:4 (identical signature, docstring, and body, verified line by line), satisfying duplication-named and locations. It correctly attributes the duplication to the change itself — the shared logic was copied into both new files rather than extracted — and does not claim any pre-existing period-formatting helper was bypassed; `src/rows.py` is cited only as a style reference and as a considered-but-rejected home for the helper (noting it deals with table rows, not periods), which the rubric explicitly permits. The remedy — extract the function into a shared module (e.g. `src/periods.py`) and import it in both export modules — is exactly the aligned fix.",
+    "criteria": {
+      "duplication_named": true,
+      "no_invented_helper": true,
+      "remedy_aligned": true,
+      "locations": true
+    }
+  }
 }

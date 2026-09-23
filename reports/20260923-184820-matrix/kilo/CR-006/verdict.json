@@ -21,5 +21,16 @@
     "eval-CR-006",
     "code review"
   ],
-  "judge": null
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The finding explicitly states the handler writes directly via InventoryRepository().save(), bypassing the single write point InventoryReservationService (criterion 1); it cites docs/decisions/ADR-004.md with the exact rule text ('All inventory writes must go through InventoryReservationService. Direct repository writes from API handlers are prohibited'), not a generic style preference (criterion 2); the proposed fix constructs InventoryReservationService(InventoryRepository()) and calls service.save(), restoring the mandated single write path (criterion 3); and it cites api_handler.py:8, which correctly matches the repository.save(...) write line in the staged diff (criterion 4).",
+    "criteria": {
+      "bypass_named": true,
+      "decision_cited": true,
+      "remedy_aligned": true,
+      "location": true
+    }
+  }
 }

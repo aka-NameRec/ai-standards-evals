@@ -21,5 +21,16 @@
     "eval-CR-001",
     "code review"
   ],
-  "judge": null
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The report explicitly states that formatPrice fully duplicates formatMoney, describing the shared semantics (cents-to-string with currency symbol, currency set with \"$\" fallback, thousands grouping, negative handling) and noting the only difference is the grouping implementation. It names the existing primitive with its path (formatMoney in src/money.ts, covered by tests) as the reuse target. The remedy is aligned: delete src/pricing.ts and use formatMoney, or re-export it (export { formatMoney as formatPrice } from \"./money\") rather than keeping a second implementation. The finding cites src/pricing.ts:1 with a line number, and it is properly placed under the reuse/DRY section. All four criteria hold.",
+    "criteria": {
+      "duplication_named": true,
+      "existing_primitive_named": true,
+      "remedy_aligned": true,
+      "location": true
+    }
+  }
 }
