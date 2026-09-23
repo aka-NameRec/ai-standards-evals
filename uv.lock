@@ -24,6 +24,7 @@ name = "ai-standards-evals"
 version = "0.1.0.dev0"
 source = { editable = "." }
 dependencies = [
+    { name = "httpx" },
     { name = "inspect-ai" },
 ]
 
@@ -35,7 +36,10 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "inspect-ai", specifier = ">=0.3,<1.0" }]
+requires-dist = [
+    { name = "httpx", specifier = ">=0.28,<1.0" },
+    { name = "inspect-ai", specifier = ">=0.3,<1.0" },
+]
 
 [package.metadata.requires-dev]
 dev = [

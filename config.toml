@@ -7,3 +7,11 @@ revision = "2.5.0-2026-09-21"
 # Model is pinned for baseline/candidate comparability.
 model = "zai-coding-plan/glm-5.3-flash"
 timeout_seconds = 900
+
+[judge]
+# LLM grader for finding depth; runs on demand (milestone/PR runs), not in smoke runs.
+enabled = false
+base_url = "https://api.z.ai/api/paas/v4"
+model = "glm-5.3"
+api_key_env = "ZAI_JUDGE_API_KEY"
+temperature = 0.0

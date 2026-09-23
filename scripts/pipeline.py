@@ -6,15 +6,75 @@ import json
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
+from typing import cast
 
 from agents.base import AgentAdapter
 from scorers import report_shape, review_findings
+from scorers.llm_judge import (
+    RUBRICS_DIR,
+    HttpxJsonClient,
+    JudgeError,
+    judge_report,
+    load_rubric,
+)
 from scripts.config import EvalConfig
 from scripts.fixtures import build_fixture
-from scripts.oracle import changed_files
+from scripts.oracle import changed_files, diff_patch
 from scripts.standards import Scenario
 
+JUDGE_SCENARIOS = frozenset({"CR-004", "CR-006"})
 NO_FIXTURE_NOTE = "scenario has no deterministic fixture builder yet"
+
+
+def _run_judge(
+    config: EvalConfig,
+    scenario_id: str,
+    run_dir: Path,
+    report: str,
+    diff_text: str,
+    fixture_path: Path,
+) -> tuple[dict[str, object] | None, bool]:
+    """Grade finding depth when the judge is enabled; errors never punish the agent."""
+    judge_config = config.judge
+    if judge_config is None or not judge_config.enabled or scenario_id not in JUDGE_SCENARIOS:
+        return None, True
+    try:
+        rubric = load_rubric(RUBRICS_DIR, scenario_id)
+    except JudgeError as error:
+        return {"status": "error", "model": judge_config.model, "error": str(error)}, True
+    context = _judge_context(scenario_id, fixture_path)
+    try:
+        judge_verdict = judge_report(
+            rubric, report, diff_text, context, judge_config, HttpxJsonClient()
+        )
+    except JudgeError as error:
+        return {"status": "error", "model": judge_config.model, "error": str(error)}, True
+    failures = (
+        []
+        if judge_verdict.status == "pass"
+        else [f"judge rubric not met: {judge_verdict.rationale}"]
+    )
+    (run_dir / "judge-response.json").write_text(
+        judge_verdict.raw_response, encoding="utf-8"
+    )
+    return {
+        "status": judge_verdict.status,
+        "model": judge_verdict.model,
+        "score": judge_verdict.score,
+        "rationale": judge_verdict.rationale,
+        "criteria": judge_verdict.criteria,
+        "failures": failures,
+    }, judge_verdict.status == "pass"
+
+
+def _judge_context(scenario_id: str, fixture_path: Path) -> str:
+    extra: dict[str, Path] = {
+        "CR-006": fixture_path / "docs" / "decisions" / "ADR-004.md",
+    }
+    path = extra.get(scenario_id)
+    if path is not None and path.is_file():
+        return path.read_text(encoding="utf-8")
+    return "(no additional context)"
 
 
 _SCENARIO_CHECKS: dict[str, Callable[[str, set[str], Path], report_shape.ShapeCheck]] = {
@@ -58,6 +118,7 @@ class ScenarioVerdict:
     failures: tuple[str, ...]
     report_path: Path
     fixture_path: Path | None
+    judge: dict[str, object] | None = None
 
 
 def run_scenario(
@@ -90,6 +151,8 @@ def run_scenario(
     # mutate the tree (small fixes revert files to their HEAD state), and the
     # scope judgment must stay anchored to the diff the agent was given.
     reviewed_diff = changed_files(fixture_path)
+    diff_text = diff_patch(fixture_path)
+    (run_dir / "reviewed-diff.patch").write_text(diff_text, encoding="utf-8")
     result = adapter.run(scenario.prompt, fixture_path, scenario.scenario_id)
     (run_dir / "agent-stdout.jsonl").write_text(result.stdout, encoding="utf-8")
     (run_dir / "agent-stderr.log").write_text(result.stderr, encoding="utf-8")
@@ -98,6 +161,22 @@ def run_scenario(
     report_path.write_text(report, encoding="utf-8")
     check = score_scenario(
         scenario.scenario_id, report, reviewed_diff, fixture_path
+    )
+    judge_block, judge_ok = _run_judge(
+        config, scenario.scenario_id, run_dir, report, diff_text, fixture_path
+    )
+    judge_failures = (
+        []
+        if judge_block is None
+        else list(cast("list[str]", judge_block.get("failures", [])))
+    )
+    verdict = ScenarioVerdict(
+        scenario_id=scenario.scenario_id,
+        ok=check.ok and judge_ok,
+        failures=check.failures + tuple(f"judge: {f}" for f in judge_failures),
+        report_path=report_path,
+        fixture_path=fixture_path,
+        judge=judge_block,
     )
     verdict = ScenarioVerdict(
         scenario_id=scenario.scenario_id,
@@ -116,6 +195,7 @@ def run_scenario(
         "model": config.model,
         "standards_revision": config.standards_revision,
         "command": list(result.command),
+        "judge": verdict.judge,
     }
     verdict_path = run_dir / "verdict.json"
     verdict_path.write_text(

@@ -12,6 +12,17 @@ DEFAULT_TIMEOUT_SECONDS = 900
 
 
 @dataclass(frozen=True)
+class JudgeConfig:
+    """LLM judge settings; the API key itself lives in an environment variable."""
+
+    enabled: bool
+    base_url: str
+    model: str
+    api_key_env: str
+    temperature: float
+
+
+@dataclass(frozen=True)
 class EvalConfig:
     """Pinned standards revision and runner parameters."""
 
@@ -19,6 +30,7 @@ class EvalConfig:
     standards_revision: str
     model: str
     timeout_seconds: int = DEFAULT_TIMEOUT_SECONDS
+    judge: JudgeConfig | None = None
 
 
 def load_config(
@@ -35,9 +47,25 @@ def load_config(
     resolved_revision = cast("str", standards["revision"])
     if revision is not None:
         resolved_revision = revision
+    judge = _load_judge(cast("dict[str, object] | None", data.get("judge")))
     return EvalConfig(
         standards_repo=Path(cast("str", standards["repo"])).expanduser(),
         standards_revision=resolved_revision,
         model=cast("str", runner["model"]),
-        timeout_seconds=cast("int", runner.get("timeout_seconds", DEFAULT_TIMEOUT_SECONDS)),
+        timeout_seconds=cast(
+            "int", runner.get("timeout_seconds", DEFAULT_TIMEOUT_SECONDS)
+        ),
+        judge=judge,
+    )
+
+
+def _load_judge(raw: dict[str, object] | None) -> JudgeConfig | None:
+    if raw is None:
+        return None
+    return JudgeConfig(
+        enabled=bool(raw.get("enabled", False)),
+        base_url=cast("str", raw["base_url"]),
+        model=cast("str", raw["model"]),
+        api_key_env=cast("str", raw["api_key_env"]),
+        temperature=float(cast("int | float | str", raw.get("temperature", 0.0))),
     )

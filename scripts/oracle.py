@@ -33,3 +33,8 @@ def changed_files(repo: Path, base: str = "HEAD") -> set[str]:
     """Files changed in the working tree (staged and unstaged) relative to ``base``."""
     out = run_git(repo, "diff", "--name-only", base)
     return {line for line in out.splitlines() if line}
+
+
+def diff_patch(repo: Path, base: str = "HEAD") -> str:
+    """Full patch of the working tree changes relative to ``base``."""
+    return run_git(repo, "diff", base)
