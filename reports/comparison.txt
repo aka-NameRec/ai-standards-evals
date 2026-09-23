@@ -1,0 +1,16 @@
+scenario  baseline  candidate  delta
+------------------------------------
+CR-001    NO RUNS   NO RUNS    same
+CR-002    NO RUNS   NO RUNS    same
+CR-003    NO RUNS   NO RUNS    same
+CR-004    NO RUNS   NO RUNS    same
+CR-005    NO RUNS   NO RUNS    same
+CR-006    NO RUNS   NO RUNS    same
+CR-007    NO RUNS   NO RUNS    same
+CR-008    NO RUNS   NO RUNS    same
+CR-009    NO RUNS   NO RUNS    same
+CR-010    NO RUNS   PASS       upgrade
+CR-011    NO RUNS   PASS       upgrade
+CR-012    NO RUNS   PASS       upgrade
+
+verdict: ACCEPT

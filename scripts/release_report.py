@@ -14,9 +14,16 @@ DEFAULT_SCENARIOS = ",".join(f"CR-{number:03d}" for number in range(1, 10))
 
 
 def collect_runs(reports_root: Path, revision: str) -> dict[str, list[dict[str, object]]]:
-    """Group rescore-aware verdicts by scenario for the requested revision."""
+    """Group rescore-aware verdicts by scenario for the requested revision.
+
+    Both layouts count: single-scenario run dirs (``reports/<run>/verdict.json``)
+    and matrix cells (``reports/<matrix>/<adapter>/<scenario>/verdict.json``).
+    Archived runs (any ``archive*`` directory) are excluded.
+    """
     runs: dict[str, list[dict[str, object]]] = {}
-    for verdict_path in sorted(reports_root.glob("*/verdict.json")):
+    for verdict_path in sorted(reports_root.rglob("verdict.json")):
+        if any(part.startswith("archive") for part in verdict_path.parts):
+            continue
         verdict = json.loads(verdict_path.read_text(encoding="utf-8"))
         if verdict.get("standards_revision") != revision:
             continue
