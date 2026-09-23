@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -16,7 +17,7 @@ from scripts.standards import Scenario
 NO_FIXTURE_NOTE = "scenario has no deterministic fixture builder yet"
 
 
-_SCENARIO_CHECKS = {
+_SCENARIO_CHECKS: dict[str, Callable[[str, set[str], Path], report_shape.ShapeCheck]] = {
     "CR-001": review_findings.check_cr001,
     "CR-003": review_findings.check_cr003,
     "CR-004": review_findings.check_cr004,
@@ -32,17 +33,19 @@ def score_scenario(
     scenario_id: str,
     report: str,
     changed: set[str],
+    fixture_path: Path | None,
 ) -> report_shape.ShapeCheck:
     """Dispatch the strongest mechanical scorer available for the scenario.
 
     ``changed`` is the reviewed diff snapshot taken before the agent runs, so
-    scope judgments never depend on tree mutations the agent may make.
+    scope judgments never depend on tree mutations the agent may make;
+    ``fixture_path`` lets evidence checks read the cited lines.
     """
     if scenario_id == "CR-002":
         return report_shape.check_no_padding(report)
     check = _SCENARIO_CHECKS.get(scenario_id)
-    if check is not None:
-        return check(report, changed)
+    if check is not None and fixture_path is not None:
+        return check(report, changed, fixture_path)
     return report_shape.check(report)
 
 
@@ -93,7 +96,9 @@ def run_scenario(
     report = result.answer.strip()
     report_path = run_dir / "report.md"
     report_path.write_text(report, encoding="utf-8")
-    check = score_scenario(scenario.scenario_id, report, reviewed_diff)
+    check = score_scenario(
+        scenario.scenario_id, report, reviewed_diff, fixture_path
+    )
     verdict = ScenarioVerdict(
         scenario_id=scenario.scenario_id,
         ok=check.ok,

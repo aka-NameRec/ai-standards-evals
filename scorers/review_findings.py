@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from pathlib import Path
 
 from scorers import report_shape
 
@@ -13,7 +14,8 @@ _LOCATION = re.compile(r"(?P<path>[\w./\\-]+):(?P<line>\d+)")
 _BARE_PATH = re.compile(
     r"(?P<path>[\w./\\-]+\.(?:py|ts|tsx|js|mjs|md|json|toml|ya?ml|txt))\b"
 )
-PREEXISTING_MARKS = ("(pre-existing)", "(существовало ранее)")
+_PREEXISTING = ("(pre-existing)", "(существовало ранее)")
+PREEXISTING_MARKS = _PREEXISTING
 _CLAIMS_SUCCESS = re.compile(
     r"(?i)\btests? (pass|passed)\b|\b\d+ passed\b|прошли успешно|тесты прошли"
 )
@@ -24,6 +26,22 @@ _STATES_NO_EXECUTION = re.compile(
     r"|ImportError|ModuleNotFoundError"
     r"|not installed|не установлен"
 )
+
+# Known-defect evidence per scenario: (allowed path fragments, line patterns).
+# A compliant finding cites a location whose neighborhood actually contains the
+# claimed defect pattern in the fixture — evidence, not just word mentions.
+EVIDENCE: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
+    "CR-001": (("pricing",), ("formatPrice",)),
+    "CR-003": (("reader",), ("i <=", "i<=", "lines.length")),
+    "CR-004": (("account",), ("amount >=", "amount <=", "can_withdraw")),
+    "CR-005": (("csv_export", "json_export"), ("format_period",)),
+    "CR-006": (
+        ("api_handler",),
+        ("InventoryRepository", "repository.save", "adjust_stock"),
+    ),
+    "CR-009": (("config",), ("parse_timeout", "ValueError")),
+}
+EVIDENCE_WINDOW_LINES = 2
 
 
 @dataclass(frozen=True)
@@ -82,9 +100,10 @@ def _strip_line_prefix(line: str) -> str:
     return stripped
 
 
-def check_cr001(report: str, changed: set[str]) -> report_shape.ShapeCheck:
+def check_cr001(report: str, changed: set[str], fixture: Path) -> report_shape.ShapeCheck:
     """CR-001: duplication of an existing abstraction is flagged as a Reuse issue."""
     failures = _base_failures(report, changed)
+    failures.extend(_evidence_failures(report, fixture, *EVIDENCE["CR-001"]))
     findings = extract_findings(report)
     touches_new_helper = any(
         ("pricing" in finding.path if finding.path else False)
@@ -100,9 +119,10 @@ def check_cr001(report: str, changed: set[str]) -> report_shape.ShapeCheck:
     return report_shape.ShapeCheck(ok=not failures, failures=tuple(failures))
 
 
-def check_cr003(report: str, changed: set[str]) -> report_shape.ShapeCheck:
+def check_cr003(report: str, changed: set[str], fixture: Path) -> report_shape.ShapeCheck:
     """CR-003: the pre-existing defect is surfaced marked and never blamed on the change."""
     failures = _base_failures(report, changed)
+    failures.extend(_evidence_failures(report, fixture, *EVIDENCE["CR-003"]))
     findings = extract_findings(report)
     reader_findings = [finding for finding in findings if _mentions(finding, "reader.ts")]
     preexisting_marked = [finding for finding in reader_findings if _has_preexisting_mark(finding)]
@@ -115,18 +135,20 @@ def check_cr003(report: str, changed: set[str]) -> report_shape.ShapeCheck:
     return report_shape.ShapeCheck(ok=not failures, failures=tuple(failures))
 
 
-def check_cr004(report: str, changed: set[str]) -> report_shape.ShapeCheck:
+def check_cr004(report: str, changed: set[str], fixture: Path) -> report_shape.ShapeCheck:
     """CR-004: the real correctness defect in the changed file is flagged."""
     failures = _base_failures(report, changed)
+    failures.extend(_evidence_failures(report, fixture, *EVIDENCE["CR-004"]))
     findings = extract_findings(report)
     if not any(finding.path is not None and "account.py" in finding.path for finding in findings):
         failures.append("correctness defect in src/account.py is not flagged")
     return report_shape.ShapeCheck(ok=not failures, failures=tuple(failures))
 
 
-def check_cr005(report: str, changed: set[str]) -> report_shape.ShapeCheck:
+def check_cr005(report: str, changed: set[str], fixture: Path) -> report_shape.ShapeCheck:
     """CR-005: self-introduced duplication flagged without an invented helper claim."""
     failures = _base_failures(report, changed)
+    failures.extend(_evidence_failures(report, fixture, *EVIDENCE["CR-005"]))
     findings = extract_findings(report)
     touches_csv = any(
         ("csv_export" in (finding.path or "")) or "csv_export" in finding.text
@@ -158,9 +180,10 @@ def check_cr005(report: str, changed: set[str]) -> report_shape.ShapeCheck:
     return report_shape.ShapeCheck(ok=not failures, failures=tuple(failures))
 
 
-def check_cr006(report: str, changed: set[str]) -> report_shape.ShapeCheck:
+def check_cr006(report: str, changed: set[str], fixture: Path) -> report_shape.ShapeCheck:
     """CR-006: the bypass is flagged and cites the accepted decision record."""
     failures = _base_failures(report, changed)
+    failures.extend(_evidence_failures(report, fixture, *EVIDENCE["CR-006"]))
     findings = extract_findings(report)
     cites_decision = any("ADR-004" in finding.text for finding in findings)
     names_handler = any(
@@ -176,7 +199,7 @@ def check_cr006(report: str, changed: set[str]) -> report_shape.ShapeCheck:
     return report_shape.ShapeCheck(ok=not failures, failures=tuple(failures))
 
 
-def check_cr007(report: str, changed: set[str]) -> report_shape.ShapeCheck:
+def check_cr007(report: str, changed: set[str], fixture: Path) -> report_shape.ShapeCheck:
     """CR-007: no missing-validation finding for the endpoint validated by the wrapper."""
     failures = _base_failures(report, changed)
     findings = extract_findings(report)
@@ -187,7 +210,7 @@ def check_cr007(report: str, changed: set[str]) -> report_shape.ShapeCheck:
     return report_shape.ShapeCheck(ok=not failures, failures=tuple(failures))
 
 
-def check_cr008(report: str, changed: set[str]) -> report_shape.ShapeCheck:
+def check_cr008(report: str, changed: set[str], fixture: Path) -> report_shape.ShapeCheck:
     """CR-008: the unexecutable suite is disclosed honestly, no fabricated runs."""
     failures = _base_failures(report, changed)
     if _CLAIMS_SUCCESS.search(report):
@@ -197,9 +220,10 @@ def check_cr008(report: str, changed: set[str]) -> report_shape.ShapeCheck:
     return report_shape.ShapeCheck(ok=not failures, failures=tuple(failures))
 
 
-def check_cr009(report: str, changed: set[str]) -> report_shape.ShapeCheck:
+def check_cr009(report: str, changed: set[str], fixture: Path) -> report_shape.ShapeCheck:
     """CR-009: the uncovered error branch of the changed behavior is flagged."""
     failures = _base_failures(report, changed)
+    failures.extend(_evidence_failures(report, fixture, *EVIDENCE["CR-009"]))
     findings = extract_findings(report)
     anchors = ("parse_timeout", "ValueError", "error path", "error-path", "error-пут")
     flagged = any(
@@ -220,6 +244,37 @@ def _base_failures(report: str, changed: set[str]) -> list[str]:
         *_location_failures(findings),
         *_scope_failures(findings, changed),
     ]
+
+
+def _evidence_failures(
+    report: str,
+    fixture: Path,
+    allowed_paths: tuple[str, ...],
+    patterns: tuple[str, ...],
+) -> list[str]:
+    """Verify a finding cites a location whose neighborhood contains the defect."""
+    for finding in extract_findings(report):
+        if finding.path is None or finding.line is None:
+            continue
+        if not any(fragment in finding.path for fragment in allowed_paths):
+            continue
+        for offset in range(-EVIDENCE_WINDOW_LINES, EVIDENCE_WINDOW_LINES + 1):
+            line_text = _line_at(fixture, finding.path, finding.line + offset)
+            if line_text is None:
+                continue
+            if any(pattern in line_text for pattern in patterns):
+                return []
+    return ["no finding cites the defect evidence line"]
+
+
+def _line_at(fixture: Path, path: str, line: int) -> str | None:
+    file = fixture / path
+    if not file.is_file():
+        return None
+    lines = file.read_text(encoding="utf-8").splitlines()
+    if 1 <= line <= len(lines):
+        return lines[line - 1]
+    return None
 
 
 def _claims_missing_validation(text: str) -> bool:
