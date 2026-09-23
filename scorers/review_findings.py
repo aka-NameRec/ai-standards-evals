@@ -466,6 +466,8 @@ def _names_missing_coverage(text: str) -> bool:
             "не покрыт" in lowered
             or "покрытия нет" in lowered
             or "отсутствует" in lowered
+            or "нет тест" in lowered
+            or "нет кейс" in lowered
             or "no test" in lowered
             or "not covered" in lowered
             or "missing" in lowered

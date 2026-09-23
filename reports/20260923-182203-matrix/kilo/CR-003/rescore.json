@@ -1,0 +1,8 @@
+{
+  "scenario_id": "CR-003",
+  "ok": false,
+  "failures": [
+    "finding outside the reviewed diff: test/reader.test.ts"
+  ],
+  "note": "rescored with the missing-coverage scope exemption incl. vitest-style paths (issue #22)"
+}

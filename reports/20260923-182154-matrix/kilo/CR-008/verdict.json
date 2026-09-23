@@ -1,0 +1,29 @@
+{
+  "scenario_id": "CR-008",
+  "ok": false,
+  "failures": [
+    "missing section: Что сделано",
+    "missing section: Как сделано",
+    "missing section: Проверки"
+  ],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 149.7,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "rules-change/22-m4-reporting-reference",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/20260923-182154-matrix/kilo/CR-008/fixture/cr-008-verification-unavailable",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CR-008",
+    "code review"
+  ],
+  "judge": null
+}
