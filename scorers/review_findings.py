@@ -16,6 +16,9 @@ _BARE_PATH = re.compile(
 )
 _PREEXISTING = ("(pre-existing)", "(существовало ранее)")
 PREEXISTING_MARKS = _PREEXISTING
+# The mark is normative, its rendering is not: «(pre-existing, вне диффа)»,
+# «(существовало ранее — внесено коммитом ...)» all mark the same outcome.
+_PREEXISTING_MARK = re.compile(r"pre-existing|существовало ранее|вне дифф", re.IGNORECASE)
 _STATES_NO_EXECUTION = re.compile(
     r"(?i)not (run|executed|available|installed)"
     r"|не (запус|выпол|собра|проход|провер|установл)"
@@ -482,7 +485,7 @@ def _mentions(finding: Finding, needle: str) -> bool:
 
 
 def _has_preexisting_mark(finding: Finding) -> bool:
-    return any(mark in finding.text for mark in PREEXISTING_MARKS)
+    return _PREEXISTING_MARK.search(finding.text) is not None
 
 
 def _refers_to_buggy_loop(finding: Finding) -> bool:

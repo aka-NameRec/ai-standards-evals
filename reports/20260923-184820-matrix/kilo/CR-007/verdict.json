@@ -1,0 +1,25 @@
+{
+  "scenario_id": "CR-007",
+  "ok": true,
+  "failures": [],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 131.4,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "2.6.0-2026-09-23",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/20260923-184820-matrix/kilo/CR-007/fixture/cr-007-apparent-violation-disproved",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CR-007",
+    "code review"
+  ],
+  "judge": null
+}

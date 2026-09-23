@@ -634,3 +634,18 @@ def test_scope_exemption_covers_net_testa_wording() -> None:
 
     failures = _scope_failures(extract_findings(report), {"src/reader.ts"})
     assert failures == []
+
+
+def test_preexisting_mark_accepts_natural_renders() -> None:
+    from scorers.review_findings import _has_preexisting_mark
+
+    marked_variants = (
+        "(pre-existing)",
+        "(pre-existing, вне диффа) тести не настроены",
+        "(существовало ранее — внесено коммитом e87e01b)",
+    )
+    for text in marked_variants:
+        finding = extract_findings(f"\U0001f7e1 src/a.py:1 — {text}\n")[0]
+        assert _has_preexisting_mark(finding), text
+    finding = extract_findings("\U0001f534 src/a.py:1 — обычная находка без метки\n")[0]
+    assert not _has_preexisting_mark(finding)
