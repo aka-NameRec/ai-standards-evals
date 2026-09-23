@@ -35,9 +35,15 @@ def discover_runs(
     scenarios: frozenset[str],
     force: bool,
 ) -> list[Path]:
-    """Find run dirs for judge scenarios that have no judge verdict yet."""
+    """Find run dirs for judge scenarios that have no judge verdict yet.
+
+    Both layouts count: single-scenario run dirs and matrix cells; archived
+    runs are excluded.
+    """
     found: list[Path] = []
-    for verdict_path in sorted(reports_root.glob("*/verdict.json")):
+    for verdict_path in sorted(reports_root.rglob("verdict.json")):
+        if any(part.startswith("archive") for part in verdict_path.parts):
+            continue
         verdict = json.loads(verdict_path.read_text(encoding="utf-8"))
         if verdict.get("scenario_id") not in scenarios:
             continue

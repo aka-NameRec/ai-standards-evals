@@ -1,15 +1,15 @@
 scenario  baseline  candidate  delta
 ------------------------------------
-CR-001    NO RUNS   NO RUNS    same
-CR-002    NO RUNS   NO RUNS    same
-CR-003    NO RUNS   NO RUNS    same
-CR-004    NO RUNS   NO RUNS    same
-CR-005    NO RUNS   NO RUNS    same
-CR-006    NO RUNS   NO RUNS    same
-CR-007    NO RUNS   NO RUNS    same
-CR-008    NO RUNS   NO RUNS    same
-CR-009    NO RUNS   NO RUNS    same
-CR-010    NO RUNS   PASS       upgrade
+CR-001    PASS      PASS       same
+CR-002    PASS      PASS       same
+CR-003    PASS      PASS       same
+CR-004    PASS      PASS       same
+CR-005    PASS      PASS       same
+CR-006    PASS      PASS       same
+CR-007    PASS      PASS       same
+CR-008    PASS      PASS       same
+CR-009    MIXED     PASS       upgrade
+CR-010    NO RUNS   MIXED      upgrade
 CR-011    NO RUNS   PASS       upgrade
 CR-012    NO RUNS   PASS       upgrade
 
