@@ -1,0 +1,36 @@
+{
+  "scenario_id": "CR-001",
+  "ok": true,
+  "failures": [],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 127.2,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "main",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/20260923-140531-CR-001/fixture/cr-001-duplicate-abstraction-exists",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CR-001",
+    "code review"
+  ],
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The finding in the 'Переиспользование' section explicitly states that formatPrice fully duplicates formatMoney, detailing the shared logic (currency symbol map EUR→€/GBP→£/default $, sign handling via amount < 0 and Math.abs, Math.floor(abs / 100) and padStart(2, \"0\") fraction formatting, and identical output format like -€5.01, noting only the grouping mechanism differs). It names the existing primitive with precise references (formatMoney in src/money.ts:1-8, grouping regex at src/money.ts:7), and the remedy is aligned: delete formatPrice and use formatMoney, or re-export the existing function under a pricing-domain name if needed, rather than keeping a second implementation. The location is cited as src/pricing.ts:1 with a line number. All four criteria hold.",
+    "criteria": {
+      "duplication_named": true,
+      "existing_primitive_named": true,
+      "remedy_aligned": true,
+      "location": true
+    }
+  }
+}

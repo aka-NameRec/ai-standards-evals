@@ -1,0 +1,36 @@
+{
+  "scenario_id": "CR-004",
+  "ok": true,
+  "failures": [],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 118.1,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "main",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/20260923-141158-CR-004/fixture/cr-004-real-correctness-defect",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CR-004",
+    "code review"
+  ],
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The finding explicitly names the defect as an inverted comparison (`amount >= balance` instead of `amount <= balance`) in the 'Корректность' section. It explains the consequence concretely: `amount >= balance` returns True only when withdrawing the full balance or more (allowing overdraft) and legitimate withdrawals such as `can_withdraw(100, 40)` return False, confirmed by the failing test. Expected behavior is grounded in the docstring contract («Return whether ``amount`` may be withdrawn») and the existing test `tests/test_account.py:5`, not in taste. The location is precise: `src/account.py:6`, matching the diff hunk.",
+    "criteria": {
+      "defect_named": true,
+      "consequence_explained": true,
+      "expected_behavior_sourced": true,
+      "location": true
+    }
+  }
+}

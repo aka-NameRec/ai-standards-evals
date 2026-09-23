@@ -21,5 +21,16 @@
     "eval-CR-005",
     "code review"
   ],
-  "judge": null
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The reuse finding explicitly identifies format_period in src/json_export.py:4 as a byte-for-byte copy of format_period in src/csv_export.py:4, detailing the shared logic (docstring, boundary swap, \"{start}..{end}\" format) and citing locations in both new modules. It explicitly verified via grep that no prior implementation existed — the duplication is introduced by this diff, not an ignored existing helper — and referencing src/rows.py merely as the natural home for the extracted helper (alongside a proposed new src/periods.py) is acceptable per the rubric. The remedy extracts a shared helper into a common module imported by both exports, satisfying all four criteria.",
+    "criteria": {
+      "duplication_named": true,
+      "no_invented_helper": true,
+      "remedy_aligned": true,
+      "locations": true
+    }
+  }
 }

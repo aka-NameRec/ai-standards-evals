@@ -21,5 +21,16 @@
     "eval-CR-006",
     "code review"
   ],
-  "judge": null
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The finding explicitly names the bypass: the handler instantiates InventoryRepository and writes directly to storage instead of going through InventoryReservationService (also restated in the summary as 'обработчик обходит InventoryReservationService'). It cites ADR-004 by number and path (docs/decisions/ADR-004.md:3-4) and quotes its rule text verbatim, corroborated by the repository docstring, so it is anchored to the specific decision rather than generic layering preference. The proposed fix — construct InventoryReservationService(InventoryRepository()) and call its save() — routes the write through the service and explicitly preserves the single write path. The location is cited as api_handler.py:7-8, which correctly matches the lines in the diff where the repository is instantiated and save() is called. All four criteria are satisfied.",
+    "criteria": {
+      "bypass_named": true,
+      "decision_cited": true,
+      "remedy_aligned": true,
+      "location": true
+    }
+  }
 }

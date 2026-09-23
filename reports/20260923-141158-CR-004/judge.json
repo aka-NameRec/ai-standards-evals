@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The finding explicitly names the defect as an inverted comparison (`amount >= balance` instead of `amount <= balance`) in the 'Корректность' section. It explains the consequence concretely: `amount >= balance` returns True only when withdrawing the full balance or more (allowing overdraft) and legitimate withdrawals such as `can_withdraw(100, 40)` return False, confirmed by the failing test. Expected behavior is grounded in the docstring contract («Return whether ``amount`` may be withdrawn») and the existing test `tests/test_account.py:5`, not in taste. The location is precise: `src/account.py:6`, matching the diff hunk.",
+  "criteria": {
+    "defect_named": true,
+    "consequence_explained": true,
+    "expected_behavior_sourced": true,
+    "location": true
+  }
+}

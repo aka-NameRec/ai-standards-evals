@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The finding explicitly names the defect — the comparison in the withdrawal condition is inverted (`amount <= balance` became `amount >= balance`, 'инвертирует правило снятия') — rather than vaguely flagging the line. It explains both consequences with concrete examples: a legitimate withdrawal `can_withdraw(100, 40)` now returns False, while an overdraft withdrawal `can_withdraw(100, 150)` returns True. Expected behavior is grounded in the docstring contract ('снятие допустимо при amount <= balance') and corroborated by the failing test `test_routine_withdrawal`, not in taste. The location cites `src/account.py:6`, which matches the changed line in the diff hunk (hunk starts at line 3: blank, def, docstring, return). All four criteria hold.",
+  "criteria": {
+    "defect_named": true,
+    "consequence_explained": true,
+    "expected_behavior_sourced": true,
+    "location": true
+  }
+}

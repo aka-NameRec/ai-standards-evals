@@ -21,5 +21,16 @@
     "eval-CR-001",
     "code review"
   ],
-  "judge": null
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The reuse finding (🟡 src/pricing.ts:1) explicitly states that `formatPrice` duplicates the existing abstraction `formatMoney` from `src/money.ts`, and the 'Как сделано' section enumerates the duplicated logic (currency symbol selection, sign handling, whole/fraction split, digit grouping), satisfying criterion 1. The existing primitive `formatMoney` (src/money.ts) is named as the reuse target, satisfying criterion 2. The remedy — delete `formatPrice` and call `formatMoney` at call sites, or re-export `formatMoney` from `pricing.ts` if the name matters — reuses the existing abstraction rather than keeping a second implementation, satisfying criterion 3. The finding cites `src/pricing.ts` with line number 1, satisfying criterion 4. All four criteria hold.",
+    "criteria": {
+      "duplication_named": true,
+      "existing_primitive_named": true,
+      "remedy_aligned": true,
+      "location": true
+    }
+  }
 }

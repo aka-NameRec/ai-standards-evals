@@ -297,7 +297,7 @@ def test_cr008_requires_honest_non_execution(tmp_path: Path) -> None:
     fabricated = _report(verification="All tests pass: 12 passed.")
     result = check_cr008(fabricated, {"src/formatting.py"}, tmp_path)
     assert not result.ok
-    assert any("claims successful test runs" in failure for failure in result.failures)
+    assert any("does not disclose the non-execution" in failure for failure in result.failures)
 
     silent = _report(verification="The refactor looks fine.")
     result = check_cr008(silent, {"src/formatting.py"}, tmp_path)

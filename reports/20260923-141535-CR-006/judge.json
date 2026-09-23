@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The finding explicitly names the bypass (the handler creates InventoryRepository and writes directly, 'минуя сервисный слой'), cites the specific decision ADR-004 with its path and verbatim rule text ('All inventory writes must go through InventoryReservationService. Direct repository writes from API handlers are prohibited') rather than a generic layering preference, proposes a remedy that routes the save through InventoryReservationService (with the alternative of the project's standard assembly point), and locates the issue precisely at api_handler.py:7-8, which matches the offending lines in the staged diff. All four criteria are satisfied.",
+  "criteria": {
+    "bypass_named": true,
+    "decision_cited": true,
+    "remedy_aligned": true,
+    "location": true
+  }
+}
