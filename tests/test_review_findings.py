@@ -575,3 +575,32 @@ def test_cr012_rejects_wrong_fallback_order() -> None:
     check = check_cr012(report, {"textkit.py"}, Path("."))
     assert not check.ok
     assert "fallback sections are out of order" in check.failures
+
+
+def test_scope_exempts_missing_coverage_findings_on_test_paths() -> None:
+    report = _report(
+        {
+            "Quality": (
+                "\U0001f7e1 tests/test_account.py — единственный тест покрывает только "
+                "happy path, кейс с пустой строкой отсутствует — нарушает: core/base\n"
+            )
+        }
+    )
+    from scorers.review_findings import _scope_failures, extract_findings
+
+    failures = _scope_failures(extract_findings(report), {"src/account.py"})
+    assert failures == []
+
+
+def test_scope_keeps_real_out_of_diff_findings() -> None:
+    report = _report(
+        {
+            "Reuse": (
+                "\U0001f7e1 src/other.py:10 — duplicates the helper — violates: DRY\n"
+            )
+        }
+    )
+    from scorers.review_findings import _scope_failures, extract_findings
+
+    failures = _scope_failures(extract_findings(report), {"src/account.py"})
+    assert failures == ["finding outside the reviewed diff: src/other.py"]

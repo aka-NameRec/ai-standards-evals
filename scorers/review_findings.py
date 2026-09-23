@@ -435,13 +435,38 @@ def _location_failures(findings: tuple[Finding, ...]) -> list[str]:
 
 
 def _scope_failures(findings: tuple[Finding, ...], changed: set[str]) -> list[str]:
-    return [
-        f"finding outside the reviewed diff: {finding.path}"
-        for finding in findings
-        if finding.path is not None
-        and finding.path not in changed
-        and not _has_preexisting_mark(finding)
-    ]
+    failures = []
+    for finding in findings:
+        if finding.path is None or finding.path in changed or _has_preexisting_mark(finding):
+            continue
+        # A missing-coverage finding legitimately cites the test file where the
+        # coverage is absent; it does not expand the review into unrelated code.
+        if _is_test_path(finding.path) and _names_missing_coverage(finding.text):
+            continue
+        failures.append(f"finding outside the reviewed diff: {finding.path}")
+    return failures
+
+
+def _is_test_path(path: str) -> bool:
+    name = path.rsplit("/", 1)[-1]
+    return name.startswith("test_") or name.endswith("_test") or name == "tests"
+
+
+def _names_missing_coverage(text: str) -> bool:
+    lowered = text.lower()
+    return (
+        ("тест" in lowered or "test" in lowered or "кейс" in lowered or "cover" in lowered)
+        and (
+            "не покрыт" in lowered
+            or "покрытия нет" in lowered
+            or "отсутствует" in lowered
+            or "no test" in lowered
+            or "not covered" in lowered
+            or "missing" in lowered
+            or "uncovered" in lowered
+            or "только happy path" in lowered
+        )
+    )
 
 
 def _mentions(finding: Finding, needle: str) -> bool:
