@@ -20,5 +20,17 @@
     "--title",
     "eval-CR-005",
     "code review"
-  ]
+  ],
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The reuse finding explicitly names `format_period` as duplicated verbatim between `src/csv_export.py:4` and `src/json_export.py:4` (identical signature, docstring, and body, lines 4–8 in both files), correctly framing it as duplication introduced by the change rather than a bypass of an existing abstraction — the mention of `src/rows.py` is only cited as a precedent for shared helper modules and is explicitly noted as unsuitable (tabular data), so no ignored helper is invented. The suggested remedy is to extract the function into a new shared module (`src/periods.py`) imported by both exporters, which matches the aligned fix, and locations in both new modules are cited. All four criteria hold.",
+    "criteria": {
+      "duplication_named": true,
+      "no_invented_helper": true,
+      "remedy_aligned": true,
+      "locations": true
+    }
+  }
 }

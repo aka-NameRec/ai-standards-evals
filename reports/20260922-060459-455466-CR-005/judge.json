@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The finding explicitly names the duplication: `format_period` in `src/json_export.py:4` is stated to be fully identical to `format_period` in `src/csv_export.py:4`, with the same logic added as two copies within a single change — correctly attributing the duplication to the diff itself, not to a bypassed existing helper. `src/rows.py` is referenced only as an existing generic helpers pattern and the natural home for the extracted helper (explicitly allowed by the rubric), never as a pre-existing period-formatting helper that was ignored. The remedy — move `format_period` into a shared module (`src/rows.py` or a new `src/period.py`) with both exports importing it — is aligned, and locations in both new modules are cited.",
+  "criteria": {
+    "duplication_named": true,
+    "no_invented_helper": true,
+    "remedy_aligned": true,
+    "locations": true
+  }
+}

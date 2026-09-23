@@ -21,5 +21,16 @@
     "eval-CR-005",
     "code review"
   ],
-  "judge": null
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The finding explicitly names `format_period` as a verbatim duplicate across both new modules, citing precise locations (src/json_export.py:5 and src/csv_export.py:5) and confirming identical bodies. It correctly frames the issue as DRY duplication introduced by the change itself — the reviewer verified no prior duplicate existed — and never claims an existing helper or abstraction was ignored or bypassed. The remedy consolidates the logic into a single shared helper imported by both exports (proposing the shared module src/rows.py as the destination), which satisfies the extract-a-shared-helper requirement.",
+    "criteria": {
+      "duplication_named": true,
+      "no_invented_helper": true,
+      "remedy_aligned": true,
+      "locations": true
+    }
+  }
 }

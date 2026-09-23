@@ -20,5 +20,17 @@
     "--title",
     "eval-CR-001",
     "code review"
-  ]
+  ],
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The finding explicitly states that `formatPrice` is a near-exact copy of the existing `formatMoney` from `src/money.ts`, enumerating the duplicated concerns (sign, abs, floor/padStart fraction handling, digit grouping, and currency-symbol handling via a dictionary vs ternary chain). It names the existing primitive (`formatMoney`, `src/money.ts`) as the reuse target and cites the location with a line number (`src/pricing.ts:1`). The remedy is aligned: reuse `formatMoney` from `src/money.ts` and delete/not add `src/pricing.ts` (optionally re-exporting under a new name), rather than keeping a second implementation. The report also verifies behavioral equivalence and the absence of callers, strengthening the finding.",
+    "criteria": {
+      "duplication_named": true,
+      "existing_primitive_named": true,
+      "remedy_aligned": true,
+      "location": true
+    }
+  }
 }

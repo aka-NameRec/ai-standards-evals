@@ -22,7 +22,7 @@ from scripts.fixtures import build_fixture
 from scripts.oracle import changed_files, diff_patch
 from scripts.standards import Scenario
 
-JUDGE_SCENARIOS = frozenset({"CR-004", "CR-006"})
+JUDGE_SCENARIOS = frozenset({"CR-001", "CR-004", "CR-005", "CR-006"})
 NO_FIXTURE_NOTE = "scenario has no deterministic fixture builder yet"
 
 

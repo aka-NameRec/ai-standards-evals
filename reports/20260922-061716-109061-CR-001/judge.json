@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The reuse finding explicitly states that formatPrice duplicates the existing formatMoney primitive, enumerating the shared logic (currency symbol handling, sign, whole/frac splitting of cents, thousands grouping), and names the reuse target with its file (formatMoney, src/money.ts:1). It cites the offending location as src/pricing.ts:1 with a line number. The disposition names the aligned remedy — removing the duplicate and migrating calls to formatMoney — rather than keeping a second implementation; although the agent frames applying it as the author's decision and leaves the staged code as is, the suggested fix itself is reuse of formatMoney, so criterion 3 holds. All four criteria are satisfied.",
+  "criteria": {
+    "duplication_named": true,
+    "existing_primitive_named": true,
+    "remedy_aligned": true,
+    "location": true
+  }
+}

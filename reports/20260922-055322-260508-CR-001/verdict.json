@@ -20,5 +20,17 @@
     "--title",
     "eval-CR-001",
     "code review"
-  ]
+  ],
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The finding explicitly names the duplication: formatPrice is behaviorally identical to the existing formatMoney (same cents semantics, same currency symbols with the same `$` fallback, same output format including sign and grouping, verified on 36 input combinations). It explicitly points to the existing abstraction formatMoney in src/money.ts (with line reference) as the reuse target. The remedy is aligned: delete src/pricing.ts or turn it into a re-export of formatMoney, eliminating the second implementation rather than keeping it. The finding cites the location src/pricing.ts with a line number (:1). All four criteria hold.",
+    "criteria": {
+      "duplication_named": true,
+      "existing_primitive_named": true,
+      "remedy_aligned": true,
+      "location": true
+    }
+  }
 }

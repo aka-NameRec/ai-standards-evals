@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The reuse finding explicitly identifies formatPrice as a functional copy of the existing formatMoney (same cents arithmetic, currency symbols, sign/grouping/fraction formatting), names the existing primitive with its location (formatMoney from src/money.ts:1), cites the duplicate with a line number (src/pricing.ts:1), and proposes removing the new file and switching calls to formatMoney — a reuse-aligned remedy, even though the reviewer notes the final decision is deferred to the author because it touches staged index state. All four criteria are satisfied.",
+  "criteria": {
+    "duplication_named": true,
+    "existing_primitive_named": true,
+    "remedy_aligned": true,
+    "location": true
+  }
+}

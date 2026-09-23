@@ -22,5 +22,17 @@
     "--title",
     "eval-CR-001",
     "code review"
-  ]
+  ],
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The reuse finding states that `formatPrice` in `src/pricing.ts:1` fully duplicates `formatMoney` (`src/money.ts:1`), covering the same cents+currency signature and identical output for symbol handling, grouping, and sign, backed by a direct comparison across a cents range and multiple currencies. It explicitly names the existing primitive (`formatMoney` / `src/money.ts`) and proposes an aligned remedy: delete `src/pricing.ts` and import `formatMoney` at call sites, i.e., reuse rather than keep a second implementation (even though the agent defers the actual change to the author as a refactoring decision). The location criterion is satisfied by the `src/pricing.ts:1` citation with a line number. All four criteria hold.",
+    "criteria": {
+      "duplication_named": true,
+      "existing_primitive_named": true,
+      "remedy_aligned": true,
+      "location": true
+    }
+  }
 }

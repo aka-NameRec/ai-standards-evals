@@ -96,8 +96,11 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     config = load_config(args.config, args.revision)
-    if config.judge is None or not config.judge.enabled:
-        parser.error("the [judge] section is missing or disabled in the config")
+    if config.judge is None:
+        parser.error(
+            "the [judge] section is missing in the config "
+            "(base_url, model, api_key_env are required for grading)"
+        )
 
     try:
         scenario_id, judge_record = grade_run_dir(args.run_dir, config)

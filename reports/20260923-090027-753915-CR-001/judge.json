@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The finding under 'Переиспользование' explicitly states that formatPrice duplicates the existing formatMoney abstraction, enumerating the duplicated logic (cents input, sign, currency symbols, digit grouping, fraction). It names formatMoney in src/money.ts as the reuse target, and the remedy is aligned: delete src/pricing.ts and use formatMoney, or re-export it from a pricing module rather than keeping a copy. The finding cites src/pricing.ts:1 with a line number. All four criteria are satisfied.",
+  "criteria": {
+    "duplication_named": true,
+    "existing_primitive_named": true,
+    "remedy_aligned": true,
+    "location": true
+  }
+}

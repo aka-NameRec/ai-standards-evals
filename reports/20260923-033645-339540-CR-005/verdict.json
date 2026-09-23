@@ -20,5 +20,17 @@
     "--title",
     "eval-CR-005",
     "code review"
-  ]
+  ],
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The finding explicitly names format_period as a byte-identical duplicate across the two new modules (src/json_export.py:4 copying src/csv_export.py:4, including docstring and date-swap logic) and cites line-level locations in both files. Crucially, it frames the issue as new DRY duplication introduced by the diff — the copy source is the other new module, not any pre-existing project helper — so it does not invent or accuse the author of bypassing an existing abstraction. The remedy, extracting the function into a common shared module and importing it in both export files, matches the required shared-helper fix; nominating src/rows.py as the destination is a plausible shared location for the extraction and is not a claim that an existing format_period helper was ignored.",
+    "criteria": {
+      "duplication_named": true,
+      "no_invented_helper": true,
+      "remedy_aligned": true,
+      "locations": true
+    }
+  }
 }

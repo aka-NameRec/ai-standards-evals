@@ -40,14 +40,30 @@ class HttpJsonClient(Protocol):
 
 
 class HttpxJsonClient:
-    """Default ``HttpJsonClient`` backed by httpx."""
+    """Default ``HttpJsonClient`` backed by httpx.
+
+    Judge calls can be slow on long reports; one retry absorbs transient
+    transport failures.
+    """
 
     def post_json(
         self, url: str, headers: dict[str, str], payload: dict[str, object]
     ) -> dict[str, object]:
-        response = httpx.post(url, headers=headers, json=payload, timeout=120.0)
-        response.raise_for_status()
-        return dict(response.json())
+        request_timeout = 300.0
+        last_error: Exception | None = None
+        for attempt in (1, 2):
+            try:
+                response = httpx.post(
+                    url, headers=headers, json=payload, timeout=request_timeout
+                )
+                response.raise_for_status()
+                return dict(response.json())
+            except httpx.HTTPError as error:
+                last_error = error
+                if attempt == 2:
+                    break
+        msg = f"judge transport failed after retry: {last_error}"
+        raise JudgeError(msg)
 
 
 class JudgeError(RuntimeError):

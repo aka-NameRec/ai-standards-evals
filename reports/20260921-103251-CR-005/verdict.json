@@ -22,5 +22,17 @@
     "--title",
     "eval-CR-005",
     "code review"
-  ]
+  ],
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The finding explicitly names `format_period` as duplicated verbatim (identical signature, docstring, and body) between src/csv_export.py:4 and src/json_export.py:4, citing locations in both new modules. Critically, it correctly attributes the duplication to the change itself ('обе копии добавлены этим же изменением') and frames the issue as a DRY violation, not as ignoring an existing helper — `src/rows.py` is referenced only as a conventions precedent for where shared code lives, not as a bypassed abstraction, and the reviewer affirmatively checked for a reusable primitive and found none. The suggested fix — extract `format_period` into a shared module (e.g., `src/period.py`) and import it in both exports — is exactly the aligned remedy. All four criteria hold.",
+    "criteria": {
+      "duplication_named": true,
+      "no_invented_helper": true,
+      "remedy_aligned": true,
+      "locations": true
+    }
+  }
 }

@@ -20,5 +20,17 @@
     "--title",
     "eval-CR-001",
     "code review"
-  ]
+  ],
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The reuse finding explicitly states that formatPrice fully duplicates formatMoney, enumerating the overlapping logic (currency-symbol mapping, sign handling, floor(abs/100), fraction padding, digit grouping), which satisfies criterion 1. It explicitly names the existing abstraction formatMoney in src/money.ts as the reuse target (criterion 2). The recommended fix — delete src/pricing.ts and use formatMoney from src/money.ts — removes the second implementation and reuses the existing primitive rather than keeping or delegating alongside a duplicate, satisfying criterion 3. The finding is anchored at src/pricing.ts:1, citing the file with a line number as required by criterion 4. All four criteria hold.",
+    "criteria": {
+      "duplication_named": true,
+      "existing_primitive_named": true,
+      "remedy_aligned": true,
+      "location": true
+    }
+  }
 }

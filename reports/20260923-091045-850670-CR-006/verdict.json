@@ -21,5 +21,16 @@
     "eval-CR-006",
     "code review"
   ],
-  "judge": null
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The finding explicitly states the API handler writes directly to InventoryRepository, bypassing InventoryReservationService; it cites docs/decisions/ADR-004.md along with its exact rule text ('All inventory writes must go through InventoryReservationService. Direct repository writes from API handlers are prohibited'), rather than a generic layering preference; the proposed fix routes the write through InventoryReservationService, preserving the single write path; and it pinpoints the exact location api_handler.py:7-8, which matches the lines in the diff where the repository is instantiated and written to. All four criteria are satisfied.",
+    "criteria": {
+      "bypass_named": true,
+      "decision_cited": true,
+      "remedy_aligned": true,
+      "location": true
+    }
+  }
 }

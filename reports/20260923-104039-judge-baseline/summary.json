@@ -1,0 +1,24 @@
+{
+  "kind": "judge-baseline-summary",
+  "runs": 2,
+  "pass": 2,
+  "fail": 0,
+  "errors": 0,
+  "model": "glm-5.3",
+  "results": [
+    {
+      "run": "20260923-090027-753915-CR-001",
+      "scenario_id": "CR-001",
+      "status": "pass",
+      "score": 1.0,
+      "rationale": "The finding under 'Переиспользование' explicitly states that formatPrice duplicates the existing formatMoney abstraction, enumerating the duplicated logic (cents input, sign, currency symbols, digit grouping, fraction). It names formatMoney in src/money.ts as the reuse target, and the remedy is aligned: delete src/pricing.ts and use formatMoney, or re-export it from a pricing module rather than keeping a copy. The finding cites src/pricing.ts:1 with a line number. All four criteria are satisfied."
+    },
+    {
+      "run": "20260923-090907-075387-CR-005",
+      "scenario_id": "CR-005",
+      "status": "pass",
+      "score": 1.0,
+      "rationale": "The finding explicitly names `format_period` as a verbatim duplicate across both new modules, citing precise locations (src/json_export.py:5 and src/csv_export.py:5) and confirming identical bodies. It correctly frames the issue as DRY duplication introduced by the change itself — the reviewer verified no prior duplicate existed — and never claims an existing helper or abstraction was ignored or bypassed. The remedy consolidates the logic into a single shared helper imported by both exports (proposing the shared module src/rows.py as the destination), which satisfies the extract-a-shared-helper requirement."
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "kind": "judge-baseline-summary",
+  "runs": 2,
+  "pass": 2,
+  "fail": 0,
+  "errors": 0,
+  "model": "glm-5.3",
+  "results": [
+    {
+      "run": "20260923-090706-477782-CR-004",
+      "scenario_id": "CR-004",
+      "status": "pass",
+      "score": 1.0,
+      "rationale": "The finding explicitly names the inversion (`amount <= balance` became `amount >= balance` in `can_withdraw`), explains both consequences — withdrawals exceeding the balance are permitted (demonstrated with `can_withdraw(100, 150)` returning `True`) and legitimate withdrawals are rejected (existing test `can_withdraw(100, 40)` fails, confirmed empirically via pytest) — grounds the expected behavior in the docstring contract («Return whether ``amount`` may be withdrawn from ``balance``») and the existing test rather than taste, and cites the precise location `src/account.py:6`. All four criteria are satisfied."
+    },
+    {
+      "run": "20260923-091045-850670-CR-006",
+      "scenario_id": "CR-006",
+      "status": "pass",
+      "score": 1.0,
+      "rationale": "The finding explicitly states the API handler writes directly to InventoryRepository, bypassing InventoryReservationService; it cites docs/decisions/ADR-004.md along with its exact rule text ('All inventory writes must go through InventoryReservationService. Direct repository writes from API handlers are prohibited'), rather than a generic layering preference; the proposed fix routes the write through InventoryReservationService, preserving the single write path; and it pinpoints the exact location api_handler.py:7-8, which matches the lines in the diff where the repository is instantiated and written to. All four criteria are satisfied."
+    }
+  ]
+}
