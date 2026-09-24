@@ -1,0 +1,37 @@
+{
+  "scenario_id": "CR-009",
+  "ok": false,
+  "failures": [
+    "missing section: What Was Done",
+    "missing section: How It Was Done",
+    "missing section: Correctness",
+    "missing section: Architecture & Conventions",
+    "missing section: Reuse",
+    "missing section: Efficiency",
+    "missing section: Quality",
+    "missing section: Verification",
+    "missing ai-standards version line or 'version is undetermined'",
+    "no finding cites the defect evidence line",
+    "the uncovered error branch is not flagged as a Quality concern"
+  ],
+  "adapter": "kilo",
+  "returncode": 1,
+  "duration_seconds": 105.4,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "main",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/20260924-162737-matrix/kilo/CR-009/fixture/cr-009-missing-error-path-test",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CR-009",
+    "code review"
+  ],
+  "judge": null
+}

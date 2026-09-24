@@ -1,0 +1,99 @@
+{
+  "generated": "20260924-162737",
+  "standards_revision": "main",
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "adapters": [
+    "kilo"
+  ],
+  "scenarios": [
+    "CR-001",
+    "CR-002",
+    "CR-003",
+    "CR-004",
+    "CR-005",
+    "CR-006",
+    "CR-007",
+    "CR-008",
+    "CR-009",
+    "CR-010",
+    "CR-011",
+    "CR-012",
+    "BM-001",
+    "BM-002"
+  ],
+  "cells": {
+    "kilo|CR-001": {
+      "verdict": "PASS",
+      "failures": []
+    },
+    "kilo|CR-002": {
+      "verdict": "PASS",
+      "failures": []
+    },
+    "kilo|CR-003": {
+      "verdict": "PASS",
+      "failures": []
+    },
+    "kilo|CR-004": {
+      "verdict": "PASS",
+      "failures": []
+    },
+    "kilo|CR-005": {
+      "verdict": "PASS",
+      "failures": []
+    },
+    "kilo|CR-006": {
+      "verdict": "PASS",
+      "failures": []
+    },
+    "kilo|CR-007": {
+      "verdict": "PASS",
+      "failures": []
+    },
+    "kilo|CR-008": {
+      "verdict": "PASS",
+      "failures": []
+    },
+    "kilo|CR-009": {
+      "verdict": "FAIL",
+      "failures": [
+        "missing section: What Was Done",
+        "missing section: How It Was Done",
+        "missing section: Correctness",
+        "missing section: Architecture & Conventions",
+        "missing section: Reuse",
+        "missing section: Efficiency",
+        "missing section: Quality",
+        "missing section: Verification",
+        "missing ai-standards version line or 'version is undetermined'",
+        "no finding cites the defect evidence line",
+        "the uncovered error branch is not flagged as a Quality concern"
+      ]
+    },
+    "kilo|CR-010": {
+      "verdict": "FAIL",
+      "failures": [
+        "finding-like line without a marker: `pytest`: 1 passed — тестов на пустой slug нет (tests/test_s",
+        "report is not posted inside a fenced Markdown block"
+      ]
+    },
+    "kilo|CR-011": {
+      "verdict": "PASS",
+      "failures": []
+    },
+    "kilo|CR-012": {
+      "verdict": "FAIL",
+      "failures": [
+        "review does not state that the worked example file is missing"
+      ]
+    },
+    "kilo|BM-001": {
+      "verdict": "PASS",
+      "failures": []
+    },
+    "kilo|BM-002": {
+      "verdict": "PASS",
+      "failures": []
+    }
+  }
+}

@@ -1,0 +1,16 @@
+scenario        kilo
+--------------------
+CR-001          PASS
+CR-002          PASS
+CR-003          PASS
+CR-004          PASS
+CR-005          PASS
+CR-006          PASS
+CR-007          PASS
+CR-008          PASS
+CR-009          FAIL
+CR-010          FAIL
+CR-011          PASS
+CR-012          FAIL
+BM-001          PASS
+BM-002          PASS

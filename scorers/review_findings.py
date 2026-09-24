@@ -368,6 +368,7 @@ _MISSING_EXAMPLE = (
 _MISSING_MARKS = (
     r"missing|absent|not found|could not|does not exist|unavailable"
     r"|отсутств\w+|не найден\w*|недоступ\w+|не обнаружен\w*"
+    r"|\bнет\b|не запускался|не выполнялся"
 )
 _STATES_MISSING_EXAMPLE = re.compile(
     rf"(?is)({_MISSING_EXAMPLE}).{{0,200}}?({_MISSING_MARKS})|({_MISSING_MARKS}).{{0,200}}?({_MISSING_EXAMPLE})"

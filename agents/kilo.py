@@ -44,21 +44,31 @@ class KiloAdapter:
         return [*command, prompt]
 
     def run(self, prompt: str, cwd: Path, scenario_id: str) -> AgentResult:
-        """Execute the prompt and capture stdout, stderr, and the extracted answer."""
+        """Execute the prompt and capture stdout, stderr, and the extracted answer.
+
+        An empty answer means the harness produced no assistant output at all
+        (server-side connection resets surface this way with exit code 0);
+        such a run is retried once, and the retry is recorded in stderr.
+        """
         command = self.build_command(prompt, cwd, scenario_id)
         result = run_agent_command(self.name, command, cwd, self.timeout_seconds)
+        answer = extract_answer(result.stdout)
+        if not answer:
+            stderr_note = "[evals] empty answer (no assistant output), retrying once\n"
+            result = run_agent_command(self.name, command, cwd, self.timeout_seconds)
+            result = AgentResult(
+                adapter=result.adapter,
+                command=result.command,
+                returncode=result.returncode,
+                stdout=result.stdout,
+                stderr=stderr_note + result.stderr,
+                duration_seconds=result.duration_seconds,
+                answer=extract_answer(result.stdout),
+            )
         if result.returncode != 0 and not result.stdout:
             msg = f"kilo run failed with code {result.returncode}: {result.stderr[:400]}"
             raise AgentRunError(msg)
-        return AgentResult(
-            adapter=result.adapter,
-            command=result.command,
-            returncode=result.returncode,
-            stdout=result.stdout,
-            stderr=result.stderr,
-            duration_seconds=result.duration_seconds,
-            answer=extract_answer(result.stdout),
-        )
+        return result
 
 
 def extract_answer(stdout: str) -> str:

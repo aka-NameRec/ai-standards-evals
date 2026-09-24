@@ -47,3 +47,30 @@ def test_isolated_config_env_points_xdg_at_a_persistent_directory() -> None:
     override = isolated_config_env()
     assert "XDG_CONFIG_HOME" in override
     assert Path(override["XDG_CONFIG_HOME"]).is_dir()
+
+
+def test_kilo_adapter_retries_empty_answer(monkeypatch, tmp_path: Path) -> None:
+    from agents.kilo import KiloAdapter
+
+    real_run = run_agent_command
+    calls: list[str] = []
+
+    def _flaky(adapter, command, cwd, timeout_seconds):
+        calls.append(command[0])
+        if len(calls) == 1:
+            return real_run(
+                adapter, ["printf", ""], cwd, timeout_seconds
+            )
+        return real_run(
+            adapter,
+            ["printf", '{"type":"text","part":{"text":"отчёт"}}'],
+            cwd,
+            timeout_seconds,
+        )
+
+    monkeypatch.setattr("agents.kilo.run_agent_command", _flaky)
+    result = KiloAdapter(model="m").run("промпт", tmp_path, "CR-001")
+
+    assert len(calls) == 2
+    assert "retrying once" in result.stderr
+    assert "отчёт" in result.answer

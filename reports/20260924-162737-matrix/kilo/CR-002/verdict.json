@@ -1,0 +1,25 @@
+{
+  "scenario_id": "CR-002",
+  "ok": true,
+  "failures": [],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 86.9,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "main",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/20260924-162737-matrix/kilo/CR-002/fixture/cr-002-review-no-valid-findings",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CR-002",
+    "code review"
+  ],
+  "judge": null
+}

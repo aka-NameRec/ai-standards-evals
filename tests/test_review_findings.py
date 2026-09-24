@@ -728,3 +728,18 @@ def test_version_line_accepts_heading_markup() -> None:
     )
     check = check_cr012(report, {"textkit.py"}, Path("."))
     assert check.ok, check.failures
+
+
+def test_cr012_accepts_net_formulation() -> None:
+    """Observed in the release-verification epoch: «файлов ... в проекте нет»."""
+    report = (
+        "ai-standards 2.6.0\n\n"
+        "Файлов `.ai-standards/code-review-report.md` в проекте нет — "
+        "`ai-sync sync-templates` не запускался, использую fallback.\n\n"
+        "### Что сделано\n\nПравка.\n\n### Как сделано\n\nЧтение.\n\n"
+        "### Корректность\n\nНе найдено.\n\n### Архитектура и конвенции\n\nНе найдено.\n\n"
+        "### Переиспользование\n\nНе найдено.\n\n### Эффективность\n\nНе найдено.\n\n"
+        "### Качество\n\nНе найдено.\n\n### Проверки\n\npytest — ок.\n"
+    )
+    check = check_cr012(report, {"textkit.py"}, Path("."))
+    assert check.ok, check.failures
