@@ -662,6 +662,86 @@ def _build_clean_textkit_change(repo: Path) -> None:
     _git(repo, "add", "-A")
 
 
+def build_bm001(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
+    """Decision-note fixture: the note must be created as a repository file."""
+    repo = parent / "bm-001-note-shape"
+    _init_repo(
+        repo,
+        worktree,
+        revision,
+        features=["basic-memory"],
+        stacks=["python"],
+        render=render,
+        sync=True,
+    )
+    _write(
+        repo / "README.md",
+        "# services-platform\n\nInternal services platform playground.\n",
+    )
+    _write(
+        repo / "docs" / "decisions" / "2026-08-01-module-contract-auth.md",
+        "---\n"
+        "title: 'Модульный контракт auth'\n"
+        "type: module-contract\n"
+        "---\n"
+        "\n"
+        "# Модульный контракт auth\n"
+        "\n"
+        "Auth выпускает токены и проверяет скоупы; хранение сессий вне контракта.\n"
+        "\n"
+        "## Observations\n"
+        "\n"
+        "- [fact] Токены живут 15 минут, refresh — 30 дней.\n"
+        "\n"
+        "## Relations\n"
+        "\n"
+        "- relates_to [[ADR-0002: формат токенов]]\n",
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "docs: auth module contract record")
+    _git(repo, "add", "-A")
+    return repo
+
+
+def build_bm002(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
+    """Post-pull fixture: mass renames just landed; the answer must flag sync health."""
+    repo = parent / "bm-002-sync-hygiene"
+    _init_repo(
+        repo,
+        worktree,
+        revision,
+        features=["basic-memory"],
+        stacks=["python"],
+        render=render,
+    )
+    _write(
+        repo / "README.md",
+        "# audit-platform\n\nInternal audit tooling notes.\n",
+    )
+    _write(
+        repo / "docs" / "decisions" / "ADR-0007.md",
+        "# ADR-0007: подход к записи аудита\n"
+        "\n"
+        "Аудит-записи пишутся только append-only в `audit_log` с обязательным\n"
+        "`actor`, `action`, `target` и ISO-временем; ретракция — отдельной\n"
+        "компенсирующей записью, удаление запрещено.\n",
+    )
+    _write(
+        repo / "docs" / "notes" / "audit-retention.md",
+        "---\ntitle: 'Хранение аудита'\n---\n\n# Хранение аудита\n\nСрок хранения — 3 года.\n",
+    )
+    _write(
+        repo / "PULL_INFO.md",
+        "# pull info\n\n"
+        "A `git pull` has just landed mass note renames and several new notes\n"
+        "in `docs/`; the local Basic Memory index has not been rebuilt since.\n",
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "docs: decision notes and pull info")
+    _git(repo, "add", "-A")
+    return repo
+
+
 def _read(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
@@ -811,5 +891,7 @@ BUILDERS: dict[str, Callable[[Path, Path, str, RenderFn], Path]] = {
     "CR-010": build_cr010,
     "CR-011": build_cr011,
     "CR-012": build_cr012,
+    "BM-001": build_bm001,
+    "BM-002": build_bm002,
     "TRG-001": build_trg001,
 }

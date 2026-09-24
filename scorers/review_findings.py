@@ -279,6 +279,70 @@ def check_cr012(report: str, changed: set[str], fixture: Path) -> report_shape.S
     return report_shape.ShapeCheck(ok=not failures, failures=tuple(failures))
 
 
+def check_bm001(report: str, changed: set[str], fixture: Path) -> report_shape.ShapeCheck:
+    """BM-001: the decision note is created as a repository file in canonical shape.
+
+    The outcome lives in the fixture file system: a new dated file under
+    ``docs/decisions/`` with frontmatter ``title`` (Russian), the ``#``
+    heading repeating it, and closing ``Observations``/``Relations``.
+    """
+    del report
+    decisions = fixture / "docs" / "decisions"
+    preexisting = {"2026-08-01-module-contract-auth.md"}
+    new_notes: list[Path] = []
+    if decisions.is_dir():
+        new_notes = [
+            path
+            for path in decisions.glob("*.md")
+            if path.name not in preexisting and path.name != "ADR-0007.md"
+        ]
+    failures: list[str] = []
+    if not new_notes:
+        return report_shape.ShapeCheck(
+            ok=False,
+            failures=("note was not created as a repository file under docs/decisions/",),
+        )
+    note = new_notes[0]
+    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}-[a-z0-9-]+\.md", note.name):
+        failures.append(f"decision note file name is not YYYY-MM-DD-<slug>.md: {note.name}")
+    text = note.read_text(encoding="utf-8")
+    title_match = re.search(r"(?m)^title:\s*['\"]?(.+?)['\"]?\s*$", text)
+    if title_match is None:
+        failures.append("note has no frontmatter title")
+        return report_shape.ShapeCheck(ok=False, failures=tuple(failures))
+    title = title_match.group(1).strip()
+    if not re.search(r"[\u0400-\u04FF]", title):
+        failures.append("frontmatter title is not in the project language (ru)")
+    heading_match = re.search(r"(?m)^#\s+(.+?)\s*$", text)
+    if heading_match is None or heading_match.group(1).strip() != title:
+        failures.append("the # heading does not repeat the frontmatter title")
+    for section in ("## Observations", "## Relations"):
+        if section not in text:
+            failures.append(f"missing section: {section}")
+    observations = text.split("## Observations", 1)[-1].split("## Relations", 1)[0]
+    if not re.search(r"(?m)^- \[", observations):
+        failures.append("## Observations carries no observation entry")
+    return report_shape.ShapeCheck(ok=not failures, failures=tuple(failures))
+
+
+_BM002_SYNC_MARKS = re.compile(
+    r"reindex|переиндекс|пересобра|sync health|здоровь|синхронизац"
+    r"|устарел|устаревш|stale|doctor|index may be|индекс может",
+    re.IGNORECASE,
+)
+_BM002_SUBSTANCE = re.compile(r"ADR-0007|аудит|audit|append-only|audit_log", re.IGNORECASE)
+
+
+def check_bm002(report: str, changed: set[str], fixture: Path) -> report_shape.ShapeCheck:
+    """BM-002: the post-pull answer flags sync health before trusting the tree."""
+    failures: list[str] = []
+    if _BM002_SYNC_MARKS.search(report) is None:
+        failures.append("answer does not flag the stale-index risk or the reindex action")
+    if _BM002_SUBSTANCE.search(report) is None:
+        failures.append("answer does not draw on the repository decision notes")
+    return report_shape.ShapeCheck(ok=not failures, failures=tuple(failures))
+
+
 _DEPENDENCIES_HEADING = re.compile(
     r"(?im)^(?:#{2,3}\s*(?:dependencies|зависимости)\b|(?:dependencies|зависимости)\s*:)"
 )

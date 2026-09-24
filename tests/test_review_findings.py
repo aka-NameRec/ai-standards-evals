@@ -5,6 +5,8 @@ from __future__ import annotations
 from pathlib import Path
 
 from scorers.review_findings import (
+    check_bm001,
+    check_bm002,
     check_cr001,
     check_cr003,
     check_cr004,
@@ -649,3 +651,47 @@ def test_preexisting_mark_accepts_natural_renders() -> None:
         assert _has_preexisting_mark(finding), text
     finding = extract_findings("\U0001f534 src/a.py:1 — обычная находка без метки\n")[0]
     assert not _has_preexisting_mark(finding)
+
+
+def test_bm001_accepts_canonical_note(tmp_path: Path) -> None:
+    decisions = tmp_path / "docs" / "decisions"
+    decisions.mkdir(parents=True)
+    (decisions / "2026-08-01-module-contract-auth.md").write_text("pre-existing\n")
+    (decisions / "2026-09-24-rest-to-grpc.md").write_text(
+        "---\ntitle: 'Переход на gRPC'\n---\n\n"
+        "# Переход на gRPC\n\n"
+        "## Observations\n\n"
+        "- [fact] Внутренние сервисы переходят на gRPC из-за контрактов.\n\n"
+        "## Relations\n\n"
+        "- relates_to [[ADR-0002]]\n",
+        encoding="utf-8",
+    )
+    check = check_bm001("", set(), tmp_path)
+    assert check.ok, check.failures
+
+
+def test_bm001_rejects_missing_note_and_bad_shape(tmp_path: Path) -> None:
+    check = check_bm001("", set(), tmp_path)
+    assert not check.ok
+    assert "not created as a repository file" in check.failures[0]
+
+    decisions = tmp_path / "docs" / "decisions"
+    decisions.mkdir(parents=True)
+    note = decisions / "grpc-note.md"
+    note.write_text("# Переход на gRPC\n", encoding="utf-8")
+    check = check_bm001("", set(), tmp_path)
+    assert not check.ok
+    assert any("not YYYY-MM-DD" in failure for failure in check.failures)
+
+
+def test_bm002_requires_sync_flag_and_substance() -> None:
+    ok = check_bm002(
+        "Индекс мог устареть после pull — нужен reindex. По ADR-0007 аудит пишется append-only.",
+        set(),
+        Path("."),
+    )
+    assert ok.ok, ok.failures
+
+    silent = check_bm002("Аудит пишется append-only в audit_log.", set(), Path("."))
+    assert not silent.ok
+    assert any("stale-index risk" in failure for failure in silent.failures)

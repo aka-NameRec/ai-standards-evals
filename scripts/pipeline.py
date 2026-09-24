@@ -89,6 +89,8 @@ _SCENARIO_CHECKS: dict[str, Callable[[str, set[str], Path], report_shape.ShapeCh
     "CR-010": review_findings.check_cr010,
     "CR-011": review_findings.check_cr011,
     "CR-012": review_findings.check_cr012,
+    "BM-001": review_findings.check_bm001,
+    "BM-002": review_findings.check_bm002,
 }
 
 
