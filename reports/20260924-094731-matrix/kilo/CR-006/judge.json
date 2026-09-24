@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The 🔴 finding explicitly states the API handler writes directly to `InventoryRepository`, bypassing `InventoryReservationService` (criterion 1); it cites ADR-004 by ID, path, and quoted rule text rather than a generic layering preference (criterion 2); the remedy composes `InventoryReservationService(InventoryRepository())` at the assembly point and has the handler call only the service, preserving the single write path (criterion 3); and the finding is located at `api_handler.py:7-8`, matching the diff lines where the repository is instantiated and `save` is called (criterion 4). The report is further strengthened by verifying the violation against `ADR-004.md`, `inventory_service.py`, and `inventory_repository.py`.",
+  "criteria": {
+    "bypass_named": true,
+    "decision_cited": true,
+    "remedy_aligned": true,
+    "location": true
+  }
+}

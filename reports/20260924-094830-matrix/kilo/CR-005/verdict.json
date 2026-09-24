@@ -21,5 +21,16 @@
     "eval-CR-005",
     "code review"
   ],
-  "judge": null
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The finding in the «Переиспользование» section explicitly names `format_period` as duplicated byte-for-byte between `src/csv_export.py` and `src/json_export.py`, citing line-level locations in both new modules (csv_export.py:4 and json_export.py:4). It correctly frames the duplication as new and introduced by this diff («это новое внутреннее дублирование, внесённое данным диффом»), making no claim that a pre-existing period-formatting helper was bypassed; the reference to `src/rows.py` merely judges it an unsuitable home (tabular helpers), which is a legitimate reference to an existing pattern rather than an invented helper. The proposed remedy — extract `format_period` into a shared module (e.g. `src/periods.py`) and import it in both exporters — is exactly the aligned fix. All four criteria hold.",
+    "criteria": {
+      "duplication_named": true,
+      "no_invented_helper": true,
+      "remedy_aligned": true,
+      "locations": true
+    }
+  }
 }

@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The finding explicitly names the inverted comparison in can_withdraw (amount <= balance → amount >= balance), explains both consequences with concrete counterexamples (a legitimate withdrawal of 40 against a balance of 100 is rejected, while an overdraft of 150 is allowed), grounds the expected behavior in the function's docstring contract at src/account.py:5 and the existing test tests/test_account.py:5, and cites the defect at src/account.py:6 with a line number. All four criteria are satisfied.",
+  "criteria": {
+    "defect_named": true,
+    "consequence_explained": true,
+    "expected_behavior_sourced": true,
+    "location": true
+  }
+}

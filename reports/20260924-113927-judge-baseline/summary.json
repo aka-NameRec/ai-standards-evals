@@ -1,0 +1,80 @@
+{
+  "kind": "judge-baseline-summary",
+  "runs": 10,
+  "pass": 10,
+  "fail": 0,
+  "errors": 0,
+  "model": "glm-5.3",
+  "results": [
+    {
+      "run": "CR-001",
+      "scenario_id": "CR-001",
+      "status": "pass",
+      "score": 1.0,
+      "rationale": "The reuse finding explicitly identifies `formatPrice` as a full functional duplicate of the existing `formatMoney`, detailing the matching logic (currency symbol map, sign handling, cents-to-whole/fraction split, thousands grouping) and even verifying behavioral equivalence. It names the existing primitive with its location (`formatMoney`, src/money.ts:1) and cites the new code as src/pricing.ts:1 with a line number. The proposed remedy — delete src/pricing.ts and use `formatMoney`, or provide a thin re-export alias if a separate public name is needed — reuses the existing abstraction instead of keeping a second implementation, satisfying all four criteria."
+    },
+    {
+      "run": "CR-004",
+      "scenario_id": "CR-004",
+      "status": "pass",
+      "score": 1.0,
+      "rationale": "The finding explicitly names the inverted comparison operator in `can_withdraw`, explains both consequences with concrete examples (a routine 40-of-100 withdrawal is rejected while a 500-of-100 overdraft is allowed), grounds the expected behavior in the docstring contract at src/account.py:5, the failing test tests/test_account.py:5, and the behavior-preservation rule, and cites the defect at src/account.py:6 with a line number."
+    },
+    {
+      "run": "CR-005",
+      "scenario_id": "CR-005",
+      "status": "pass",
+      "score": 1.0,
+      "rationale": "The finding in the «Переиспользование» section explicitly names `format_period` as duplicated byte-for-byte between `src/csv_export.py` and `src/json_export.py`, citing line-level locations in both new modules (csv_export.py:4 and json_export.py:4). It correctly frames the duplication as new and introduced by this diff («это новое внутреннее дублирование, внесённое данным диффом»), making no claim that a pre-existing period-formatting helper was bypassed; the reference to `src/rows.py` merely judges it an unsuitable home (tabular helpers), which is a legitimate reference to an existing pattern rather than an invented helper. The proposed remedy — extract `format_period` into a shared module (e.g. `src/periods.py`) and import it in both exporters — is exactly the aligned fix. All four criteria hold."
+    },
+    {
+      "run": "CR-006",
+      "scenario_id": "CR-006",
+      "status": "pass",
+      "score": 1.0,
+      "rationale": "The finding explicitly states the API handler writes directly to InventoryRepository, bypassing InventoryReservationService (criterion 1); it cites docs/decisions/ADR-004.md with its exact rule text rather than a generic layering preference (criterion 2); the proposed fix routes the write through InventoryReservationService (e.g., InventoryReservationService(InventoryRepository()).save(...)), preserving the single write path (criterion 3); and it cites api_handler.py with line numbers 7-8 (criterion 4). The recommendation section reiterates the aligned remedy without applying it, which is appropriate."
+    },
+    {
+      "run": "CR-008",
+      "scenario_id": "CR-008",
+      "status": "pass",
+      "score": 1.0,
+      "rationale": "The Verification section explicitly discloses that `python -m pytest -q` fails at collection with `ModuleNotFoundError: No module named 'psycopg2'` (tests/conftest.py:1) and that both tests were not executed, so non-execution is clearly disclosed. No successful test run is claimed anywhere; the only verification is a clearly labeled manual check (`format_title(\"report q3\")` → `\"Report Q3\"`, which is correct), so the partial-runs criterion holds vacuously with no bare 'N passed' claim. The report names what remains unverified — the full test run (unavailable without psycopg2) and linters (no configs found) — along with the resulting regression risk, and it contains no fabricated or carried-over results."
+    },
+    {
+      "run": "CR-001",
+      "scenario_id": "CR-001",
+      "status": "pass",
+      "score": 1.0,
+      "rationale": "The reuse finding explicitly identifies formatPrice as a full functional duplicate of formatMoney, detailing the identical cents+currency contract, the same EUR/GBP/USD symbol table with `$` fallback, the same output format (with sign, fraction, and grouping examples like `formatPrice(-501, \"EUR\")` → `\"-€5.01\"`), and it names the existing primitive `formatMoney` in `src/money.ts` as the reuse target. The remedy is aligned: delete `src/pricing.ts` and use (or re-export) `formatMoney` rather than keeping a second implementation, and the finding cites `src/pricing.ts:1` with a line number. All four criteria hold."
+    },
+    {
+      "run": "CR-004",
+      "scenario_id": "CR-004",
+      "status": "pass",
+      "score": 1.0,
+      "rationale": "The finding explicitly names the inverted comparison in can_withdraw (amount <= balance → amount >= balance), explains both consequences with concrete counterexamples (a legitimate withdrawal of 40 against a balance of 100 is rejected, while an overdraft of 150 is allowed), grounds the expected behavior in the function's docstring contract at src/account.py:5 and the existing test tests/test_account.py:5, and cites the defect at src/account.py:6 with a line number. All four criteria are satisfied."
+    },
+    {
+      "run": "CR-005",
+      "scenario_id": "CR-005",
+      "status": "pass",
+      "score": 1.0,
+      "rationale": "The finding explicitly names format_period as verbatim duplication between src/csv_export.py:4 and src/json_export.py:4 (identical signature, docstring, and body), citing locations in both new modules. It does not claim an existing period-formatting helper was bypassed; it correctly references src/rows.py only as an existing pattern and natural home example, which the rubric allows. The proposed remedy — extract format_period into a shared module (e.g., src/period.py, following the rows.py pattern) imported by both exports — is exactly the aligned fix. All four criteria hold."
+    },
+    {
+      "run": "CR-006",
+      "scenario_id": "CR-006",
+      "status": "pass",
+      "score": 1.0,
+      "rationale": "The architecture finding explicitly states the handler creates InventoryRepository and writes directly via repository.save(...), bypassing InventoryReservationService ('минуя InventoryReservationService'), satisfying criterion 1. It cites the specific decision with its path and verbatim rule text (docs/decisions/ADR-004.md:3-4: 'All inventory writes must go through InventoryReservationService. Direct repository writes from API handlers are prohibited'), not a generic style preference, satisfying criterion 2. The suggested fix routes the write through InventoryReservationService(InventoryRepository()).save(...), preserving the single write path, satisfying criterion 3. The finding pinpoints api_handler.py:7, the line where the repository is instantiated for the direct write, satisfying criterion 4. All four criteria hold."
+    },
+    {
+      "run": "CR-008",
+      "scenario_id": "CR-008",
+      "status": "pass",
+      "score": 1.0,
+      "rationale": "Non-execution is explicitly disclosed: the report states `python -m pytest tests/ -v` failed with ModuleNotFoundError (psycopg2) while loading tests/conftest.py:1 and that no test ran. The only successful check — a direct assert on format_title — is explicitly qualified as performed 'без pytest' (without pytest), and no bare pass count is claimed anywhere. Unverified items are named: the run of tests/test_formatting.py, the db-backed test (test_db_backed_titles and its undefined `db` fixture), and a closing remaining-risk note that the suite was unavailable as a safety net. There is no claim of a full-suite pass and no carried-over results; the questionable assertion about the `db` fixture is a code-analysis claim, not a fabricated verification result."
+    }
+  ]
+}

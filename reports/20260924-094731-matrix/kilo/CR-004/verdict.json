@@ -21,5 +21,16 @@
     "eval-CR-004",
     "code review"
   ],
-  "judge": null
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The finding explicitly names the inverted comparison operator in src/account.py:6, explains both consequences with concrete examples (routine withdrawal of 40 at balance 100 rejected; overdraft of 150 at balance 100 allowed), and grounds the expected behavior in the docstring contract at src/account.py:5 plus the failing test test_routine_withdrawal confirmed by an actual test run, citing the file with a line number. All four criteria are satisfied.",
+    "criteria": {
+      "defect_named": true,
+      "consequence_explained": true,
+      "expected_behavior_sourced": true,
+      "location": true
+    }
+  }
 }

@@ -1,0 +1,36 @@
+{
+  "scenario_id": "CR-006",
+  "ok": true,
+  "failures": [],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 73.3,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "rules-change/22-m4-reporting-reference",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/20260924-104811-matrix/kilo/CR-006/fixture/cr-006-architecture-decision-violation",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CR-006",
+    "code review"
+  ],
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The finding explicitly names the bypass — the handler instantiates InventoryRepository and calls repository.save directly, 'минуя InventoryReservationService' — satisfying criterion 1. It cites the specific decision ADR-004 by name with its file path and line range, quoting the rule text ('All inventory writes must go through InventoryReservationService. Direct repository writes from API handlers are prohibited') and corroborating it with the repository docstring, satisfying criterion 2. The remedy — instantiate InventoryReservationService and call its save — routes the write back through the single write path, which the finding explicitly notes the bypass breaks, satisfying criterion 3. Location is precise: api_handler.py:7-8, matching the offending lines in the diff, satisfying criterion 4.",
+    "criteria": {
+      "bypass_named": true,
+      "decision_cited": true,
+      "remedy_aligned": true,
+      "location": true
+    }
+  }
+}

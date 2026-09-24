@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The reuse finding at src/pricing.ts:1 explicitly states that formatPrice near-verbatim duplicates the existing formatMoney from src/money.ts, matching the symbol map (EUR/GBP/default $), the cents-to-string logic including sign and fraction, and the digit grouping; it names the existing abstraction, and the proposed remedy deletes src/pricing.ts to reuse formatMoney (or renames the single existing implementation, keeping one implementation and one test), so all four criteria hold.",
+  "criteria": {
+    "duplication_named": true,
+    "existing_primitive_named": true,
+    "remedy_aligned": true,
+    "location": true
+  }
+}

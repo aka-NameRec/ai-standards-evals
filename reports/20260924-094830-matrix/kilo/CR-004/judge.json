@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The finding explicitly names the inverted comparison operator in `can_withdraw`, explains both consequences with concrete examples (a routine 40-of-100 withdrawal is rejected while a 500-of-100 overdraft is allowed), grounds the expected behavior in the docstring contract at src/account.py:5, the failing test tests/test_account.py:5, and the behavior-preservation rule, and cites the defect at src/account.py:6 with a line number.",
+  "criteria": {
+    "defect_named": true,
+    "consequence_explained": true,
+    "expected_behavior_sourced": true,
+    "location": true
+  }
+}
