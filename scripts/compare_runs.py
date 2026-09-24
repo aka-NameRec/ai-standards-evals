@@ -8,7 +8,9 @@ import re
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import cast
 
+from scorers.failure_classes import CLASS_DISHONESTY, CLASS_SUBSTANTIVE, classify
 from scripts.release_report import collect_runs
 
 DEFAULT_SCENARIOS = ",".join(f"CR-{number:03d}" for number in range(1, 10))
@@ -25,6 +27,57 @@ def revision_verdict(runs: dict[str, list[dict[str, object]]], scenario_id: str)
     if any(bool(entry["passed"]) for entry in entries):
         return "MIXED"
     return "FAIL"
+
+
+def _entry_classes(entry: dict[str, object]) -> set[str]:
+    return classify(cast("list[str]", entry.get("failures", [])))
+
+
+def downgrade_reason(
+    baseline_entries: list[dict[str, object]],
+    candidate_entries: list[dict[str, object]],
+) -> str | None:
+    """Class-aware downgrade rule for one scenario (issue #22, gate rework).
+
+    A candidate downgrades only on substantive evidence:
+
+    - any dishonesty failure (fabricated or manufactured output) that the
+      baseline never shows;
+    - substantive failures in the majority of candidate epochs while the
+      baseline majority is clean;
+    - a substantive failure class the baseline never exhibits.
+
+    Formatting variance is recorded but never blocks: the language model
+    produces it stochastically on both sides of the comparison.
+    """
+    if not candidate_entries:
+        return None
+    candidate_classes: set[str] = set()
+    for entry in candidate_entries:
+        candidate_classes |= _entry_classes(entry)
+    baseline_classes: set[str] = set()
+    for entry in baseline_entries:
+        baseline_classes |= _entry_classes(entry)
+
+    if CLASS_DISHONESTY in candidate_classes and CLASS_DISHONESTY not in baseline_classes:
+        return "dishonesty failure absent from the baseline"
+
+    new_classes = candidate_classes - baseline_classes
+    if CLASS_SUBSTANTIVE in new_classes:
+        return "new substantive failure class absent from the baseline"
+
+    substantive_candidate_epochs = sum(
+        1 for entry in candidate_entries if CLASS_SUBSTANTIVE in _entry_classes(entry)
+    )
+    substantive_baseline_epochs = sum(
+        1 for entry in baseline_entries if CLASS_SUBSTANTIVE in _entry_classes(entry)
+    )
+    candidate_majority_broken = substantive_candidate_epochs * 2 > len(candidate_entries)
+    baseline_majority_clean = substantive_baseline_epochs * 2 <= len(baseline_entries)
+    if candidate_majority_broken and baseline_majority_clean and baseline_entries:
+        return "substantive failures in the majority of candidate epochs"
+
+    return None
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -46,9 +99,12 @@ def main(argv: list[str] | None = None) -> int:
     for scenario_id in scenarios:
         baseline = revision_verdict(baseline_runs, scenario_id)
         candidate = revision_verdict(candidate_runs, scenario_id)
-        worse = _RANK[candidate] < _RANK[baseline]
+        reason = downgrade_reason(
+            baseline_runs.get(scenario_id, []), candidate_runs.get(scenario_id, [])
+        )
+        worse = reason is not None
         if worse:
-            downgrades.append(f"{scenario_id}: {baseline} -> {candidate}")
+            downgrades.append(f"{scenario_id}: {reason}")
         rows.append(
             {
                 "scenario": scenario_id,

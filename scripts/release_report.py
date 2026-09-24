@@ -32,13 +32,15 @@ def collect_runs(reports_root: Path, revision: str) -> dict[str, list[dict[str, 
             continue
         run_dir = verdict_path.parent
         passed = bool(verdict.get("ok"))
+        failures: list[str] = list(cast("list[str]", verdict.get("failures", [])))
         rescore_path = run_dir / "rescore.json"
         if rescore_path.is_file():
             rescore = json.loads(rescore_path.read_text(encoding="utf-8"))
             if rescore.get("scenario_id") == scenario_id:
                 passed = bool(rescore.get("ok"))
+                failures = list(cast("list[str]", rescore.get("failures", [])))
         runs.setdefault(scenario_id, []).append(
-            {"run": run_dir.name, "passed": passed}
+            {"run": run_dir.name, "passed": passed, "failures": failures}
         )
     return runs
 
