@@ -20,3 +20,6 @@ reports/**/fixture/
 
 # OS noise
 .DS_Store
+
+# Local working memory (agent-managed, never canonical)
+/docs/local/
