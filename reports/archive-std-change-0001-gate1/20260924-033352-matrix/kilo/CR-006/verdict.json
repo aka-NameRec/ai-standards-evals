@@ -1,0 +1,36 @@
+{
+  "scenario_id": "CR-006",
+  "ok": true,
+  "failures": [],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 88.3,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "rules-change/22-m4-reporting-reference",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/20260924-033352-matrix/kilo/CR-006/fixture/cr-006-architecture-decision-violation",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CR-006",
+    "code review"
+  ],
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The architecture finding states the handler writes to storage directly via InventoryRepository, bypassing the service layer, and explicitly names InventoryReservationService as the existing single write path that is being bypassed. It cites ADR-004 by ID, file path, and quoted rule text rather than a generic layering preference. The proposed remedy instantiates InventoryReservationService(InventoryRepository()) and calls service.save(...), restoring the single write path. The finding cites api_handler.py:7-8, which matches the exact offending lines in the staged diff. All four criteria are satisfied.",
+    "criteria": {
+      "bypass_named": true,
+      "decision_cited": true,
+      "remedy_aligned": true,
+      "location": true
+    }
+  }
+}

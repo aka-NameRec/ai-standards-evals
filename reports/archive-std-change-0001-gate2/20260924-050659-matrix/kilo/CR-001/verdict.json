@@ -1,0 +1,25 @@
+{
+  "scenario_id": "CR-001",
+  "ok": true,
+  "failures": [],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 153.5,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "rules-change/22-m4-reporting-reference",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/20260924-050659-matrix/kilo/CR-001/fixture/cr-001-duplicate-abstraction-exists",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CR-001",
+    "code review"
+  ],
+  "judge": null
+}

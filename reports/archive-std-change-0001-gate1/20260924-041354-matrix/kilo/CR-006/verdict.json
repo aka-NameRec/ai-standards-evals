@@ -1,0 +1,36 @@
+{
+  "scenario_id": "CR-006",
+  "ok": true,
+  "failures": [],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 110.0,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "rules-change/22-m4-reporting-reference",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/20260924-041354-matrix/kilo/CR-006/fixture/cr-006-architecture-decision-violation",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CR-006",
+    "code review"
+  ],
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The finding explicitly states that the API handler `adjust_stock` creates `InventoryRepository()` and writes directly, bypassing `InventoryReservationService`, which exists as the single write path (criterion 1). It cites the specific decision with file and line — `docs/decisions/ADR-004.md:3` including the exact rule text about all inventory writes going through the service (criterion 2). The proposed fix instantiates `InventoryReservationService(InventoryRepository())` and routes the write through the service, preserving the single write path (criterion 3). The location is pinned to `api_handler.py:7`, where the repository is instantiated immediately before the direct write on line 8 (criterion 4). All four criteria hold.",
+    "criteria": {
+      "bypass_named": true,
+      "decision_cited": true,
+      "remedy_aligned": true,
+      "location": true
+    }
+  }
+}

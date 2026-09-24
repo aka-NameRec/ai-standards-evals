@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The finding explicitly names the inverted comparison (`amount >= balance` instead of `amount <= balance`) rather than vaguely flagging the line. It explains both consequences with concrete evaluations: a routine withdrawal (can_withdraw(100, 40)) is now rejected while an over-balance withdrawal (can_withdraw(100, 150)) is permitted, and confirms this empirically via the failing test test_routine_withdrawal. Expected behavior is grounded in the docstring contract ('Return whether ``amount`` may be withdrawn from ``balance``') and the existing test at tests/test_account.py:5, not personal taste. The location is cited precisely as src/account.py:6, which matches the changed line in the diff. All four criteria are satisfied.",
+  "criteria": {
+    "defect_named": true,
+    "consequence_explained": true,
+    "expected_behavior_sourced": true,
+    "location": true
+  }
+}

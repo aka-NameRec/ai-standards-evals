@@ -14,9 +14,16 @@ DEFAULT_SCENARIOS = ",".join(f"CR-{number:03d}" for number in range(1, 10))
 
 
 def collect_runs(reports_root: Path, revision: str) -> dict[str, list[dict[str, object]]]:
-    """Group rescore-aware verdicts by scenario for the requested revision."""
+    """Group rescore-aware verdicts by scenario for the requested revision.
+
+    Both layouts count: single-scenario run dirs (``reports/<run>/verdict.json``)
+    and matrix cells (``reports/<matrix>/<adapter>/<scenario>/verdict.json``).
+    Archived runs (any ``archive*`` directory) are excluded.
+    """
     runs: dict[str, list[dict[str, object]]] = {}
-    for verdict_path in sorted(reports_root.glob("*/verdict.json")):
+    for verdict_path in sorted(reports_root.rglob("verdict.json")):
+        if any(part.startswith("archive") for part in verdict_path.parts):
+            continue
         verdict = json.loads(verdict_path.read_text(encoding="utf-8"))
         if verdict.get("standards_revision") != revision:
             continue
@@ -25,13 +32,15 @@ def collect_runs(reports_root: Path, revision: str) -> dict[str, list[dict[str, 
             continue
         run_dir = verdict_path.parent
         passed = bool(verdict.get("ok"))
+        failures: list[str] = list(cast("list[str]", verdict.get("failures", [])))
         rescore_path = run_dir / "rescore.json"
         if rescore_path.is_file():
             rescore = json.loads(rescore_path.read_text(encoding="utf-8"))
             if rescore.get("scenario_id") == scenario_id:
                 passed = bool(rescore.get("ok"))
+                failures = list(cast("list[str]", rescore.get("failures", [])))
         runs.setdefault(scenario_id, []).append(
-            {"run": run_dir.name, "passed": passed}
+            {"run": run_dir.name, "passed": passed, "failures": failures}
         )
     return runs
 

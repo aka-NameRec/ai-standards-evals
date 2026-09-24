@@ -1,0 +1,36 @@
+{
+  "scenario_id": "CR-005",
+  "ok": true,
+  "failures": [],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 83.7,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "rules-change/22-m4-reporting-reference",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/20260924-094731-matrix/kilo/CR-005/fixture/cr-005-new-internal-duplication",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CR-005",
+    "code review"
+  ],
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The finding explicitly names the byte-identical `format_period` duplication between the two new modules with DRY cited as the violated standard, and anchors both sides with locations (src/json_export.py:4 and src/csv_export.py:4). It correctly frames the duplication as introduced by this change — it verifies via grep that no existing `format_period` implementation or imports exist, and only references src/rows.py as an existing shared-helpers pattern / candidate home, not as a bypassed helper. The remedy — extract `format_period` into a shared module (e.g. src/period.py or extended src/rows.py) imported by both exporters — is exactly the aligned fix. All criteria are satisfied.",
+    "criteria": {
+      "duplication_named": true,
+      "no_invented_helper": true,
+      "remedy_aligned": true,
+      "locations": true
+    }
+  }
+}

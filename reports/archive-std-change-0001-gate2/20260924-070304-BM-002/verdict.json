@@ -1,0 +1,25 @@
+{
+  "scenario_id": "BM-002",
+  "ok": true,
+  "failures": [],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 81.2,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "rules-change/22-m4-reporting-reference",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/20260924-070304-BM-002/fixture/bm-002-sync-hygiene",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-BM-002",
+    "Мы только что сделали git pull с массовыми переименованиями заметок. Какой подход к записи аудита зафиксирован в наших решениях? Ответь по заметкам."
+  ],
+  "judge": null
+}

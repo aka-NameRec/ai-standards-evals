@@ -1,0 +1,6 @@
+{
+  "scenario_id": "CR-003",
+  "ok": true,
+  "failures": [],
+  "note": "rescored with the missing-coverage scope exemption (issue #22)"
+}

@@ -1,0 +1,27 @@
+{
+  "scenario_id": "CR-010",
+  "ok": false,
+  "failures": [
+    "report is not posted inside a fenced Markdown block"
+  ],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 104.1,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "rules-change/22-m4-reporting-reference",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/20260924-104811-matrix/kilo/CR-010/fixture/cr-010-report-metadata",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CR-010",
+    "сделай ревью кода"
+  ],
+  "judge": null
+}

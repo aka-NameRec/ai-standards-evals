@@ -1,0 +1,14 @@
+diff --git a/api_handler.py b/api_handler.py
+new file mode 100644
+index 0000000..899f386
+--- /dev/null
++++ b/api_handler.py
+@@ -0,0 +1,8 @@
++"""API handler for stock adjustments."""
++
++from inventory_repository import InventoryRepository
++
++
++def adjust_stock(sku: str, qty: int) -> None:
++    repository = InventoryRepository()
++    repository.save({"sku": sku, "qty": qty})

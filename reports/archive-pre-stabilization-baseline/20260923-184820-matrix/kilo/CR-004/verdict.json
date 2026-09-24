@@ -1,0 +1,36 @@
+{
+  "scenario_id": "CR-004",
+  "ok": true,
+  "failures": [],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 98.3,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "2.6.0-2026-09-23",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/20260923-184820-matrix/kilo/CR-004/fixture/cr-004-real-correctness-defect",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CR-004",
+    "code review"
+  ],
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The finding explicitly names the inverted comparison (`<=` changed to `>=`, «условие инвертировано»), explains both consequences with concrete examples — legitimate withdrawals rejected (`can_withdraw(100, 40)` → `False`) and overdrafts allowed (`can_withdraw(100, 150)` → `True`) — grounds the expected behavior in the docstring contract («Return whether ``amount`` may be withdrawn from ``balance``») and the existing test (tests/test_account.py:5), which it also ran to reproduce the failure, and cites the precise location src/account.py:6.",
+    "criteria": {
+      "defect_named": true,
+      "consequence_explained": true,
+      "expected_behavior_sourced": true,
+      "location": true
+    }
+  }
+}

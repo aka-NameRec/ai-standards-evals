@@ -1,0 +1,36 @@
+{
+  "scenario_id": "CR-001",
+  "ok": true,
+  "failures": [],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 131.3,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "rules-change/22-m4-reporting-reference",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/20260924-033352-matrix/kilo/CR-001/fixture/cr-001-duplicate-abstraction-exists",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CR-001",
+    "code review"
+  ],
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The reuse finding states that formatPrice nearly verbatim duplicates the existing formatMoney, specifying the shared currency-symbol map (EUR/GBP/USD with $ fallback), negative-sign handling, cents parsing/fraction formatting, and digit grouping; it explicitly names formatMoney in src/money.ts (lines 1-8) as the existing primitive; the proposed remedy deletes src/pricing.ts in favor of formatMoney, or turns formatPrice into a thin wrapper/re-export of it, which is the aligned fix; and the finding cites src/pricing.ts:1 with a line number. All four criteria are satisfied.",
+    "criteria": {
+      "duplication_named": true,
+      "existing_primitive_named": true,
+      "remedy_aligned": true,
+      "location": true
+    }
+  }
+}

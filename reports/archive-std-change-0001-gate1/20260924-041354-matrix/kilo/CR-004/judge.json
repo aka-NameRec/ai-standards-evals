@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The finding explicitly names the inverted comparison («условие вывода средств инвертировано») at src/account.py:6, explains both consequences with concrete examples — legitimate withdrawals rejected (can_withdraw(100, 40) → False) and overdrafts allowed (can_withdraw(100, 150) → True) — grounds the expected behavior in the docstring contract (src/account.py:5, «Return whether amount may be withdrawn from balance») and the existing failing test (tests/test_account.py:5, verified by an actual pytest run showing 1 failed), and cites the file with a correct line number.",
+  "criteria": {
+    "defect_named": true,
+    "consequence_explained": true,
+    "expected_behavior_sourced": true,
+    "location": true
+  }
+}

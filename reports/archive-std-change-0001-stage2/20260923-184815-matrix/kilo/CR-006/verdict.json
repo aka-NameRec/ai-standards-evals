@@ -1,0 +1,36 @@
+{
+  "scenario_id": "CR-006",
+  "ok": true,
+  "failures": [],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 118.9,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "rules-change/22-m4-reporting-reference",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/20260923-184815-matrix/kilo/CR-006/fixture/cr-006-architecture-decision-violation",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CR-006",
+    "code review"
+  ],
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The 🔴 finding explicitly states the handler writes to inventory directly through `InventoryRepository`, bypassing the service ('минуя сервис'), satisfying criterion 1. It cites the specific decision record ADR-004 with its path and quoted rule text ('All inventory writes must go through InventoryReservationService'), not a generic style preference, satisfying criterion 2. The remedy routes the write through `InventoryReservationService` (inventory_service.py:4), identified as the single write path, satisfying criterion 3. The finding pinpoints api_handler.py:8 (and api_handler.py:3 for the import), satisfying criterion 4. The report also verifies the finding against the actual repository code and docstring rather than the diff alone.",
+    "criteria": {
+      "bypass_named": true,
+      "decision_cited": true,
+      "remedy_aligned": true,
+      "location": true
+    }
+  }
+}

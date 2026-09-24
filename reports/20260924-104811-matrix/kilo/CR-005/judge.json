@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The finding explicitly names format_period as verbatim-duplicated between src/csv_export.py and src/json_export.py (lines 4–8 in both), correctly notes that no shared helper existed before this diff — the duplication is introduced by the change itself — and only references src/rows.py as an existing helpers pattern / natural home for extraction, which is acceptable. The proposed remedy extracts format_period into a shared module (e.g. src/period.py or src/rows.py) imported by both exports, and both module locations are cited. All four criteria hold.",
+  "criteria": {
+    "duplication_named": true,
+    "no_invented_helper": true,
+    "remedy_aligned": true,
+    "locations": true
+  }
+}

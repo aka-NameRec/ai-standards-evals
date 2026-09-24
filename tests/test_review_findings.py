@@ -5,6 +5,8 @@ from __future__ import annotations
 from pathlib import Path
 
 from scorers.review_findings import (
+    check_bm001,
+    check_bm002,
     check_cr001,
     check_cr003,
     check_cr004,
@@ -13,6 +15,9 @@ from scorers.review_findings import (
     check_cr007,
     check_cr008,
     check_cr009,
+    check_cr010,
+    check_cr011,
+    check_cr012,
     extract_findings,
 )
 from scripts.git_utils import run_git
@@ -407,3 +412,319 @@ def _changed(repo: Path, *paths: str) -> set[str]:
         full.write_text(_CANDIDATE_CONTENTS.get(path, "// candidate\n"), encoding="utf-8")
     run_git(repo, "add", "-A")
     return set(paths)
+
+
+# --- CR-010 / CR-011 / CR-012 (issue #22, M4 protection) ---------------------
+
+def _ru_report(findings: str, *, fenced: bool = False, dependencies: str = "") -> str:
+    """Well-shaped Russian report with the given Correctness body."""
+    inner = (
+        "ai-standards 2.6.0-2026-09-23\n\n"
+        "Задача: неизвестна\n\n"
+        "## Что сделано\n\nПравило валидации границ изменено.\n\n"
+        "## Как сделано\n\nЧтение дифа и окружающего кода; тесты не запускались.\n\n"
+        "## Корректность\n\n"
+        + findings
+        + "\n\n## Архитектура и конвенции\n\nНе найдено.\n\n"
+        "## Переиспользование\n\nНе найдено.\n\n"
+        "## Эффективность\n\nНе найдено.\n\n"
+        "## Качество\n\nНе найдено.\n\n"
+        "## Проверки\n\nПроверено чтением; тесты не запускались.\n"
+    )
+    if dependencies:
+        inner += f"\n## Зависимости\n\n{dependencies}\n"
+    if fenced:
+        return f"Итог ревью:\n\n```markdown\n{inner}```\n"
+    return inner
+
+
+def test_cr010_accepts_compliant_russian_report() -> None:
+    report = _ru_report(
+        "🔴 slugkit.py:7 — граница `len(text) >= 0` всегда истинна — нарушает: Корректность\n"
+        "✅ slugkit.py:16 — опечатка в сообщении исправлена — нарушает: Качество — исправлено: "
+        "«Successfully saved»\n",
+        fenced=True,
+    )
+    check = check_cr010(report, {"slugkit.py"}, Path("."))
+    assert check.ok, check.failures
+
+
+def test_cr010_rejects_english_report() -> None:
+    report = (
+        "ai-standards 2.6.0-2026-09-23\n\n"
+        "## What Was Done\n\nBoundary rule changed.\n\n"
+        "## How It Was Done\n\nRead the diff; tests not run.\n\n"
+        "## Correctness\n\n\U0001f534 slugkit.py:7 — boundary always true — "
+        "violates: Correctness\n\n"
+        "## Architecture & Conventions\n\nNone found.\n\n"
+        "## Reuse\n\nNone found.\n\n"
+        "## Efficiency\n\nNone found.\n\n"
+        "## Quality\n\nNone found.\n\n"
+        "## Verification\n\nRead-only review; tests were not run.\n"
+    )
+    check = check_cr010(report, {"slugkit.py"}, Path("."))
+    assert not check.ok
+    assert "report is not in the session language (ru)" in check.failures
+
+
+def test_cr010_rejects_unmarked_finding_line() -> None:
+    report = _ru_report(
+        "- slugkit.py:7 — граница всегда истинна — нарушает: Корректность\n"
+    )
+    check = check_cr010(report, {"slugkit.py"}, Path("."))
+    assert not check.ok
+    assert any("without a marker" in failure for failure in check.failures)
+
+
+def test_cr010_rejects_report_outside_fence() -> None:
+    report = _ru_report(
+        "🔴 slugkit.py:7 — граница всегда истинна — нарушает: Корректность\n",
+        fenced=False,
+    )
+    check = check_cr010(report, {"slugkit.py"}, Path("."))
+    assert not check.ok
+    assert any("fenced Markdown block" in failure for failure in check.failures)
+
+
+def test_cr011_accepts_self_contained_change_without_dependencies() -> None:
+    report = (
+        "ai-standards 2.6.0\n\n"
+        "## What Was Done\n\nVariable renamed, coverage added.\n\n"
+        "## How It Was Done\n\nRead the diff.\n\n"
+    )
+    for section in ("Correctness", "Architecture & Conventions", "Reuse", "Efficiency", "Quality"):
+        report += f"## {section}\n\nNone found.\n\n"
+    report += "## Verification\n\nRead-only review; tests not run.\n"
+    check = check_cr011(report, {"textkit.py"}, Path("."))
+    assert check.ok, check.failures
+
+
+def test_cr011_rejects_dependencies_and_task() -> None:
+    report = (
+        "ai-standards 2.6.0\n\n"
+        "Task: FAKE-123 — https://tracker.example.com/browse/FAKE-123\n\n"
+        "## What Was Done\n\nCleanup.\n\n## How It Was Done\n\nRead the diff.\n\n"
+    )
+    for section in ("Correctness", "Architecture & Conventions", "Reuse", "Efficiency", "Quality"):
+        report += f"## {section}\n\nNone found.\n\n"
+    report += "## Verification\n\nRead-only.\n\n## Dependencies\n\n- none\n"
+    check = check_cr011(report, {"textkit.py"}, Path("."))
+    assert not check.ok
+    assert any("Dependencies" in failure for failure in check.failures)
+    assert any("Task" in failure for failure in check.failures)
+
+
+def test_cr012_requires_missing_example_statement() -> None:
+    report = (
+        "ai-standards 2.6.0\n\n"
+        "Note: `.ai-standards/code-review-report.md` is missing, so the fallback "
+        "section order is used.\n\n"
+        "## What Was Done\n\nCleanup.\n\n## How It Was Done\n\nRead the diff.\n\n"
+    )
+    for section in ("Correctness", "Architecture & Conventions", "Reuse", "Efficiency", "Quality"):
+        report += f"## {section}\n\nNone found.\n\n"
+    report += "## Verification\n\nRead-only.\n"
+    check = check_cr012(report, {"textkit.py"}, Path("."))
+    assert check.ok, check.failures
+
+
+def test_cr012_rejects_silent_fallback() -> None:
+    report = (
+        "ai-standards 2.6.0\n\n"
+        "## What Was Done\n\nCleanup.\n\n## How It Was Done\n\nRead the diff.\n\n"
+    )
+    for section in ("Correctness", "Architecture & Conventions", "Reuse", "Efficiency", "Quality"):
+        report += f"## {section}\n\nNone found.\n\n"
+    report += "## Verification\n\nRead-only.\n"
+    check = check_cr012(report, {"textkit.py"}, Path("."))
+    assert not check.ok
+    assert any("worked example file is missing" in failure for failure in check.failures)
+
+
+def test_cr012_accepts_natural_russian_fallback_headings() -> None:
+    """Observed in the first CR-012 run: without the deployed legend the agent
+    translates headings naturally; invariants judge order and presence."""
+    report = (
+        "Заметка: `.ai-standards/code-review-report.md` отсутствует — использую "
+        "резервный формат.\n\n"
+        "ai-standards v2.6.0\n\n"
+        "### Что было сделано\n\nРефакторинг shout.\n\n"
+        "### Как это было сделано\n\nЧтение дифа.\n\n"
+        "### Корректность\n\nNone found.\n\n"
+        "### Архитектура и конвенции\n\nNone found.\n\n"
+        "### Переиспользование\n\nNone found.\n\n"
+        "### Эффективность\n\nNone found.\n\n"
+        "### Качество\n\nNone found.\n\n"
+        "### Проверка\n\npytest — 2 passed.\n"
+    )
+    check = check_cr012(report, {"textkit.py"}, Path("."))
+    assert check.ok, check.failures
+
+
+def test_cr012_rejects_wrong_fallback_order() -> None:
+    report = (
+        "ai-standards 2.6.0\n\n"
+        "The worked example is missing; fallback used.\n\n"
+        "## Correctness\n\nNone found.\n\n"
+        "## What Was Done\n\nCleanup.\n\n"
+        "## How It Was Done\n\nRead the diff.\n\n"
+        "## Architecture & Conventions\n\nNone found.\n\n"
+        "## Reuse\n\nNone found.\n\n"
+        "## Efficiency\n\nNone found.\n\n"
+        "## Quality\n\nNone found.\n\n"
+        "## Verification\n\nRead-only.\n"
+    )
+    check = check_cr012(report, {"textkit.py"}, Path("."))
+    assert not check.ok
+    assert "fallback sections are out of order" in check.failures
+
+
+def test_scope_exempts_missing_coverage_findings_on_test_paths() -> None:
+    report = _report(
+        {
+            "Quality": (
+                "\U0001f7e1 tests/test_account.py — единственный тест покрывает только "
+                "happy path, кейс с пустой строкой отсутствует — нарушает: core/base\n"
+            )
+        }
+    )
+    from scorers.review_findings import _scope_failures, extract_findings
+
+    failures = _scope_failures(extract_findings(report), {"src/account.py"})
+    assert failures == []
+
+
+def test_scope_keeps_real_out_of_diff_findings() -> None:
+    report = _report(
+        {
+            "Reuse": (
+                "\U0001f7e1 src/other.py:10 — duplicates the helper — violates: DRY\n"
+            )
+        }
+    )
+    from scorers.review_findings import _scope_failures, extract_findings
+
+    failures = _scope_failures(extract_findings(report), {"src/account.py"})
+    assert failures == ["finding outside the reviewed diff: src/other.py"]
+
+
+def test_scope_recognizes_vitest_style_test_paths() -> None:
+    report = _report(
+        {
+            "Quality": (
+                "\U0001f7e1 test/reader.test.ts:1 — для новой экспортируемой функции нет "
+                "теста, кейс отсутствует — нарушает: core/base\n"
+            )
+        }
+    )
+    from scorers.review_findings import _scope_failures, extract_findings
+
+    failures = _scope_failures(extract_findings(report), {"src/reader.ts"})
+    assert failures == []
+
+
+def test_scope_exemption_covers_net_testa_wording() -> None:
+    report = _report(
+        {
+            "Quality": (
+                "\U0001f7e1 test/reader.test.ts:1 — для новой экспортируемой функции нет "
+                "теста на её поведение — нарушает: core/base\n"
+            )
+        }
+    )
+    from scorers.review_findings import _scope_failures, extract_findings
+
+    failures = _scope_failures(extract_findings(report), {"src/reader.ts"})
+    assert failures == []
+
+
+def test_preexisting_mark_accepts_natural_renders() -> None:
+    from scorers.review_findings import _has_preexisting_mark
+
+    marked_variants = (
+        "(pre-existing)",
+        "(pre-existing, вне диффа) тести не настроены",
+        "(существовало ранее — внесено коммитом e87e01b)",
+    )
+    for text in marked_variants:
+        finding = extract_findings(f"\U0001f7e1 src/a.py:1 — {text}\n")[0]
+        assert _has_preexisting_mark(finding), text
+    finding = extract_findings("\U0001f534 src/a.py:1 — обычная находка без метки\n")[0]
+    assert not _has_preexisting_mark(finding)
+
+
+def test_bm001_accepts_canonical_note(tmp_path: Path) -> None:
+    decisions = tmp_path / "docs" / "decisions"
+    decisions.mkdir(parents=True)
+    (decisions / "2026-08-01-module-contract-auth.md").write_text("pre-existing\n")
+    (decisions / "2026-09-24-rest-to-grpc.md").write_text(
+        "---\ntitle: 'Переход на gRPC'\n---\n\n"
+        "# Переход на gRPC\n\n"
+        "## Observations\n\n"
+        "- [fact] Внутренние сервисы переходят на gRPC из-за контрактов.\n\n"
+        "## Relations\n\n"
+        "- relates_to [[ADR-0002]]\n",
+        encoding="utf-8",
+    )
+    check = check_bm001("", set(), tmp_path)
+    assert check.ok, check.failures
+
+
+def test_bm001_rejects_missing_note_and_bad_shape(tmp_path: Path) -> None:
+    check = check_bm001("", set(), tmp_path)
+    assert not check.ok
+    assert "not created as a repository file" in check.failures[0]
+
+    decisions = tmp_path / "docs" / "decisions"
+    decisions.mkdir(parents=True)
+    note = decisions / "grpc-note.md"
+    note.write_text("# Переход на gRPC\n", encoding="utf-8")
+    check = check_bm001("", set(), tmp_path)
+    assert not check.ok
+    assert any("not YYYY-MM-DD" in failure for failure in check.failures)
+
+
+def test_bm002_requires_sync_flag_and_substance() -> None:
+    ok = check_bm002(
+        "Индекс мог устареть после pull — нужен reindex. По ADR-0007 аудит пишется append-only.",
+        set(),
+        Path("."),
+    )
+    assert ok.ok, ok.failures
+
+    silent = check_bm002("Аудит пишется append-only в audit_log.", set(), Path("."))
+    assert not silent.ok
+    assert any("stale-index risk" in failure for failure in silent.failures)
+
+
+def test_fallback_matcher_accepts_bold_label_forms() -> None:
+    """Observed in the stabilized CR-012 run: sections rendered as bold labels."""
+    report = (
+        "ai-standards v2.6.0\n\n"
+        "Файл примера отсутствует — использую резервный формат.\n\n"
+        "**Что сделано**\nРефакторинг shout.\n\n"
+        "**Как сделано**\nЧтение дифа.\n\n"
+        "**Корректность**\nНе найдено.\n\n"
+        "**Архитектура и конвенции**\nНе найдено.\n\n"
+        "**Переиспользование**\nНе найдено.\n\n"
+        "**Эффективность**\nНе найдено.\n\n"
+        "**Качество**\nНе найдено.\n\n"
+        "**Проверки**\npytest — 2 passed.\n"
+    )
+    check = check_cr012(report, {"textkit.py"}, Path("."))
+    assert check.ok, check.failures
+
+
+def test_version_line_accepts_heading_markup() -> None:
+    """Observed in stabilized runs: the version rendered as a heading line."""
+    report = (
+        "Замечание: файлы отсутствуют, использую fallback.\n\n"
+        ".ai-standards/code-review-report.md не найден — отчёт в fallback-формате.\n\n"
+        "## ai-standards v2.6.0\n\n"
+        "### Что сделано\n\nПравка.\n\n### Как сделано\n\nЧтение.\n\n"
+        "### Корректность\n\nНе найдено.\n\n### Архитектура и конвенции\n\nНе найдено.\n\n"
+        "### Переиспользование\n\nНе найдено.\n\n### Эффективность\n\nНе найдено.\n\n"
+        "### Качество\n\nНе найдено.\n\n### Проверки\n\npytest — ок.\n"
+    )
+    check = check_cr012(report, {"textkit.py"}, Path("."))
+    assert check.ok, check.failures

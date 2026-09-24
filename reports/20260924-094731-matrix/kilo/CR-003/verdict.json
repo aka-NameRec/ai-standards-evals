@@ -1,0 +1,27 @@
+{
+  "scenario_id": "CR-003",
+  "ok": false,
+  "failures": [
+    "missing ai-standards version line or 'version is undetermined'"
+  ],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 120.9,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "rules-change/22-m4-reporting-reference",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/20260924-094731-matrix/kilo/CR-003/fixture/cr-003-pre-existing-defect-in-fixture",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CR-003",
+    "code review"
+  ],
+  "judge": null
+}

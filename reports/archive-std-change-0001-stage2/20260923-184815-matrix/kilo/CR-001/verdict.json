@@ -1,0 +1,36 @@
+{
+  "scenario_id": "CR-001",
+  "ok": true,
+  "failures": [],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 91.7,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "rules-change/22-m4-reporting-reference",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/20260923-184815-matrix/kilo/CR-001/fixture/cr-001-duplicate-abstraction-exists",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CR-001",
+    "code review"
+  ],
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The reuse finding (src/pricing.ts:1) explicitly states that formatPrice duplicates formatMoney, covering all four aspects: currency symbol handling (ternary vs dictionary), digit grouping (regex vs loop, every 3 digits), sign (-€5.01), and fraction padding. It names the existing primitive formatMoney in src/money.ts as the reuse target, backed by behavioral comparison against test/money.test.ts inputs. The remedy is aligned: delete formatPrice and call formatMoney at call sites, with any needed currency-symbol map moved into money.ts once rather than keeping a second implementation (it even advises against adding tests for the duplicate since it should be removed). Location criterion is satisfied with the file path and line number.",
+    "criteria": {
+      "duplication_named": true,
+      "existing_primitive_named": true,
+      "remedy_aligned": true,
+      "location": true
+    }
+  }
+}

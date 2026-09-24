@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The architecture finding explicitly states the handler creates InventoryRepository and writes directly via repository.save(...), bypassing InventoryReservationService ('минуя InventoryReservationService'), satisfying criterion 1. It cites the specific decision with its path and verbatim rule text (docs/decisions/ADR-004.md:3-4: 'All inventory writes must go through InventoryReservationService. Direct repository writes from API handlers are prohibited'), not a generic style preference, satisfying criterion 2. The suggested fix routes the write through InventoryReservationService(InventoryRepository()).save(...), preserving the single write path, satisfying criterion 3. The finding pinpoints api_handler.py:7, the line where the repository is instantiated for the direct write, satisfying criterion 4. All four criteria hold.",
+  "criteria": {
+    "bypass_named": true,
+    "decision_cited": true,
+    "remedy_aligned": true,
+    "location": true
+  }
+}

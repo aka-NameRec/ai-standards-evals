@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The finding explicitly states that `adjust_stock` creates `InventoryRepository()` and writes directly to storage, bypassing `InventoryReservationService` (bypass named); it cites ADR-004 by name and path with its rule text about all inventory writes going through the service and prohibiting direct repository writes from API handlers (decision cited); the proposed fix constructs `InventoryReservationService(InventoryRepository())` and calls `service.save(...)`, routing the write through the service and preserving the single write path (remedy aligned); and it locates the issue at api_handler.py:7–8 (location). All four criteria are satisfied.",
+  "criteria": {
+    "bypass_named": true,
+    "decision_cited": true,
+    "remedy_aligned": true,
+    "location": true
+  }
+}

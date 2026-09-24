@@ -16,6 +16,9 @@ _BARE_PATH = re.compile(
 )
 _PREEXISTING = ("(pre-existing)", "(существовало ранее)")
 PREEXISTING_MARKS = _PREEXISTING
+# The mark is normative, its rendering is not: «(pre-existing, вне диффа)»,
+# «(существовало ранее — внесено коммитом ...)» all mark the same outcome.
+_PREEXISTING_MARK = re.compile(r"pre-existing|существовало ранее|вне дифф", re.IGNORECASE)
 _STATES_NO_EXECUTION = re.compile(
     r"(?i)not (run|executed|available|installed)"
     r"|не (запус|выпол|собра|проход|провер|установл)"
@@ -237,6 +240,233 @@ def check_cr009(report: str, changed: set[str], fixture: Path) -> report_shape.S
     return report_shape.ShapeCheck(ok=not failures, failures=tuple(failures))
 
 
+def check_cr010(report: str, changed: set[str], fixture: Path) -> report_shape.ShapeCheck:
+    """CR-010: report metadata, marker discipline, session language, and posting."""
+    failures = _base_failures(report, changed)
+    if report_shape.locale_name(report) != "ru":
+        failures.append("report is not in the session language (ru)")
+    findings = extract_findings(report)
+    if not findings:
+        failures.append("no marker findings although the fixture carries a reportable defect")
+    for failure in _unmarked_finding_bullets(report):
+        failures.append(failure)
+    if not _posted_in_fenced_block(report):
+        failures.append("report is not posted inside a fenced Markdown block")
+    return report_shape.ShapeCheck(ok=not failures, failures=tuple(failures))
+
+
+def check_cr011(report: str, changed: set[str], fixture: Path) -> report_shape.ShapeCheck:
+    """CR-011: the reporting-reference policy is followed for a self-contained change."""
+    failures = _base_failures(report, changed)
+    failures.extend(_section_presence_failures(report, _DEPENDENCIES_HEADING, name="Dependencies"))
+    failures.extend(_section_presence_failures(report, _TASK_HEADING, name="Task"))
+    return report_shape.ShapeCheck(ok=not failures, failures=tuple(failures))
+
+
+def check_cr012(report: str, changed: set[str], fixture: Path) -> report_shape.ShapeCheck:
+    """CR-012: fallback order plus an explicit statement that the example is missing.
+
+    The fallback mode runs without the deployed template, so the localization
+    legend is unavailable by construction: invariants judge presence and order
+    of the sections (matched fuzzily, in either language), never the exact
+    heading wording.
+    """
+    failures = _version_and_verdict_failures(report)
+    failures.extend(_section_presence_failures(report, _TASK_HEADING, name="Task"))
+    failures.extend(_fallback_section_failures(report))
+    if not _STATES_MISSING_EXAMPLE.search(report):
+        failures.append("review does not state that the worked example file is missing")
+    return report_shape.ShapeCheck(ok=not failures, failures=tuple(failures))
+
+
+def check_bm001(report: str, changed: set[str], fixture: Path) -> report_shape.ShapeCheck:
+    """BM-001: the decision note is created as a repository file in canonical shape.
+
+    The outcome lives in the fixture file system: a new dated file under
+    ``docs/decisions/`` with frontmatter ``title`` (Russian), the ``#``
+    heading repeating it, and closing ``Observations``/``Relations``.
+    """
+    del report
+    decisions = fixture / "docs" / "decisions"
+    preexisting = {"2026-08-01-module-contract-auth.md"}
+    new_notes: list[Path] = []
+    if decisions.is_dir():
+        new_notes = [
+            path
+            for path in decisions.glob("*.md")
+            if path.name not in preexisting and path.name != "ADR-0007.md"
+        ]
+    failures: list[str] = []
+    if not new_notes:
+        return report_shape.ShapeCheck(
+            ok=False,
+            failures=("note was not created as a repository file under docs/decisions/",),
+        )
+    note = new_notes[0]
+    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}-[a-z0-9-]+\.md", note.name):
+        failures.append(f"decision note file name is not YYYY-MM-DD-<slug>.md: {note.name}")
+    text = note.read_text(encoding="utf-8")
+    title_match = re.search(r"(?m)^title:\s*['\"]?(.+?)['\"]?\s*$", text)
+    if title_match is None:
+        failures.append("note has no frontmatter title")
+        return report_shape.ShapeCheck(ok=False, failures=tuple(failures))
+    title = title_match.group(1).strip()
+    if not re.search(r"[\u0400-\u04FF]", title):
+        failures.append("frontmatter title is not in the project language (ru)")
+    heading_match = re.search(r"(?m)^#\s+(.+?)\s*$", text)
+    if heading_match is None or heading_match.group(1).strip() != title:
+        failures.append("the # heading does not repeat the frontmatter title")
+    for section in ("## Observations", "## Relations"):
+        if section not in text:
+            failures.append(f"missing section: {section}")
+    observations = text.split("## Observations", 1)[-1].split("## Relations", 1)[0]
+    if not re.search(r"(?m)^- \[", observations):
+        failures.append("## Observations carries no observation entry")
+    return report_shape.ShapeCheck(ok=not failures, failures=tuple(failures))
+
+
+_BM002_SYNC_MARKS = re.compile(
+    r"reindex|переиндекс|пересобра|sync health|здоровь|синхронизац"
+    r"|устарел|устаревш|stale|doctor|index may be|индекс может",
+    re.IGNORECASE,
+)
+_BM002_SUBSTANCE = re.compile(r"ADR-0007|аудит|audit|append-only|audit_log", re.IGNORECASE)
+
+
+def check_bm002(report: str, changed: set[str], fixture: Path) -> report_shape.ShapeCheck:
+    """BM-002: the post-pull answer flags sync health before trusting the tree."""
+    failures: list[str] = []
+    if _BM002_SYNC_MARKS.search(report) is None:
+        failures.append("answer does not flag the stale-index risk or the reindex action")
+    if _BM002_SUBSTANCE.search(report) is None:
+        failures.append("answer does not draw on the repository decision notes")
+    return report_shape.ShapeCheck(ok=not failures, failures=tuple(failures))
+
+
+_DEPENDENCIES_HEADING = re.compile(
+    r"(?im)^(?:#{2,3}\s*(?:dependencies|зависимости)\b|(?:dependencies|зависимости)\s*:)"
+)
+_TASK_HEADING = re.compile(
+    r"(?im)^(?:#{2,3}\s*task\b|(?:task|задача)\s*:)"
+)
+_FINDING_LIKE_BULLET = re.compile(
+    r"^\s*[-*]\s+(.*)$", re.MULTILINE
+)
+_VIOLATION_MARKS = ("violates:", "нарушает:")
+_FENCED_BLOCK = re.compile(r"```[^\n]*\n(.*?)```", re.DOTALL)
+_FENCED_SECTION_ANCHORS = (
+    "What Was Done",
+    "Correctness",
+    "Verification",
+    "Что сделано",
+    "Корректность",
+    "Проверки",
+)
+_MISSING_EXAMPLE = (
+    r"code-review-report\.md|worked example|report template|пример\w*|шаблон\w*"
+)
+_MISSING_MARKS = (
+    r"missing|absent|not found|could not|does not exist|unavailable"
+    r"|отсутств\w+|не найден\w*|недоступ\w+|не обнаружен\w*"
+)
+_STATES_MISSING_EXAMPLE = re.compile(
+    rf"(?is)({_MISSING_EXAMPLE}).{{0,200}}?({_MISSING_MARKS})|({_MISSING_MARKS}).{{0,200}}?({_MISSING_EXAMPLE})"
+)
+
+
+def _unmarked_finding_bullets(report: str) -> list[str]:
+    """List-item lines that read as findings but do not start with a marker glyph."""
+    failures: list[str] = []
+    for match in _FINDING_LIKE_BULLET.finditer(report):
+        body = match.group(1).lstrip("*_ ")
+        if not any(mark in body for mark in _VIOLATION_MARKS) and not re.search(
+            r"[\w./\\-]+\.(?:py|ts|tsx|js|md):\d+", body
+        ):
+            continue
+        if not body or body[0] not in MARKER_CHARS:
+            failures.append(f"finding-like line without a marker: {body[:60]}")
+    return failures
+
+
+def _posted_in_fenced_block(report: str) -> bool:
+    """True when a fenced block carries report content (headings or the version line)."""
+    for match in _FENCED_BLOCK.finditer(report):
+        block = match.group(1)
+        if any(anchor in block for anchor in _FENCED_SECTION_ANCHORS):
+            return True
+        if re.search(r"(?m)^[`*_]{0,2}ai-standards\s+\S", block):
+            return True
+    return False
+
+
+def _section_presence_failures(report: str, pattern: re.Pattern[str], *, name: str) -> list[str]:
+    if pattern.search(report) is not None:
+        return [f"{name} section must be omitted for this scenario"]
+    return []
+
+
+# Heading stems for the fallback mode: a heading matches when it carries the
+# stem, so natural translations («Что было сделано», «Проверка») stay compliant.
+_FALLBACK_SECTIONS: tuple[tuple[str, tuple[str, ...]], ...] = (
+    ("What Was Done", ("what was done", "что")),
+    ("How It Was Done", ("how it was done", "как")),
+    ("Correctness", ("correctness", "корректн")),
+    ("Architecture & Conventions", ("architecture", "conventions", "архитект", "конвенц")),
+    ("Reuse", ("reuse", "переиспольз", "повторн")),
+    ("Efficiency", ("efficiency", "эффективн")),
+    ("Quality", ("quality", "качеств")),
+    ("Verification", ("verification", "проверк", "верификац")),
+)
+_FALLBACK_HEADING = re.compile(
+    r"^(?:#{2,3}\s+(?P<heading>.+?)\s*|\*\*(?P<label>[^*\n]{2,60}?)\*\*\s*:?)\s*$",
+    re.MULTILINE,
+)
+
+
+def _fallback_section_failures(report: str) -> list[str]:
+    """Order-and-presence check over heading and bold-label section forms.
+
+    The guidelines accept heading, label, bare-line, and bold-label renderings
+    of one section; the matcher reads heading and bold-label lines as
+    candidates ordered by their position in the report and matches the
+    required sections in order. Heading lines apply the substring stem rule;
+    label lines must START with the stem (a heading like «Протокол проверки»
+    is a section, a prose line mentioning «проверку» is not).
+    """
+    candidates: list[tuple[int, str, bool]] = []
+    for match in _FALLBACK_HEADING.finditer(report):
+        if match.group("heading") is not None:
+            candidates.append((match.start(), match.group("heading").lower(), True))
+        else:
+            label = (match.group("label") or "").lower()
+            candidates.append((match.start(), label, False))
+    candidates.sort(key=lambda item: item[0])
+
+    cursor = 0
+    for _name, stems in _FALLBACK_SECTIONS:
+        found = False
+        while cursor < len(candidates):
+            _offset, text, is_heading = candidates[cursor]
+            cursor += 1
+            if is_heading:
+                matched = any(stem in text for stem in stems)
+            else:
+                matched = any(text.startswith(stem) for stem in stems)
+            if matched:
+                found = True
+                break
+        if not found:
+            if len(candidates) < len(_FALLBACK_SECTIONS):
+                return ["a fallback section is missing entirely"]
+            return ["fallback sections are out of order"]
+    return []
+
+
+def _version_and_verdict_failures(report: str) -> list[str]:
+    failures = report_shape.check(report).failures
+    return [failure for failure in failures if not failure.startswith("missing section")]
+
+
 def _base_failures(report: str, changed: set[str]) -> list[str]:
     findings = extract_findings(report)
     return [
@@ -297,13 +527,46 @@ def _location_failures(findings: tuple[Finding, ...]) -> list[str]:
 
 
 def _scope_failures(findings: tuple[Finding, ...], changed: set[str]) -> list[str]:
-    return [
-        f"finding outside the reviewed diff: {finding.path}"
-        for finding in findings
-        if finding.path is not None
-        and finding.path not in changed
-        and not _has_preexisting_mark(finding)
-    ]
+    failures = []
+    for finding in findings:
+        if finding.path is None or finding.path in changed or _has_preexisting_mark(finding):
+            continue
+        # A missing-coverage finding legitimately cites the test file where the
+        # coverage is absent; it does not expand the review into unrelated code.
+        if _is_test_path(finding.path) and _names_missing_coverage(finding.text):
+            continue
+        failures.append(f"finding outside the reviewed diff: {finding.path}")
+    return failures
+
+
+def _is_test_path(path: str) -> bool:
+    name = path.rsplit("/", 1)[-1]
+    return (
+        name.startswith("test_")
+        or name.endswith("_test")
+        or name == "tests"
+        or ".test." in name
+        or ".spec." in name
+    )
+
+
+def _names_missing_coverage(text: str) -> bool:
+    lowered = text.lower()
+    return (
+        ("тест" in lowered or "test" in lowered or "кейс" in lowered or "cover" in lowered)
+        and (
+            "не покрыт" in lowered
+            or "покрытия нет" in lowered
+            or "отсутствует" in lowered
+            or "нет тест" in lowered
+            or "нет кейс" in lowered
+            or "no test" in lowered
+            or "not covered" in lowered
+            or "missing" in lowered
+            or "uncovered" in lowered
+            or "только happy path" in lowered
+        )
+    )
 
 
 def _mentions(finding: Finding, needle: str) -> bool:
@@ -311,7 +574,7 @@ def _mentions(finding: Finding, needle: str) -> bool:
 
 
 def _has_preexisting_mark(finding: Finding) -> bool:
-    return any(mark in finding.text for mark in PREEXISTING_MARKS)
+    return _PREEXISTING_MARK.search(finding.text) is not None
 
 
 def _refers_to_buggy_loop(finding: Finding) -> bool:

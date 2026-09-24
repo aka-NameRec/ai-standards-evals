@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The 🔴 finding explicitly states the handler writes to inventory directly through `InventoryRepository`, bypassing the service ('минуя сервис'), satisfying criterion 1. It cites the specific decision record ADR-004 with its path and quoted rule text ('All inventory writes must go through InventoryReservationService'), not a generic style preference, satisfying criterion 2. The remedy routes the write through `InventoryReservationService` (inventory_service.py:4), identified as the single write path, satisfying criterion 3. The finding pinpoints api_handler.py:8 (and api_handler.py:3 for the import), satisfying criterion 4. The report also verifies the finding against the actual repository code and docstring rather than the diff alone.",
+  "criteria": {
+    "bypass_named": true,
+    "decision_cited": true,
+    "remedy_aligned": true,
+    "location": true
+  }
+}

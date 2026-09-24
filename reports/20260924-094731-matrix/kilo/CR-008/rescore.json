@@ -1,0 +1,6 @@
+{
+  "scenario_id": "CR-008",
+  "ok": true,
+  "failures": [],
+  "note": "rescored: version-line heading tolerance and bold-label fallback forms (issue #22 gate rework)"
+}

@@ -46,7 +46,7 @@ def main(argv: list[str] | None = None) -> int:
     scenario_ids = [name.strip() for name in args.scenarios.split(",")]
 
     stamp = datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
-    matrix_dir = args.reports_dir.resolve() / f"{stamp}-matrix"
+    matrix_dir = args.reports_root.resolve() / f"{stamp}-matrix"
     cells: dict[tuple[str, str], dict[str, object]] = {}
     with resolve_standards_checkout(config) as worktree:
         scenarios = index_scenarios(worktree)

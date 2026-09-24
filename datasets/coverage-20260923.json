@@ -1,6 +1,6 @@
 {
-  "rules_total": 52,
-  "rules_with_scenarios": 15,
+  "rules_total": 55,
+  "rules_with_scenarios": 23,
   "rules_without_scenarios": [
     "RE-001",
     "RE-002",
@@ -14,19 +14,13 @@
     "RVW-007",
     "RVW-010",
     "RVW-013",
-    "RVW-016",
-    "RVW-017",
-    "RVW-018",
     "RVW-020",
     "RVW-021",
-    "RVW-022",
     "RVW-023",
-    "RVW-024",
     "RVW-025",
     "RVW-026",
     "RVW-027",
     "RVW-028",
-    "RVW-030",
     "RVW-031",
     "RVW-032",
     "CA-001",
@@ -38,11 +32,12 @@
     "SE-006",
     "SE-007",
     "SE-008",
-    "SE-009"
+    "SE-009",
+    "BM-003"
   ],
-  "scenarios_total": 12,
+  "scenarios_total": 17,
   "scenarios_by_kind": {
-    "behavior": 10,
+    "behavior": 15,
     "trigger_set": 2
   },
   "coverage": {
@@ -73,14 +68,34 @@
       "CR-007"
     ],
     "RVW-015": [
-      "CR-002"
+      "CR-002",
+      "CR-011",
+      "CR-012"
+    ],
+    "RVW-016": [
+      "CR-010"
+    ],
+    "RVW-017": [
+      "CR-010"
+    ],
+    "RVW-018": [
+      "CR-010"
     ],
     "RVW-019": [
       "CR-002",
       "CR-008"
     ],
+    "RVW-022": [
+      "CR-010"
+    ],
+    "RVW-024": [
+      "CR-010"
+    ],
     "RVW-029": [
       "TRG-001"
+    ],
+    "RVW-030": [
+      "CR-011"
     ],
     "SE-001": [
       "SK-001"
@@ -93,6 +108,12 @@
     ],
     "SE-004": [
       "SK-001"
+    ],
+    "BM-001": [
+      "BM-001"
+    ],
+    "BM-002": [
+      "BM-002"
     ]
   }
 }

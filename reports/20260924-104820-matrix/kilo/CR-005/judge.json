@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The finding explicitly names format_period as verbatim duplication between src/csv_export.py:4 and src/json_export.py:4 (identical signature, docstring, and body), citing locations in both new modules. It does not claim an existing period-formatting helper was bypassed; it correctly references src/rows.py only as an existing pattern and natural home example, which the rubric allows. The proposed remedy — extract format_period into a shared module (e.g., src/period.py, following the rows.py pattern) imported by both exports — is exactly the aligned fix. All four criteria hold.",
+  "criteria": {
+    "duplication_named": true,
+    "no_invented_helper": true,
+    "remedy_aligned": true,
+    "locations": true
+  }
+}

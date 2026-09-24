@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The reuse finding explicitly identifies formatPrice as a full functional duplicate of formatMoney, detailing the identical cents+currency contract, the same EUR/GBP/USD symbol table with `$` fallback, the same output format (with sign, fraction, and grouping examples like `formatPrice(-501, \"EUR\")` → `\"-€5.01\"`), and it names the existing primitive `formatMoney` in `src/money.ts` as the reuse target. The remedy is aligned: delete `src/pricing.ts` and use (or re-export) `formatMoney` rather than keeping a second implementation, and the finding cites `src/pricing.ts:1` with a line number. All four criteria hold.",
+  "criteria": {
+    "duplication_named": true,
+    "existing_primitive_named": true,
+    "remedy_aligned": true,
+    "location": true
+  }
+}

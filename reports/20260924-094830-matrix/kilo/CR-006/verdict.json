@@ -1,0 +1,36 @@
+{
+  "scenario_id": "CR-006",
+  "ok": true,
+  "failures": [],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 75.0,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "2.6.0-2026-09-23",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/20260924-094830-matrix/kilo/CR-006/fixture/cr-006-architecture-decision-violation",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CR-006",
+    "code review"
+  ],
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The finding explicitly states the API handler writes directly to InventoryRepository, bypassing InventoryReservationService (criterion 1); it cites docs/decisions/ADR-004.md with its exact rule text rather than a generic layering preference (criterion 2); the proposed fix routes the write through InventoryReservationService (e.g., InventoryReservationService(InventoryRepository()).save(...)), preserving the single write path (criterion 3); and it cites api_handler.py with line numbers 7-8 (criterion 4). The recommendation section reiterates the aligned remedy without applying it, which is appropriate.",
+    "criteria": {
+      "bypass_named": true,
+      "decision_cited": true,
+      "remedy_aligned": true,
+      "location": true
+    }
+  }
+}

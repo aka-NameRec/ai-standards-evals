@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The finding in the 'Переиспользование' section explicitly states that formatPrice duplicates formatMoney, enumerating the duplicated logic (cents handling, sign, fraction, thousands grouping, and EUR/GBP/USD currency symbols with the same '$' fallback). It names the existing primitive precisely — formatMoney from src/money.ts:1 — as the reuse target, and cites the finding's location as src/pricing.ts:1. The recommended remedy is aligned: delete src/pricing.ts, or if the formatPrice name is needed, make it a re-export of formatMoney from src/money.ts, eliminating the second implementation. All four criteria are satisfied.",
+  "criteria": {
+    "duplication_named": true,
+    "existing_primitive_named": true,
+    "remedy_aligned": true,
+    "location": true
+  }
+}
