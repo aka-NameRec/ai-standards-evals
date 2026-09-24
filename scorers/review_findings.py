@@ -417,23 +417,48 @@ _FALLBACK_SECTIONS: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("Quality", ("quality", "качеств")),
     ("Verification", ("verification", "проверк", "верификац")),
 )
-_FALLBACK_HEADING = re.compile(r"^#{2,3}\s+(.+?)\s*$", re.MULTILINE)
+_FALLBACK_HEADING = re.compile(
+    r"^(?:#{2,3}\s+(?P<heading>.+?)\s*|\*\*(?P<label>[^*\n]{2,60}?)\*\*\s*:?)\s*$",
+    re.MULTILINE,
+)
 
 
 def _fallback_section_failures(report: str) -> list[str]:
-    headings = [match.group(1).lower() for match in _FALLBACK_HEADING.finditer(report)]
-    positions: list[int] = []
-    for name, stems in _FALLBACK_SECTIONS:
-        position = next(
-            (index for index, heading in enumerate(headings) if any(s in heading for s in stems)),
-            None,
-        )
-        if position is None:
-            failures = [f"missing fallback section: {name}"]
-            return failures
-        positions.append(position)
-    if positions != sorted(positions):
-        return ["fallback sections are out of order"]
+    """Order-and-presence check over heading and bold-label section forms.
+
+    The guidelines accept heading, label, bare-line, and bold-label renderings
+    of one section; the matcher reads heading and bold-label lines as
+    candidates ordered by their position in the report and matches the
+    required sections in order. Heading lines apply the substring stem rule;
+    label lines must START with the stem (a heading like «Протокол проверки»
+    is a section, a prose line mentioning «проверку» is not).
+    """
+    candidates: list[tuple[int, str, bool]] = []
+    for match in _FALLBACK_HEADING.finditer(report):
+        if match.group("heading") is not None:
+            candidates.append((match.start(), match.group("heading").lower(), True))
+        else:
+            label = (match.group("label") or "").lower()
+            candidates.append((match.start(), label, False))
+    candidates.sort(key=lambda item: item[0])
+
+    cursor = 0
+    for _name, stems in _FALLBACK_SECTIONS:
+        found = False
+        while cursor < len(candidates):
+            _offset, text, is_heading = candidates[cursor]
+            cursor += 1
+            if is_heading:
+                matched = any(stem in text for stem in stems)
+            else:
+                matched = any(text.startswith(stem) for stem in stems)
+            if matched:
+                found = True
+                break
+        if not found:
+            if len(candidates) < len(_FALLBACK_SECTIONS):
+                return ["a fallback section is missing entirely"]
+            return ["fallback sections are out of order"]
     return []
 
 

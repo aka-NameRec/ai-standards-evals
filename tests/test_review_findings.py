@@ -695,3 +695,36 @@ def test_bm002_requires_sync_flag_and_substance() -> None:
     silent = check_bm002("Аудит пишется append-only в audit_log.", set(), Path("."))
     assert not silent.ok
     assert any("stale-index risk" in failure for failure in silent.failures)
+
+
+def test_fallback_matcher_accepts_bold_label_forms() -> None:
+    """Observed in the stabilized CR-012 run: sections rendered as bold labels."""
+    report = (
+        "ai-standards v2.6.0\n\n"
+        "Файл примера отсутствует — использую резервный формат.\n\n"
+        "**Что сделано**\nРефакторинг shout.\n\n"
+        "**Как сделано**\nЧтение дифа.\n\n"
+        "**Корректность**\nНе найдено.\n\n"
+        "**Архитектура и конвенции**\nНе найдено.\n\n"
+        "**Переиспользование**\nНе найдено.\n\n"
+        "**Эффективность**\nНе найдено.\n\n"
+        "**Качество**\nНе найдено.\n\n"
+        "**Проверки**\npytest — 2 passed.\n"
+    )
+    check = check_cr012(report, {"textkit.py"}, Path("."))
+    assert check.ok, check.failures
+
+
+def test_version_line_accepts_heading_markup() -> None:
+    """Observed in stabilized runs: the version rendered as a heading line."""
+    report = (
+        "Замечание: файлы отсутствуют, использую fallback.\n\n"
+        ".ai-standards/code-review-report.md не найден — отчёт в fallback-формате.\n\n"
+        "## ai-standards v2.6.0\n\n"
+        "### Что сделано\n\nПравка.\n\n### Как сделано\n\nЧтение.\n\n"
+        "### Корректность\n\nНе найдено.\n\n### Архитектура и конвенции\n\nНе найдено.\n\n"
+        "### Переиспользование\n\nНе найдено.\n\n### Эффективность\n\nНе найдено.\n\n"
+        "### Качество\n\nНе найдено.\n\n### Проверки\n\npytest — ок.\n"
+    )
+    check = check_cr012(report, {"textkit.py"}, Path("."))
+    assert check.ok, check.failures

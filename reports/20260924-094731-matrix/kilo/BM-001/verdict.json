@@ -1,0 +1,25 @@
+{
+  "scenario_id": "BM-001",
+  "ok": true,
+  "failures": [],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 135.0,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "rules-change/22-m4-reporting-reference",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/20260924-094731-matrix/kilo/BM-001/fixture/bm-001-note-shape",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-BM-001",
+    "Зафиксируй решение в docs/decisions: внутренние сервисы переходят с REST на gRPC. Создай файл заметки в репозитории по стандарту проекта."
+  ],
+  "judge": null
+}

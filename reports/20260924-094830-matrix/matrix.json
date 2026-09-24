@@ -1,0 +1,59 @@
+{
+  "generated": "20260924-094830",
+  "standards_revision": "2.6.0-2026-09-23",
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "adapters": [
+    "kilo"
+  ],
+  "scenarios": [
+    "CR-001",
+    "CR-002",
+    "CR-003",
+    "CR-004",
+    "CR-005",
+    "CR-006",
+    "CR-007",
+    "CR-008",
+    "CR-009"
+  ],
+  "cells": {
+    "kilo|CR-001": {
+      "verdict": "PASS",
+      "failures": []
+    },
+    "kilo|CR-002": {
+      "verdict": "PASS",
+      "failures": []
+    },
+    "kilo|CR-003": {
+      "verdict": "PASS",
+      "failures": []
+    },
+    "kilo|CR-004": {
+      "verdict": "PASS",
+      "failures": []
+    },
+    "kilo|CR-005": {
+      "verdict": "PASS",
+      "failures": []
+    },
+    "kilo|CR-006": {
+      "verdict": "PASS",
+      "failures": []
+    },
+    "kilo|CR-007": {
+      "verdict": "PASS",
+      "failures": []
+    },
+    "kilo|CR-008": {
+      "verdict": "PASS",
+      "failures": []
+    },
+    "kilo|CR-009": {
+      "verdict": "FAIL",
+      "failures": [
+        "missing ai-standards version line or 'version is undetermined'"
+      ]
+    }
+  }
+}
