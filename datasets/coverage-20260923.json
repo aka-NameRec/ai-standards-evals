@@ -1,6 +1,6 @@
 {
-  "rules_total": 52,
-  "rules_with_scenarios": 21,
+  "rules_total": 55,
+  "rules_with_scenarios": 23,
   "rules_without_scenarios": [
     "RE-001",
     "RE-002",
@@ -32,11 +32,12 @@
     "SE-006",
     "SE-007",
     "SE-008",
-    "SE-009"
+    "SE-009",
+    "BM-003"
   ],
-  "scenarios_total": 15,
+  "scenarios_total": 17,
   "scenarios_by_kind": {
-    "behavior": 13,
+    "behavior": 15,
     "trigger_set": 2
   },
   "coverage": {
@@ -107,6 +108,12 @@
     ],
     "SE-004": [
       "SK-001"
+    ],
+    "BM-001": [
+      "BM-001"
+    ],
+    "BM-002": [
+      "BM-002"
     ]
   }
 }
