@@ -1,0 +1,6 @@
+{
+  "scenario_id": "CR-012",
+  "ok": true,
+  "failures": [],
+  "note": "rescored: the 'файлов ... нет' formulation recognized (issue #22 gate rework)"
+}
