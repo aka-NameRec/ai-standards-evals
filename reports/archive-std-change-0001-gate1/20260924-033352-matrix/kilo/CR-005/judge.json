@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The finding explicitly names the duplication of format_period (identical signature, docstring, and body) between the two new modules, cites both locations (src/csv_export.py:4 and src/json_export.py:5), and proposes an aligned remedy: extract the helper into a shared module (e.g. src/period.py) imported by both exporters. It never claims an existing helper was bypassed — src/rows.py is mentioned only as something reviewed during verification, and the extracted helper's home is a new module, which is correct since the duplication was introduced by this change.",
+  "criteria": {
+    "duplication_named": true,
+    "no_invented_helper": true,
+    "remedy_aligned": true,
+    "locations": true
+  }
+}

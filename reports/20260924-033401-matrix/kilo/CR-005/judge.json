@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The finding explicitly names the byte-for-byte duplication of `format_period` between the two new modules and cites both locations (src/json_export.py:4 and src/csv_export.py:4). It does not claim an existing period-formatting helper was bypassed — `src/rows.py` is referenced only as an existing generic helpers module and the natural home for the extracted function, which the rubric permits. The remedy (extract the function into a shared module such as `src/rows.py` or a new common module and import it in both exports) is exactly the aligned fix. All four criteria hold.",
+  "criteria": {
+    "duplication_named": true,
+    "no_invented_helper": true,
+    "remedy_aligned": true,
+    "locations": true
+  }
+}

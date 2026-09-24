@@ -1,0 +1,13 @@
+diff --git a/slugkit.py b/slugkit.py
+index b15873a..dc5888e 100644
+--- a/slugkit.py
++++ b/slugkit.py
+@@ -3,7 +3,7 @@
+ 
+ def is_valid_slug(text: str) -> bool:
+     """Return whether ``text`` is a usable slug."""
+-    return len(text) > 0 and text.strip() == text
++    return len(text) >= 0 and text.strip() == text
+ 
+ 
+ def save_slug(path, text) -> None:

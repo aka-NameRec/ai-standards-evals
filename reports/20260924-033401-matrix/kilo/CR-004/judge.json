@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The finding explicitly states the condition is inverted ('условие инвертировано'), explains both consequences with concrete examples — a legitimate withdrawal of 40 from a 100 balance is rejected and a 500 overdraft on a 100 balance is allowed — grounds the expected behavior in the docstring at src/account.py:5 (and corroborates it with the failing existing test test_routine_withdrawal), and cites the exact location src/account.py:6, which matches the changed line in the diff.",
+  "criteria": {
+    "defect_named": true,
+    "consequence_explained": true,
+    "expected_behavior_sourced": true,
+    "location": true
+  }
+}

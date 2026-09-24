@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The finding explicitly names the inverted comparison (`amount >= balance` must be reverted to `amount <= balance`), explains both consequences — routine withdrawals such as 40 of 100 are rejected while withdrawing the full balance or more is permitted — grounds the expected behavior in the docstring contract at src/account.py:5, the failing existing test at tests/test_account.py:5, and the preserve-behavior rule, and cites the exact location src/account.py:6, with a pytest run confirming the root cause.",
+  "criteria": {
+    "defect_named": true,
+    "consequence_explained": true,
+    "expected_behavior_sourced": true,
+    "location": true
+  }
+}

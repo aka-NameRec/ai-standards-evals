@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The finding explicitly states that formatPrice fully duplicates formatMoney, covering the same contract (cents + currency code) and identical output including sign, grouping, fraction, and unknown-currency fallback, and backs it with an empirical 9-case comparison. It names the existing primitive with its location (src/money.ts:1), cites the offending code at src/pricing.ts:1 with a line number, and the remedy is aligned: remove src/pricing.ts and have callers use formatMoney, with a re-export from money.ts if the formatPrice name is needed — not a second implementation. All four criteria hold.",
+  "criteria": {
+    "duplication_named": true,
+    "existing_primitive_named": true,
+    "remedy_aligned": true,
+    "location": true
+  }
+}
