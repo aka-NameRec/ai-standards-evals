@@ -2,11 +2,11 @@
   "kind": "run-comparison",
   "baseline_revision": "2.6.0-2026-09-23",
   "candidate_revision": "rules-change/22-m4-reporting-reference",
-  "generated": "20260924-050428",
+  "generated": "20260924-070453",
   "verdict": "REJECT",
   "downgrades": [
-    "CR-004: PASS -> MIXED",
-    "CR-008: PASS -> MIXED"
+    "CR-002: PASS -> MIXED",
+    "CR-004: PASS -> MIXED"
   ],
   "rows": [
     {
@@ -18,8 +18,8 @@
     {
       "scenario": "CR-002",
       "baseline": "PASS",
-      "candidate": "PASS",
-      "delta": "same"
+      "candidate": "MIXED",
+      "delta": "downgrade"
     },
     {
       "scenario": "CR-003",
@@ -54,14 +54,14 @@
     {
       "scenario": "CR-008",
       "baseline": "PASS",
-      "candidate": "MIXED",
-      "delta": "downgrade"
+      "candidate": "PASS",
+      "delta": "same"
     },
     {
       "scenario": "CR-009",
       "baseline": "MIXED",
-      "candidate": "MIXED",
-      "delta": "same"
+      "candidate": "PASS",
+      "delta": "upgrade"
     },
     {
       "scenario": "CR-010",
@@ -72,7 +72,7 @@
     {
       "scenario": "CR-011",
       "baseline": "NO RUNS",
-      "candidate": "PASS",
+      "candidate": "MIXED",
       "delta": "upgrade"
     },
     {

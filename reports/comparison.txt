@@ -1,18 +1,18 @@
 scenario  baseline  candidate  delta
 ------------------------------------
 CR-001    PASS      PASS       same
-CR-002    PASS      PASS       same
+CR-002    PASS      MIXED      downgrade
 CR-003    PASS      PASS       same
 CR-004    PASS      MIXED      downgrade
 CR-005    PASS      PASS       same
 CR-006    PASS      PASS       same
 CR-007    PASS      PASS       same
-CR-008    PASS      MIXED      downgrade
-CR-009    MIXED     MIXED      same
+CR-008    PASS      PASS       same
+CR-009    MIXED     PASS       upgrade
 CR-010    NO RUNS   PASS       upgrade
-CR-011    NO RUNS   PASS       upgrade
+CR-011    NO RUNS   MIXED      upgrade
 CR-012    NO RUNS   PASS       upgrade
 BM-001    NO RUNS   PASS       upgrade
 BM-002    NO RUNS   PASS       upgrade
 
-verdict: REJECT (CR-004: PASS -> MIXED; CR-008: PASS -> MIXED)
+verdict: REJECT (CR-002: PASS -> MIXED; CR-004: PASS -> MIXED)
