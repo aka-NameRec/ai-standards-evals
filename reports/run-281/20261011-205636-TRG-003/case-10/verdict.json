@@ -1,0 +1,10 @@
+{
+  "index": 10,
+  "prompt": "работай автономно, но push согласуй отдельно",
+  "expected_should_trigger": true,
+  "engaged": true,
+  "skill_seen": true,
+  "ok": true,
+  "note": "",
+  "duration_seconds": 30.7
+}

@@ -1,0 +1,10 @@
+{
+  "index": 8,
+  "prompt": "зафиксируй знания стандартным образом",
+  "expected_should_trigger": false,
+  "engaged": false,
+  "skill_seen": true,
+  "ok": true,
+  "note": "",
+  "duration_seconds": 69.2
+}

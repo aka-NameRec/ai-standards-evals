@@ -1,0 +1,14 @@
+{
+  "trigger_set": "TRG-003",
+  "cases": 11,
+  "passed": 10,
+  "failed": 1,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "2.8.1-2026-10-11",
+  "failures": [
+    {
+      "prompt": "зафиксируй знания стандартным образом",
+      "note": "skill invoked on a negative case"
+    }
+  ]
+}

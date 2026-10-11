@@ -1,0 +1,10 @@
+{
+  "index": 7,
+  "prompt": "работай по плану, но согласовывай каждый шаг",
+  "expected_should_trigger": false,
+  "engaged": false,
+  "skill_seen": false,
+  "ok": true,
+  "note": "",
+  "duration_seconds": 13.7
+}

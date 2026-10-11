@@ -1,0 +1,10 @@
+{
+  "index": 1,
+  "prompt": "работай автономно до завершения задачи",
+  "expected_should_trigger": true,
+  "engaged": false,
+  "skill_seen": true,
+  "ok": false,
+  "note": "expected activation, no standard report produced",
+  "duration_seconds": 38.7
+}

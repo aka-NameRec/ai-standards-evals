@@ -1,0 +1,10 @@
+{
+  "index": 3,
+  "prompt": "автономно по плану с последующим слиянием",
+  "expected_should_trigger": true,
+  "engaged": false,
+  "skill_seen": true,
+  "ok": false,
+  "note": "expected activation, no standard report produced",
+  "duration_seconds": 29.3
+}

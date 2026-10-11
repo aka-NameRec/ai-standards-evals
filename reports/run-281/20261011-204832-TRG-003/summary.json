@@ -1,0 +1,38 @@
+{
+  "trigger_set": "TRG-003",
+  "cases": 11,
+  "passed": 4,
+  "failed": 7,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "2.8.1-2026-10-11",
+  "failures": [
+    {
+      "prompt": "работай автономно до завершения задачи",
+      "note": "expected activation, no standard report produced"
+    },
+    {
+      "prompt": "работай автономно, слей в main по стандарту",
+      "note": "expected activation, no standard report produced"
+    },
+    {
+      "prompt": "автономно по плану с последующим слиянием",
+      "note": "expected activation, no standard report produced"
+    },
+    {
+      "prompt": "work autonomously until done",
+      "note": "expected activation, no standard report produced"
+    },
+    {
+      "prompt": "run the approved plan end-to-end",
+      "note": "expected activation, no standard report produced"
+    },
+    {
+      "prompt": "работай автономно, но push согласуй отдельно",
+      "note": "expected activation, no standard report produced"
+    },
+    {
+      "prompt": "автономно, только следующий слайс",
+      "note": "expected activation, no standard report produced"
+    }
+  ]
+}

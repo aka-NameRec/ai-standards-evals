@@ -1,0 +1,10 @@
+{
+  "index": 4,
+  "prompt": "work autonomously until done",
+  "expected_should_trigger": true,
+  "engaged": true,
+  "skill_seen": true,
+  "ok": true,
+  "note": "",
+  "duration_seconds": 39.3
+}

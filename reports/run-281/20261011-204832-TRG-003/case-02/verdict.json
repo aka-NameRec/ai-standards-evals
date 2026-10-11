@@ -1,0 +1,10 @@
+{
+  "index": 2,
+  "prompt": "работай автономно, слей в main по стандарту",
+  "expected_should_trigger": true,
+  "engaged": false,
+  "skill_seen": true,
+  "ok": false,
+  "note": "expected activation, no standard report produced",
+  "duration_seconds": 36.7
+}

@@ -53,18 +53,24 @@ class KiloAdapter:
         command = self.build_command(prompt, cwd, scenario_id)
         result = run_agent_command(self.name, command, cwd, self.timeout_seconds)
         answer = extract_answer(result.stdout)
+        stderr_note = ""
         if not answer:
             stderr_note = "[evals] empty answer (no assistant output), retrying once\n"
             result = run_agent_command(self.name, command, cwd, self.timeout_seconds)
-            result = AgentResult(
-                adapter=result.adapter,
-                command=result.command,
-                returncode=result.returncode,
-                stdout=result.stdout,
-                stderr=stderr_note + result.stderr,
-                duration_seconds=result.duration_seconds,
-                answer=extract_answer(result.stdout),
-            )
+            answer = extract_answer(result.stdout)
+            if not answer:
+                stderr_note += "[evals] retry also produced no assistant output\n"
+        # ``run_agent_command`` returns the raw stdout as the answer; scorers
+        # must see the extracted assistant text, never the event stream.
+        result = AgentResult(
+            adapter=result.adapter,
+            command=result.command,
+            returncode=result.returncode,
+            stdout=result.stdout,
+            stderr=stderr_note + result.stderr,
+            duration_seconds=result.duration_seconds,
+            answer=answer,
+        )
         if result.returncode != 0 and not result.stdout:
             msg = f"kilo run failed with code {result.returncode}: {result.stderr[:400]}"
             raise AgentRunError(msg)

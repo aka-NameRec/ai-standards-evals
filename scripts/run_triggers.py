@@ -11,10 +11,13 @@ from pathlib import Path
 from agents.kilo import KiloAdapter, skill_invoked
 from scorers import report_shape
 from scripts.config import load_config
-from scripts.fixtures import build_trg001
+from scripts.fixtures import BUILDERS
 from scripts.standards import KIND_TRIGGER_SET, index_scenarios, resolve_standards_checkout
 
-TRG001_FIXTURE = "TRG-001"
+TRG_FIXTURE_BUILDERS = ("TRG-001", "TRG-003")
+# Procedure skills activate by the skill tool call; report-shaped skills by
+# the standard report in the answer.
+SKILL_INVOCATION_SETS = frozenset({"TRG-003"})
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -37,6 +40,12 @@ def main(argv: list[str] | None = None) -> int:
             if not 1 <= args.index <= len(cases):
                 parser.error(f"--index must be 1..{len(cases)}")
             cases = [cases[args.index - 1]]
+        fixture_builder = BUILDERS.get(args.trigger_set_id)
+        if fixture_builder is None or args.trigger_set_id not in TRG_FIXTURE_BUILDERS:
+            parser.error(
+                f"no fixture builder for trigger set {args.trigger_set_id!r}; "
+                f"known: {', '.join(TRG_FIXTURE_BUILDERS)}"
+            )
         reports_root = (args.reports_dir).resolve() / (
             f"{datetime.now(UTC).strftime('%Y%m%d-%H%M%S')}-{args.trigger_set_id}"
         )
@@ -44,18 +53,25 @@ def main(argv: list[str] | None = None) -> int:
         for index, case in enumerate(cases, start=args.index if args.index else 1):
             run_dir = reports_root / f"case-{index:02d}"
             run_dir.mkdir(parents=True, exist_ok=True)
-            fixture = build_trg001(
+            fixture = fixture_builder(
                 worktree, run_dir / "fixture", config.standards_revision, _render
             )
             result = adapter.run(case.prompt, fixture, f"{args.trigger_set_id}-{index:02d}")
             answer = result.answer.strip()
             (run_dir / "answer.md").write_text(answer, encoding="utf-8")
             (run_dir / "agent-stdout.jsonl").write_text(result.stdout, encoding="utf-8")
-            engaged = report_shape.check(answer).ok
             skill_seen = skill_invoked(result.stdout)
+            # Activation signal per skill: the code-review skill answers with a
+            # standard report; procedure skills activate by the skill tool call.
+            if args.trigger_set_id in SKILL_INVOCATION_SETS:
+                engaged = skill_seen
+                miss_note = "expected activation, skill tool not invoked"
+            else:
+                engaged = report_shape.check(answer).ok
+                miss_note = "expected activation, no standard report produced"
             if case.should_trigger:
                 ok = engaged
-                note = "" if engaged else "expected activation, no standard report produced"
+                note = "" if engaged else miss_note
             else:
                 ok = (not engaged) or (not skill_seen)
                 note = "skill invoked on a negative case" if engaged and skill_seen else ""
