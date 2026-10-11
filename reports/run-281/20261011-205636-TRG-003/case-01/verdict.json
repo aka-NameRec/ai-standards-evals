@@ -1,0 +1,10 @@
+{
+  "index": 1,
+  "prompt": "работай автономно до завершения задачи",
+  "expected_should_trigger": true,
+  "engaged": true,
+  "skill_seen": true,
+  "ok": true,
+  "note": "",
+  "duration_seconds": 29.9
+}

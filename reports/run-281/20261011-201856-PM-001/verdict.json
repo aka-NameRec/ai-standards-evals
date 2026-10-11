@@ -1,0 +1,25 @@
+{
+  "scenario_id": "PM-001",
+  "ok": true,
+  "failures": [],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 70.9,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "2.8.1-2026-10-11",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/run-281/20261011-201856-PM-001/fixture/pm-001-local-note-date-prefix",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-PM-001",
+    "Зафиксируй в локальной памяти проекта: приняли решение кэшировать выборку первой страницы. Запиши контекст в docs/local по стандарту проекта."
+  ],
+  "judge": null
+}

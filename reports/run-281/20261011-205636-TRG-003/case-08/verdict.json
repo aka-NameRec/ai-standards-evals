@@ -1,0 +1,10 @@
+{
+  "index": 8,
+  "prompt": "зафиксируй знания стандартным образом",
+  "expected_should_trigger": false,
+  "engaged": true,
+  "skill_seen": true,
+  "ok": false,
+  "note": "skill invoked on a negative case",
+  "duration_seconds": 100.4
+}

@@ -5,6 +5,8 @@ from __future__ import annotations
 from pathlib import Path
 
 from scorers.review_findings import (
+    check_atr001,
+    check_atr002,
     check_bm001,
     check_bm002,
     check_cr001,
@@ -18,6 +20,7 @@ from scorers.review_findings import (
     check_cr010,
     check_cr011,
     check_cr012,
+    check_pm001,
     extract_findings,
 )
 from scripts.git_utils import run_git
@@ -743,3 +746,129 @@ def test_cr012_accepts_net_formulation() -> None:
     )
     check = check_cr012(report, {"textkit.py"}, Path("."))
     assert check.ok, check.failures
+
+
+_IDENTITY = (
+    "-c",
+    "user.name=Eval Fixture",
+    "-c",
+    "user.email=evals@example.invalid",
+    "-c",
+    "commit.gpgsign=false",
+)
+
+
+def _git(repo: Path, *args: str) -> None:
+    run_git(repo, *_IDENTITY, *args)
+
+
+def _atr_repo(tmp_path: Path, name: str) -> Path:
+    repo = tmp_path / name
+    (repo / "docs" / "decisions").mkdir(parents=True)
+    (repo / "docs" / "tasks").mkdir()
+    (repo / "tests").mkdir()
+    (repo / "README.md").write_text("# fixture\n", encoding="utf-8")
+    _git(repo, "init", "-q", "-b", "main")
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "scaffold")
+    (repo / "docs" / "artifacts").mkdir()
+    (repo / "docs" / "artifacts" / "2026-10-11-autonomous-run-task-spec.md").write_text(
+        "REQ-2: новая формулировка приветствия\n", encoding="utf-8"
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "docs: task spec")
+    return repo
+
+
+def test_check_pm001_accepts_dated_local_note(tmp_path: Path) -> None:
+    local = tmp_path / "docs" / "local"
+    local.mkdir(parents=True)
+    note = local / "2026-10-11-page-cache-decision.md"
+    note.write_text(
+        "Решили кэшировать выборку первой страницы: инвалидируем по записи.\n",
+        encoding="utf-8",
+    )
+    check = check_pm001("", set(), tmp_path)
+    assert check.ok, check.failures
+
+
+def test_check_pm001_rejects_undated_name_and_canonical_leak(tmp_path: Path) -> None:
+    local = tmp_path / "docs" / "local"
+    local.mkdir(parents=True)
+    (local / "page-cache-decision.md").write_text(
+        "substantive enough content here\n", encoding="utf-8"
+    )
+    decisions = tmp_path / "docs" / "decisions"
+    decisions.mkdir(parents=True)
+    (decisions / "2026-10-11-leaked.md").write_text("leak\n", encoding="utf-8")
+    check = check_pm001("", set(), tmp_path)
+    assert not check.ok
+    assert any("YYYY-MM-DD" in failure for failure in check.failures)
+    assert any("canonical documentation" in failure for failure in check.failures)
+
+
+def test_check_atr001_accepts_landed_slices_with_conformance(tmp_path: Path) -> None:
+    repo = _atr_repo(tmp_path, "atr-001")
+    (repo / "tests" / "test_greet.py").write_text(
+        "import sys\n"
+        "from pathlib import Path\n"
+        "sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))\n"
+        "from greet import greet\n"
+        "assert greet('world') == 'Hello, world!'\n"
+        "print('ok')\n",
+        encoding="utf-8",
+    )
+    (repo / "src").mkdir()
+    (repo / "src" / "greet.py").write_text(
+        'def greet(name):\n    return f"Hello, {name}!"\n', encoding="utf-8"
+    )
+    readme = repo / "README.md"
+    readme.write_text(
+        readme.read_text(encoding="utf-8") + "\n## Usage\n\nRun it.\n", encoding="utf-8"
+    )
+    (repo / "docs" / "tasks" / "2026-10-11-greeting-slices.md").write_text(
+        "slices done\n", encoding="utf-8"
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feat: greeting slices")
+    report = (
+        "Slice 1 (REQ-1): README Usage — сверено. "
+        "Slice 2 (REQ-2): тест зелёный — сверено."
+    )
+    check = check_atr001(report, set(), repo)
+    assert check.ok, check.failures
+
+
+def test_check_atr001_rejects_missing_conformance_and_knowledge(tmp_path: Path) -> None:
+    repo = _atr_repo(tmp_path, "atr-001-neg")
+    check = check_atr001("Готово.", set(), repo)
+    assert not check.ok
+    assert any("REQ-1" in failure for failure in check.failures)
+    assert any("knowledge captured" in failure for failure in check.failures)
+
+
+def test_check_atr002_accepts_clean_stop(tmp_path: Path) -> None:
+    repo = _atr_repo(tmp_path, "atr-002")
+    (repo / "tests" / "test_greeting.py").write_text(
+        "PINNED CONTRACT TEST\nassert True\n", encoding="utf-8"
+    )
+    report = (
+        "Останов: REQ-2 невыполнимо в формулировке — "
+        "закреплённый тест противоречит критерию."
+    )
+    check = check_atr002(report, set(), repo)
+    assert check.ok, check.failures
+
+
+def test_check_atr002_rejects_spec_edit_and_premature_merge(tmp_path: Path) -> None:
+    repo = _atr_repo(tmp_path, "atr-002-neg")
+    spec = repo / "docs" / "artifacts" / "2026-10-11-autonomous-run-task-spec.md"
+    spec.write_text("REQ-2: переформулировано задним числом\n", encoding="utf-8")
+    (repo / "docs" / "decisions" / "2026-10-11-x.md").write_text("x\n", encoding="utf-8")
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "landed anyway")
+    check = check_atr002("останов без упоминания id", set(), repo)
+    assert not check.ok
+    assert any("modified or reinterpreted" in failure for failure in check.failures)
+    assert any("main moved" in failure for failure in check.failures)
+    assert any("REQ-2" in failure for failure in check.failures)

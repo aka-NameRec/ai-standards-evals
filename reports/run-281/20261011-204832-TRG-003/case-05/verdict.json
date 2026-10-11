@@ -1,0 +1,10 @@
+{
+  "index": 5,
+  "prompt": "run the approved plan end-to-end",
+  "expected_should_trigger": true,
+  "engaged": false,
+  "skill_seen": true,
+  "ok": false,
+  "note": "expected activation, no standard report produced",
+  "duration_seconds": 48.6
+}

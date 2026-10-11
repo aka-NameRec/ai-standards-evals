@@ -1,7 +1,7 @@
 # Pinned standards revision consumed by the eval runner.
 [standards]
 repo = "~/workspace/myself/ai-standards"
-revision = "2.5.0-2026-09-21"
+revision = "2.8.1-2026-10-11"
 
 [runner]
 # Model is pinned for baseline/candidate comparability.

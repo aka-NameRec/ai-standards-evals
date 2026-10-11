@@ -1,0 +1,10 @@
+{
+  "index": 11,
+  "prompt": "автономно, только следующий слайс",
+  "expected_should_trigger": true,
+  "engaged": true,
+  "skill_seen": true,
+  "ok": true,
+  "note": "",
+  "duration_seconds": 61.2
+}
