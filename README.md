@@ -51,7 +51,8 @@ scorers/     — детерминированные oracle, structured/LLM grade
 agents/      — адаптеры внешних coding agents (Codex, Claude Code, Kilo, Cursor)
 scripts/     — run_baseline / run_candidate / compare_runs / coverage_report
 reports/     — отчёты прогонов и сравнения baseline/candidate
-docs/        — cross-repo flow, авторство evals, guidelines для scorers
+docs/        — cross-repo flow, авторство evals, guidelines для scorers,
+               decision и task records
 ```
 
 ## Статус
