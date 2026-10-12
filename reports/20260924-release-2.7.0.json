@@ -1,0 +1,111 @@
+{
+  "kind": "release-report",
+  "verdict": "PASS",
+  "standards_revision": "main",
+  "min_runs": 1,
+  "blocking": [],
+  "waivers": {
+    "CR-009": "environment: no final assistant output in 4 attempts on 2026-09-24 (server instability); substantive behavior PASS 2/2 in gate-3, judge pass",
+    "CR-010": "formatting variance: unfenced chat posting under the RU prompt (consistent 2/2 in the clean environment); non-blocking trend per the class-aware gate"
+  },
+  "scenarios": {
+    "CR-001": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "CR-002": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "CR-003": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "CR-004": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "CR-005": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "CR-006": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "CR-007": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "CR-008": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "CR-009": {
+      "verdict": "NO RUNS",
+      "runs": 0,
+      "passed": 0,
+      "waived": "environment: no final assistant output in 4 attempts on 2026-09-24 (server instability); substantive behavior PASS 2/2 in gate-3, judge pass",
+      "ok": true
+    },
+    "CR-010": {
+      "verdict": "FAIL",
+      "runs": 1,
+      "passed": 0,
+      "waived": "formatting variance: unfenced chat posting under the RU prompt (consistent 2/2 in the clean environment); non-blocking trend per the class-aware gate",
+      "ok": true
+    },
+    "CR-011": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "CR-012": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "BM-001": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "BM-002": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    }
+  }
+}
