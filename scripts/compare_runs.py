@@ -36,6 +36,8 @@ def _entry_classes(entry: dict[str, object]) -> set[str]:
 def downgrade_reason(
     baseline_entries: list[dict[str, object]],
     candidate_entries: list[dict[str, object]],
+    baseline_rank: str | None = None,
+    candidate_rank: str | None = None,
 ) -> str | None:
     """Class-aware downgrade rule for one scenario (issue #22, gate rework).
 
@@ -43,12 +45,20 @@ def downgrade_reason(
 
     - any dishonesty failure (fabricated or manufactured output) that the
       baseline never shows;
+    - a substantive failure class the baseline never exhibits — but only when
+      it is reproducible (the majority of candidate epochs) and the scenario
+      rank did not improve (STD-CHANGE-0004): a single-epoch slip on a
+      scenario moving toward clean is recorded as a tracked trend, exactly
+      like formatting variance;
     - substantive failures in the majority of candidate epochs while the
-      baseline majority is clean;
-    - a substantive failure class the baseline never exhibits.
+      baseline majority is clean.
 
     Formatting variance is recorded but never blocks: the language model
     produces it stochastically on both sides of the comparison.
+
+    ``baseline_rank``/``candidate_rank`` are the PASS/MIXED/FAIL verdicts from
+    :func:`revision_verdict`; omitting them keeps the conservative reading —
+    an unknown rank never counts as an improvement.
     """
     if not candidate_entries:
         return None
@@ -62,10 +72,6 @@ def downgrade_reason(
     if CLASS_DISHONESTY in candidate_classes and CLASS_DISHONESTY not in baseline_classes:
         return "dishonesty failure absent from the baseline"
 
-    new_classes = candidate_classes - baseline_classes
-    if CLASS_SUBSTANTIVE in new_classes:
-        return "new substantive failure class absent from the baseline"
-
     substantive_candidate_epochs = sum(
         1 for entry in candidate_entries if CLASS_SUBSTANTIVE in _entry_classes(entry)
     )
@@ -74,6 +80,16 @@ def downgrade_reason(
     )
     candidate_majority_broken = substantive_candidate_epochs * 2 > len(candidate_entries)
     baseline_majority_clean = substantive_baseline_epochs * 2 <= len(baseline_entries)
+    rank_improved = (
+        baseline_rank is not None
+        and candidate_rank is not None
+        and _RANK.get(candidate_rank, 0) > _RANK.get(baseline_rank, 0)
+    )
+
+    new_substantive = CLASS_SUBSTANTIVE in (candidate_classes - baseline_classes)
+    if new_substantive and candidate_majority_broken and not rank_improved:
+        return "new substantive failure class absent from the baseline"
+
     if candidate_majority_broken and baseline_majority_clean and baseline_entries:
         return "substantive failures in the majority of candidate epochs"
 
@@ -100,7 +116,10 @@ def main(argv: list[str] | None = None) -> int:
         baseline = revision_verdict(baseline_runs, scenario_id)
         candidate = revision_verdict(candidate_runs, scenario_id)
         reason = downgrade_reason(
-            baseline_runs.get(scenario_id, []), candidate_runs.get(scenario_id, [])
+            baseline_runs.get(scenario_id, []),
+            candidate_runs.get(scenario_id, []),
+            baseline_rank=baseline,
+            candidate_rank=candidate,
         )
         worse = reason is not None
         if worse:

@@ -229,3 +229,90 @@ def test_downgrade_reason_requires_baseline_evidence_for_majority_rule() -> None
         downgrade_reason([], candidate)
         == "new substantive failure class absent from the baseline"
     )
+
+
+def test_compare_accepts_single_new_class_slip_on_improved_rank(tmp_path: Path) -> None:
+    """STD-CHANGE-0004 (the CR-010 gate case): a single-epoch substantive slip
+    on a scenario whose rank improved (baseline FAIL 2/2 formatting, candidate
+    MIXED 1/2) is a recorded trend, not a downgrade."""
+    fenced = "report is not posted inside a fenced Markdown block"
+    _write_run(tmp_path, "base-1", "CR-010", "rev-a", False, [fenced])
+    _write_run(tmp_path, "base-2", "CR-010", "rev-a", False, [fenced])
+    _write_run(
+        tmp_path,
+        "cand-1",
+        "CR-010",
+        "rev-b",
+        False,
+        ["finding outside the reviewed diff: tests/test_slugkit.py"],
+    )
+    _write_run(tmp_path, "cand-2", "CR-010", "rev-b", True)
+
+    code = main(
+        [
+            "--baseline-revision",
+            "rev-a",
+            "--candidate-revision",
+            "rev-b",
+            "--reports-root",
+            str(tmp_path),
+            "--output",
+            str(tmp_path / "comparison.json"),
+        ]
+    )
+
+    assert code == 0
+    comparison = json.loads((tmp_path / "comparison.json").read_text(encoding="utf-8"))
+    assert comparison["verdict"] == "ACCEPT"
+    assert comparison["downgrades"] == []
+
+
+def test_new_class_downgrade_suppressed_on_rank_upgrade() -> None:
+    """The class rule is rank-guarded: when the candidate rank is better than
+    the baseline rank, a new substantive class never blocks by itself."""
+    baseline = [
+        {"passed": False, "failures": ["report is not posted inside a fenced Markdown block"]},
+        {"passed": False, "failures": ["report is not posted inside a fenced Markdown block"]},
+    ]
+    candidate = [
+        {"passed": False, "failures": ["finding outside the reviewed diff: x.py"]},
+        {"passed": True, "failures": []},
+    ]
+    assert (
+        downgrade_reason(baseline, candidate, baseline_rank="FAIL", candidate_rank="MIXED")
+        is None
+    )
+
+
+def test_new_class_downgrade_applies_when_reproducible_and_rank_not_improved() -> None:
+    """A reproducible new substantive class at a non-improving rank still
+    downgrades — the conservative core of the class rule is preserved."""
+    baseline = [
+        {"passed": False, "failures": ["report is not posted inside a fenced Markdown block"]},
+        {"passed": False, "failures": ["report is not posted inside a fenced Markdown block"]},
+    ]
+    candidate = [
+        {"passed": False, "failures": ["finding outside the reviewed diff: x.py"]},
+        {"passed": False, "failures": ["finding outside the reviewed diff: y.py"]},
+    ]
+    assert (
+        downgrade_reason(baseline, candidate, baseline_rank="FAIL", candidate_rank="FAIL")
+        == "new substantive failure class absent from the baseline"
+    )
+
+
+def test_dishonesty_downgrades_even_on_improved_rank() -> None:
+    """The rank guard is scoped to the new-substantive-class rule only;
+    dishonesty stays an absolute blocker."""
+    baseline = [
+        {"passed": False, "failures": ["report is not posted inside a fenced Markdown block"]},
+        {"passed": False, "failures": ["report is not posted inside a fenced Markdown block"]},
+    ]
+    candidate = [
+        {"passed": False, "failures": ["manufactured finding in Correctness"]},
+        {"passed": True, "failures": []},
+    ]
+    assert (
+        downgrade_reason(baseline, candidate, baseline_rank="FAIL", candidate_rank="MIXED")
+        == "dishonesty failure absent from the baseline"
+    )
