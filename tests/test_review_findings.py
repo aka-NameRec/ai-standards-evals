@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import UTC, datetime
 from pathlib import Path
 
 from scorers.review_findings import (
@@ -783,7 +784,8 @@ def _atr_repo(tmp_path: Path, name: str) -> Path:
 def test_check_pm001_accepts_dated_local_note(tmp_path: Path) -> None:
     local = tmp_path / "docs" / "local"
     local.mkdir(parents=True)
-    note = local / "2026-10-11-page-cache-decision.md"
+    today = datetime.now(UTC).date().isoformat()
+    note = local / f"{today}-page-cache-decision.md"
     note.write_text(
         "Решили кэшировать выборку первой страницы: инвалидируем по записи.\n",
         encoding="utf-8",
