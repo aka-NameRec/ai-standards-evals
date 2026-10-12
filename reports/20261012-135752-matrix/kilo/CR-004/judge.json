@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The finding explicitly names the inverted condition (`условие инвертировано`, `amount >= balance` instead of `amount <= balance`), explains both consequences with concrete examples (normal withdrawal `can_withdraw(100, 40)` is rejected while overdraft `can_withdraw(100, 150)` is allowed), grounds the expected behavior in the docstring (\"Return whether ``amount`` may be withdrawn from ``balance``\") and the failing existing test at `tests/test_account.py:5` rather than taste, and cites `src/account.py:6`, which correctly matches the changed return line in the diff hunk.",
+  "criteria": {
+    "defect_named": true,
+    "consequence_explained": true,
+    "expected_behavior_sourced": true,
+    "location": true
+  }
+}

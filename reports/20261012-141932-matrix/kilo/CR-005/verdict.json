@@ -1,0 +1,36 @@
+{
+  "scenario_id": "CR-005",
+  "ok": true,
+  "failures": [],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 48.8,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "rules-change/26-implement-issue-26",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/20261012-141932-matrix/kilo/CR-005/fixture/cr-005-new-internal-duplication",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CR-005",
+    "code review"
+  ],
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The finding explicitly names format_period as duplicated verbatim between the two new modules, citing both locations (src/csv_export.py:4 and src/json_export.py:4). It correctly frames the issue as newly introduced duplication ('in each module the same function is implemented independently') rather than a bypassed pre-existing helper; the only existing module referenced, src/rows.py, is cited as the natural home for the extracted helper, not as a source of an ignored format_period. The proposed remedy — move format_period into src/rows.py and import it in both exports — is exactly the shared-helper extraction the rubric requires.",
+    "criteria": {
+      "duplication_named": true,
+      "no_invented_helper": true,
+      "remedy_aligned": true,
+      "locations": true
+    }
+  }
+}

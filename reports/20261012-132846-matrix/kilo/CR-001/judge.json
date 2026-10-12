@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The finding explicitly states that the new `formatPrice` duplicates the existing `formatMoney`, detailing the shared logic (cents handling, currency symbols EUR→€/GBP→£/else $, digit grouping, output format) and even verifying equivalence on 7 test cases. It names the existing abstraction `formatMoney` in `src/money.ts` as the reuse target, and the remedy — delete `src/pricing.ts` and route callers to `formatMoney` — eliminates the second implementation rather than keeping it. The location is cited with a line number (`src/pricing.ts:1`).",
+  "criteria": {
+    "duplication_named": true,
+    "existing_primitive_named": true,
+    "remedy_aligned": true,
+    "location": true
+  }
+}

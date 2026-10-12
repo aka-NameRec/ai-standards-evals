@@ -1,0 +1,13 @@
+diff --git a/src/register.py b/src/register.py
+index 77f9c80..dadbc4a 100644
+--- a/src/register.py
++++ b/src/register.py
+@@ -26,3 +26,8 @@ def route(schema):
+ @route(RegisterSchema)
+ def register_user(payload):
+     return {"ok": True, "user": payload}
++
++
++@route(RegisterSchema)
++def resend_confirmation(payload):
++    return {"ok": True, "queued": True}

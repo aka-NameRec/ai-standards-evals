@@ -1,0 +1,17 @@
+{
+  "generated": "20261012-132636",
+  "standards_revision": "rules-change/26-implement-issue-26",
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "adapters": [
+    "kilo"
+  ],
+  "scenarios": [
+    "CR-001"
+  ],
+  "cells": {
+    "kilo|CR-001": {
+      "verdict": "PASS",
+      "failures": []
+    }
+  }
+}

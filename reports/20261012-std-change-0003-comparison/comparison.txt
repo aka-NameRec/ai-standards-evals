@@ -1,0 +1,20 @@
+scenario  baseline  candidate  delta
+------------------------------------
+CR-001    PASS      PASS       same
+CR-002    PASS      PASS       same
+CR-003    PASS      PASS       same
+CR-004    MIXED     PASS       upgrade
+CR-005    MIXED     PASS       upgrade
+CR-006    PASS      PASS       same
+CR-007    PASS      PASS       same
+CR-008    PASS      PASS       same
+CR-009    PASS      PASS       same
+CR-010    FAIL      MIXED      upgrade
+CR-011    PASS      PASS       same
+CR-012    PASS      PASS       same
+BM-001    PASS      PASS       same
+BM-002    PASS      PASS       same
+ATR-001   MIXED     PASS       upgrade
+ATR-002   MIXED     MIXED      same
+
+verdict: ACCEPT

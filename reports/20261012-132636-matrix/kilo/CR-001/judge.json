@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The finding under 'Переиспользование' explicitly states that formatPrice fully duplicates formatMoney, detailing the overlapping logic (sign handling, abs/100 + padStart fraction, digit grouping, currency symbol with $ fallback), thereby naming the duplication and the existing primitive together with its file path src/money.ts. The suggested remedy is aligned: delete src/pricing.ts and use formatMoney, or re-export it from a pricing module if that module is needed, which removes the second implementation rather than keeping it. The finding cites src/pricing.ts:1 with a line number. All four criteria are satisfied.",
+  "criteria": {
+    "duplication_named": true,
+    "existing_primitive_named": true,
+    "remedy_aligned": true,
+    "location": true
+  }
+}

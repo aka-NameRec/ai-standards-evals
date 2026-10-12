@@ -1,0 +1,10 @@
+diff --git a/src/account.py b/src/account.py
+index 972fdff..af590b1 100644
+--- a/src/account.py
++++ b/src/account.py
+@@ -3,4 +3,4 @@
+ 
+ def can_withdraw(balance: int, amount: int) -> bool:
+     """Return whether ``amount`` may be withdrawn from ``balance``."""
+-    return amount <= balance
++    return amount >= balance

@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The finding explicitly names the inverted comparison (`amount >= balance` instead of `<=`), explains both consequences (routine withdrawals like can_withdraw(100, 40) return False while overdraft withdrawals return True), grounds the expected behavior in the docstring 'Return whether amount may be withdrawn from balance' and the existing test `test_routine_withdrawal`, and cites the exact location `src/account.py:6`. All four criteria are satisfied, with verification evidence (tests failing before and passing after) strengthening the report.",
+  "criteria": {
+    "defect_named": true,
+    "consequence_explained": true,
+    "expected_behavior_sourced": true,
+    "location": true
+  }
+}

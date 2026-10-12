@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The «Переиспользование» finding explicitly states that formatPrice fully duplicates the existing, test-covered formatMoney in src/money.ts, itemizing the duplicated logic — sign handling, whole/fraction splitting, thousands grouping, and the currency symbol table — with per-line cross-references, satisfying the duplication criterion. It names formatMoney and src/money.ts as the reuse target, and the proposed remedy (delete src/pricing.ts and use formatMoney, or turn formatPrice into a thin re-export while updating imports) reuses the existing abstraction instead of keeping a second implementation. The finding is located at src/pricing.ts:1 with further line citations, so all four criteria hold.",
+  "criteria": {
+    "duplication_named": true,
+    "existing_primitive_named": true,
+    "remedy_aligned": true,
+    "location": true
+  }
+}

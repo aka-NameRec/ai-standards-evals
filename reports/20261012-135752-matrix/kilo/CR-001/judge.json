@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The reuse finding explicitly names formatPrice as a full functional duplicate of formatMoney from src/money.ts, detailing identical cents-based input, symbol mapping (EUR→€, GBP→£, fallback $), sign handling, thousands grouping, and fraction formatting; it cites src/pricing.ts:1 with a line number; and the remedy deletes the duplicate file (git restore --staged) and directs future needs to reuse/extend formatMoney, eliminating the second implementation rather than keeping it.",
+  "criteria": {
+    "duplication_named": true,
+    "existing_primitive_named": true,
+    "remedy_aligned": true,
+    "location": true
+  }
+}

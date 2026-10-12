@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The 🔴 finding explicitly names the direct repository write from the API handler bypassing the service layer (noting InventoryReservationService is unused), cites ADR-004 by ID with its file path and verbatim rule text ('All inventory writes must go through InventoryReservationService'), proposes the aligned remedy of routing the write through InventoryReservationService while leaving integration details to the author, and pinpoints the location as api_handler.py:8 (verified against the diff, where repository.save occurs on line 8). All four criteria are satisfied.",
+  "criteria": {
+    "bypass_named": true,
+    "decision_cited": true,
+    "remedy_aligned": true,
+    "location": true
+  }
+}

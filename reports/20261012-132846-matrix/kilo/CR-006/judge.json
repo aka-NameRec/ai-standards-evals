@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The blocking finding in the 'Architecture' section explicitly states that the API handler instantiates InventoryRepository and writes to storage directly, bypassing the service layer (InventoryReservationService). It cites ADR-004 by name with its file path (docs/decisions/ADR-004.md:3-4) and quotes the actual rule text ('All inventory writes must go through InventoryReservationService'), rather than a generic layering preference. The proposed fix routes the write through InventoryReservationService(InventoryRepository()).save(...), preserving the single write path. The finding is located at api_handler.py:7 with the write itself at line 8, both accurate against the diff. All four criteria are satisfied.",
+  "criteria": {
+    "bypass_named": true,
+    "decision_cited": true,
+    "remedy_aligned": true,
+    "location": true
+  }
+}

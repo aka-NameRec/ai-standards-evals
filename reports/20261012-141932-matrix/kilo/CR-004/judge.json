@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "model": "glm-5.3",
+  "score": 1.0,
+  "rationale": "The finding explicitly names the defect as an inverted comparison operator (`amount <= balance` → `amount >= balance`), explains both consequences — ordinary withdrawals (40 of 100) are blocked while overdrafts (500 of 100) are permitted — grounds the expected behavior in the function's documented contract (docstring quoted from src/account.py:5) and the failing test tests/test_account.py:5, and cites the exact location src/account.py:6. All four criteria are satisfied, and the report even verifies the behavior empirically with can_withdraw(100, 40) → False and can_withdraw(100, 500) → True plus a failing pytest run.",
+  "criteria": {
+    "defect_named": true,
+    "consequence_explained": true,
+    "expected_behavior_sourced": true,
+    "location": true
+  }
+}

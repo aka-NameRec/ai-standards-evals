@@ -1,0 +1,36 @@
+{
+  "scenario_id": "CR-004",
+  "ok": true,
+  "failures": [],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 86.0,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "rules-change/26-implement-issue-26",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/20261012-132846-matrix/kilo/CR-004/fixture/cr-004-real-correctness-defect",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CR-004",
+    "code review"
+  ],
+  "judge": {
+    "status": "pass",
+    "model": "glm-5.3",
+    "score": 1.0,
+    "rationale": "The finding explicitly names the defect as an inverted comparison operator (`amount <= balance` → `amount >= balance`), explains both consequences with concrete boundary cases (routine withdrawal of 40 from 100 is rejected, overdraft of 150 from 100 is allowed, only exact-balance withdrawal passes), grounds the expected behavior in the docstring contract («Return whether ``amount`` may be withdrawn») and the failing existing test `test_routine_withdrawal` at tests/test_account.py:5 rather than taste, and cites the correct location `src/account.py:6` with a line number matching the diff hunk.",
+    "criteria": {
+      "defect_named": true,
+      "consequence_explained": true,
+      "expected_behavior_sourced": true,
+      "location": true
+    }
+  }
+}

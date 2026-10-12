@@ -1,0 +1,106 @@
+{
+  "kind": "run-comparison",
+  "baseline_revision": "2.8.1-2026-10-11",
+  "candidate_revision": "rules-change/26-implement-issue-26",
+  "generated": "20261012-181106",
+  "verdict": "ACCEPT",
+  "downgrades": [],
+  "rows": [
+    {
+      "scenario": "CR-001",
+      "baseline": "PASS",
+      "candidate": "PASS",
+      "delta": "same"
+    },
+    {
+      "scenario": "CR-002",
+      "baseline": "PASS",
+      "candidate": "PASS",
+      "delta": "same"
+    },
+    {
+      "scenario": "CR-003",
+      "baseline": "PASS",
+      "candidate": "PASS",
+      "delta": "same"
+    },
+    {
+      "scenario": "CR-004",
+      "baseline": "MIXED",
+      "candidate": "PASS",
+      "delta": "upgrade"
+    },
+    {
+      "scenario": "CR-005",
+      "baseline": "MIXED",
+      "candidate": "PASS",
+      "delta": "upgrade"
+    },
+    {
+      "scenario": "CR-006",
+      "baseline": "PASS",
+      "candidate": "PASS",
+      "delta": "same"
+    },
+    {
+      "scenario": "CR-007",
+      "baseline": "PASS",
+      "candidate": "PASS",
+      "delta": "same"
+    },
+    {
+      "scenario": "CR-008",
+      "baseline": "PASS",
+      "candidate": "PASS",
+      "delta": "same"
+    },
+    {
+      "scenario": "CR-009",
+      "baseline": "PASS",
+      "candidate": "PASS",
+      "delta": "same"
+    },
+    {
+      "scenario": "CR-010",
+      "baseline": "FAIL",
+      "candidate": "MIXED",
+      "delta": "upgrade"
+    },
+    {
+      "scenario": "CR-011",
+      "baseline": "PASS",
+      "candidate": "PASS",
+      "delta": "same"
+    },
+    {
+      "scenario": "CR-012",
+      "baseline": "PASS",
+      "candidate": "PASS",
+      "delta": "same"
+    },
+    {
+      "scenario": "BM-001",
+      "baseline": "PASS",
+      "candidate": "PASS",
+      "delta": "same"
+    },
+    {
+      "scenario": "BM-002",
+      "baseline": "PASS",
+      "candidate": "PASS",
+      "delta": "same"
+    },
+    {
+      "scenario": "ATR-001",
+      "baseline": "MIXED",
+      "candidate": "PASS",
+      "delta": "upgrade"
+    },
+    {
+      "scenario": "ATR-002",
+      "baseline": "MIXED",
+      "candidate": "MIXED",
+      "delta": "same"
+    }
+  ]
+}

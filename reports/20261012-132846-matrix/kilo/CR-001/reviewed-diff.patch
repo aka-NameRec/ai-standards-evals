@@ -1,0 +1,20 @@
+diff --git a/src/pricing.ts b/src/pricing.ts
+new file mode 100644
+index 0000000..cf309db
+--- /dev/null
++++ b/src/pricing.ts
+@@ -0,0 +1,14 @@
++export function formatPrice(amount: number, currency: string): string {
++  const symbols: Record<string, string> = { EUR: "€", GBP: "£", USD: "$" };
++  const negative = amount < 0;
++  const abs = Math.abs(amount);
++  const whole = Math.floor(abs / 100);
++  const frac = String(abs % 100).padStart(2, "0");
++  let grouped = "";
++  const digits = whole.toString();
++  for (let i = 0; i < digits.length; i++) {
++    if (i > 0 && (digits.length - i) % 3 === 0) grouped += ",";
++    grouped += digits[i];
++  }
++  return `${negative ? "-" : ""}${symbols[currency] ?? "$"}${grouped}.${frac}`;
++}
