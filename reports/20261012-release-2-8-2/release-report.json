@@ -1,0 +1,75 @@
+{
+  "kind": "release-report",
+  "verdict": "PASS",
+  "standards_revision": "517f844fe44c1184a66b84a9be7a10f66ad8ee16",
+  "min_runs": 1,
+  "blocking": [],
+  "waivers": {
+    "CR-001": "single formatting-class slip (version line); CR-001 passed 4/4 epochs in the STD-CHANGE-0003 merge gate on identical rule content the same day (judge 1.0)"
+  },
+  "scenarios": {
+    "CR-001": {
+      "verdict": "FAIL",
+      "runs": 1,
+      "passed": 0,
+      "waived": "single formatting-class slip (version line); CR-001 passed 4/4 epochs in the STD-CHANGE-0003 merge gate on identical rule content the same day (judge 1.0)",
+      "ok": true
+    },
+    "CR-002": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "CR-003": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "CR-004": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "CR-005": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "CR-006": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "CR-007": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "CR-008": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "CR-009": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    }
+  }
+}
