@@ -1,0 +1,2 @@
+Файл `src/app/page.tsx` — пустой fixture без компонентов; Header создаю прямо на странице как Server Component (статичный контент, `'use client'` не нужен по правилам стека).
+Секция Header добавлена в `src/app/page.tsx` как Server Component без `'use client'` — по правилам стека Server Components являются границей по умолчанию, а интерактивность здесь не требуется.

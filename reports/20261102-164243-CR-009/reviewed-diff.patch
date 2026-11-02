@@ -1,0 +1,31 @@
+diff --git a/src/config.py b/src/config.py
+index 10a7dee..49f3e48 100644
+--- a/src/config.py
++++ b/src/config.py
+@@ -7,3 +7,11 @@ def parse_setting(raw: str) -> int:
+     if value <= 0:
+         raise ValueError("must be positive")
+     return value
++
++
++def parse_timeout(text: str) -> int:
++    """Parse a timeout in seconds; raises ValueError for non-positive input."""
++    value = int(text)
++    if value <= 0:
++        raise ValueError("timeout must be positive")
++    return value
+diff --git a/tests/test_config.py b/tests/test_config.py
+index 34fb328..5b94e0c 100644
+--- a/tests/test_config.py
++++ b/tests/test_config.py
+@@ -10,3 +10,10 @@ def test_setting():
+ def test_setting_rejects_zero():
+     with pytest.raises(ValueError):
+         parse_setting("0")
++
++
++from config import parse_timeout
++
++
++def test_timeout():
++    assert parse_timeout("30") == 30

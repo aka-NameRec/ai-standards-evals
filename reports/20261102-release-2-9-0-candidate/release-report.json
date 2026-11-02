@@ -1,0 +1,202 @@
+{
+  "kind": "release-report",
+  "verdict": "PASS",
+  "standards_revision": "rules-change/29-progressive-disclosure",
+  "min_runs": 1,
+  "blocking": [],
+  "waivers": {
+    "CR-010": "single model variance: fenced-report miss on the first run, rerun PASS (reports/20261102-165647-CR-010)",
+    "ATR-002": "pre-existing: fails identically on the released pin 2.8.1 (reports/20261102-172839-ATR-002); agent stops correctly on contradictory requirements, miss is the commit-on-main step"
+  },
+  "scenarios": {
+    "CR-001": {
+      "verdict": "PASS",
+      "runs": 2,
+      "passed": 2,
+      "waived": null,
+      "ok": true
+    },
+    "CR-002": {
+      "verdict": "PASS",
+      "runs": 2,
+      "passed": 2,
+      "waived": null,
+      "ok": true
+    },
+    "CR-003": {
+      "verdict": "PASS",
+      "runs": 2,
+      "passed": 2,
+      "waived": null,
+      "ok": true
+    },
+    "CR-004": {
+      "verdict": "PASS",
+      "runs": 2,
+      "passed": 2,
+      "waived": null,
+      "ok": true
+    },
+    "CR-005": {
+      "verdict": "PASS",
+      "runs": 2,
+      "passed": 2,
+      "waived": null,
+      "ok": true
+    },
+    "CR-006": {
+      "verdict": "PASS",
+      "runs": 2,
+      "passed": 2,
+      "waived": null,
+      "ok": true
+    },
+    "CR-007": {
+      "verdict": "PASS",
+      "runs": 2,
+      "passed": 2,
+      "waived": null,
+      "ok": true
+    },
+    "CR-008": {
+      "verdict": "PASS",
+      "runs": 2,
+      "passed": 2,
+      "waived": null,
+      "ok": true
+    },
+    "CR-009": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "CR-010": {
+      "verdict": "MIXED",
+      "runs": 2,
+      "passed": 1,
+      "waived": "single model variance: fenced-report miss on the first run, rerun PASS (reports/20261102-165647-CR-010)",
+      "ok": true
+    },
+    "CR-011": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "CR-012": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "BM-001": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "BM-002": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "PM-001": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "ATR-001": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "ATR-002": {
+      "verdict": "FAIL",
+      "runs": 2,
+      "passed": 0,
+      "waived": "pre-existing: fails identically on the released pin 2.8.1 (reports/20261102-172839-ATR-002); agent stops correctly on contradictory requirements, miss is the commit-on-main step",
+      "ok": true
+    },
+    "RD-101": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "RD-102": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "RD-103": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "RD-104": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "RD-105": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "RD-106": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "RD-107": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "RD-108": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "RD-110": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    },
+    "RD-111": {
+      "verdict": "PASS",
+      "runs": 1,
+      "passed": 1,
+      "waived": null,
+      "ok": true
+    }
+  }
+}

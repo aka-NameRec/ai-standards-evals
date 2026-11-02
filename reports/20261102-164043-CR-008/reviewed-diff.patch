@@ -1,0 +1,13 @@
+diff --git a/src/formatting.py b/src/formatting.py
+index be59f24..ca26f2e 100644
+--- a/src/formatting.py
++++ b/src/formatting.py
+@@ -2,4 +2,8 @@
+ 
+ 
+ def format_title(name: str) -> str:
++    return _title(name)
++
++
++def _title(name: str) -> str:
+     return name.strip().title()

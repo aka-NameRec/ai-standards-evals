@@ -1,0 +1,1 @@
+Зафиксировал решение в `docs/local/decisions/2026-11-02-cache-first-page.md` (датированное имя по стандарту, frontmatter `title/type/status/updated`, тело: decision, reason, scope, status). Каталог `docs/local/` уже в `.gitignore`, так что заметка остаётся вне Git; в каноническую документацию решение не переносил.
