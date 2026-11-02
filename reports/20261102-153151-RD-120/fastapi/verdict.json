@@ -1,0 +1,10 @@
+{
+  "scenario_id": "RD-120[fastapi]",
+  "ok": false,
+  "failures": [
+    "the encoded fastapi rule ('dependency injection') is not observable in the answer or the edited probe file"
+  ],
+  "adapter": "kilo",
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "rules-change/29-progressive-disclosure"
+}

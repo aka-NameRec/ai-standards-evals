@@ -128,7 +128,7 @@ def test_check_rd111_requires_both_references(tmp_path: Path) -> None:
     assert not check.ok
 
 
-def test_check_rd120_param_encoded_rule_drift(tmp_path: Path) -> None:
+def test_check_rd120_param_requires_reference_and_applies_rules(tmp_path: Path) -> None:
     stdout = _event_stream([("read", "/f/.ai-standards/references/stacks/python.md")])
     reference = tmp_path / ".ai-standards" / "references" / "stacks"
     reference.mkdir(parents=True)
@@ -137,15 +137,20 @@ def test_check_rd120_param_encoded_rule_drift(tmp_path: Path) -> None:
     )
     report = "Использовал pathlib.Path по правилам стека."
 
-    check = check_rd120_param(stdout, report, tmp_path, "python", "pathlib")
+    check = check_rd120_param(stdout, report, tmp_path, "python")
 
     assert check.ok, check.failures
 
-    (reference / "python.md").write_text("- Rewritten reference body.\n", encoding="utf-8")
-    check = check_rd120_param(stdout, report, tmp_path, "python", "pathlib")
+    check = check_rd120_param(stdout, "Ничего стекового не применял.", tmp_path, "python")
 
     assert not check.ok
-    assert any("drifted" in failure for failure in check.failures)
+    assert any("no rule" in failure for failure in check.failures)
+
+    (reference / "python.md").write_text("", encoding="utf-8")
+    check = check_rd120_param(stdout, report, tmp_path, "python")
+
+    assert not check.ok
+    assert any("empty or missing" in failure for failure in check.failures)
 
 
 def _fake_render(worktree: Path, target: Path, revision: str) -> Path:

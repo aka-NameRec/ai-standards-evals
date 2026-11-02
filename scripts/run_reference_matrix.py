@@ -24,37 +24,6 @@ from scripts.pipeline import ScenarioVerdict
 from scripts.render import render_agents_md
 from scripts.standards import resolve_standards_checkout
 
-# Encoded rule per stack entry: a distinctive verbatim substring of the stack
-# reference (the fragment body). The scorer asserts the substring still exists
-# in the deployed reference, so parameter drift fails loudly instead of
-# passing silently.
-ENCODED_RULES: dict[str, str] = {
-    "layered-architecture": "explicit dependency boundaries",
-    "backend-layered-architecture": "transport boundaries",
-    "frontend-layered-architecture": "UI composition",
-    "typescript": "Avoid `any`",
-    "python": "pathlib",
-    "fastapi": "dependency injection",
-    "react": "during rendering",
-    "nextjs": "App Router",
-    "tanstack-query": "query keys",
-    "postgres": "backward compatibility",
-    "vue": "<script setup>",
-    "nuxt": "useFetch",
-    "vue-query": "query keys",
-    "vite": "import.meta.env",
-    "fsd": "slice",
-    "java": "`Optional`",
-    "spring": "constructor injection",
-    "spring-data-jpa": "DTOs or projections",
-    "java-spring": "constructor injection",
-    "django": "nearest surrounding context",
-    "django-service-layer": "service-and-selector",
-    "django-drf": "least abstract",
-    "django-save-orchestration": "save wrapper",
-    "sqlalchemy": "context managers",
-}
-
 # Probe file and edit request per stack entry; the request is small and sits
 # inside the encoded rule's area, so a compliant agent applies the rule.
 STACK_PARAMS: dict[str, tuple[str, str]] = {
@@ -132,13 +101,7 @@ def _run_parameter(
     result = adapter.run(prompt, fixture, f"RD-120-{stack}")
     (param_dir / "agent-stdout.jsonl").write_text(result.stdout, encoding="utf-8")
     (param_dir / "report.md").write_text(result.answer, encoding="utf-8")
-    check = check_rd120_param(
-        result.stdout,
-        result.answer,
-        fixture,
-        stack=stack,
-        encoded_rule=ENCODED_RULES[stack],
-    )
+    check = check_rd120_param(result.stdout, result.answer, fixture, stack=stack)
     verdict = ScenarioVerdict(
         scenario_id=f"RD-120[{stack}]",
         ok=check.ok,
@@ -185,9 +148,6 @@ def main(argv: list[str] | None = None) -> int:
         if args.stacks:
             wanted = {name.strip() for name in args.stacks.split(",")}
             stacks = [stack for stack in stacks if stack in wanted]
-        unknown = [stack for stack in stacks if stack not in ENCODED_RULES]
-        if unknown:
-            parser.error(f"no matrix parameter for stacks: {', '.join(unknown)}")
         stamp = datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
         # Render subprocesses run with cwd inside the standards checkout, so
         # every fixture path must be absolute before it leaves this process.

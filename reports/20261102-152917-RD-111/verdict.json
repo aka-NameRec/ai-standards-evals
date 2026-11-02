@@ -1,0 +1,25 @@
+{
+  "scenario_id": "RD-111",
+  "ok": true,
+  "failures": [],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 152.4,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "rules-change/29-progressive-disclosure",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/20261102-152917-RD-111/fixture/rd-111-multi-reference-sequencing",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-RD-111",
+    "code review"
+  ],
+  "judge": null
+}

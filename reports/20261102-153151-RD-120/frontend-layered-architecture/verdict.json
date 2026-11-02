@@ -1,0 +1,10 @@
+{
+  "scenario_id": "RD-120[frontend-layered-architecture]",
+  "ok": false,
+  "failures": [
+    "the encoded frontend-layered-architecture rule ('UI composition') is not observable in the answer or the edited probe file"
+  ],
+  "adapter": "kilo",
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "rules-change/29-progressive-disclosure"
+}

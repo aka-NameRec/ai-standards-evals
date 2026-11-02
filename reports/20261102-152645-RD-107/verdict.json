@@ -1,0 +1,25 @@
+{
+  "scenario_id": "RD-107",
+  "ok": true,
+  "failures": [],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 151.8,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "rules-change/29-progressive-disclosure",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/20261102-152645-RD-107/fixture/rd-107-knowledge-capture-reference-read",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-RD-107",
+    "зафиксируй знания стандартным образом"
+  ],
+  "judge": null
+}

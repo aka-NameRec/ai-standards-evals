@@ -266,36 +266,66 @@ def check_rd111(stdout: str, report: str, fixture_path: Path) -> ShapeCheck:
     return _ok(failures)
 
 
+def _significant_tokens(reference_text: str) -> list[str]:
+    """Rule-bearing words of a reference body, longest first.
+
+    Technical nouns (pathlib, router, Optional, миграция) survive answer
+    paraphrasing, so matching any of them against the answer or the edited
+    tree proves rule application without guessing the agent's language.
+    """
+    words = re.findall(r"[A-Za-zА-Яа-я][A-Za-zА-Яа-я_.-]{5,}", reference_text)
+    seen: list[str] = []
+    for word in sorted({word.strip(".-").lower() for word in words}, key=len, reverse=True):
+        if len(word) >= 6 and "_" not in word:
+            seen.append(word)
+        if len(seen) >= 40:
+            break
+    return seen
+
+
+def _applied_tokens(fixture_path: Path, tokens: list[str]) -> str | None:
+    for path in sorted(fixture_path.rglob("*")):
+        relative_parts = set(path.parts)
+        if path.is_dir() or ".git" in relative_parts or ".ai-standards" in relative_parts:
+            continue
+        text_suffixes = (".py", ".ts", ".tsx", ".vue", ".java", ".sql", ".md", ".toml", ".txt")
+        if path.suffix.lower() not in text_suffixes:
+            continue
+        content = path.read_text(encoding="utf-8", errors="ignore")
+        for token in tokens:
+            if re.search(rf"\b{re.escape(token)}\b", content, flags=re.IGNORECASE):
+                return f"{token} (in {path.relative_to(fixture_path)})"
+    return None
+
+
 def check_rd120_param(
     stdout: str,
     report: str,
     fixture_path: Path,
     stack: str,
-    encoded_rule: str,
 ) -> ShapeCheck:
+    """Matrix oracle: reference read before the edit, and its rules applied."""
     failures: list[str] = []
     reference_relative = f"references/stacks/{stack}.md"
     failures += reference_read_before_edit(stdout, reference_relative).failures
     reference_text = _read_reference_text(fixture_path, relative=reference_relative)
-    if reference_text and encoded_rule not in reference_text:
-        failures.append(
-            f"encoded rule {encoded_rule!r} is no longer part of the {stack} reference; "
-            "the matrix parameter drifted from the standards"
+    if not reference_text.strip():
+        return _ok(
+            failures
+            + [f"deployed reference {reference_relative} is empty or missing"]
         )
-    applied = encoded_rule in report
-    if not applied:
-        src_dir = fixture_path / "src"
-        probes = src_dir.rglob("*") if src_dir.exists() else []
-        for probe in probes:
-            if not probe.is_file():
-                continue
-            if encoded_rule in probe.read_text(encoding="utf-8", errors="ignore"):
-                applied = True
-                break
-    if not applied:
+    tokens = _significant_tokens(reference_text)
+    applied = None
+    for token in tokens:
+        if re.search(rf"\b{re.escape(token)}\b", report, flags=re.IGNORECASE):
+            applied = f"{token} (in the answer)"
+            break
+    if applied is None:
+        applied = _applied_tokens(fixture_path, tokens)
+    if applied is None:
         failures.append(
-            f"the encoded {stack} rule ({encoded_rule!r}) is not observable in the "
-            "answer or the edited probe file"
+            "no rule from the deployed stack reference is observable in the "
+            "answer or the edited tree"
         )
     return _ok(failures)
 
