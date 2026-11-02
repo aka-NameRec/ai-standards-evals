@@ -211,7 +211,11 @@ def test_build_rd104_and_rd105_fixtures(tmp_path: Path, monkeypatch) -> None:
     assert (rules / "fragments" / "process" / "commit-lint.md").is_file()
 
 
-def test_build_rd106_rd107_rd108_fixtures(tmp_path: Path) -> None:
+def test_build_rd106_rd107_rd108_fixtures(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(
+        "scripts.fixtures.sync_templates",
+        lambda worktree, target, revision: None,
+    )
     lenses = build_rd106(tmp_path / "wt", tmp_path, "test-rev", _fake_render)
     capture = build_rd107(tmp_path / "wt2", tmp_path, "test-rev", _fake_render)
     placement = build_rd108(tmp_path / "wt3", tmp_path, "test-rev", _fake_render)

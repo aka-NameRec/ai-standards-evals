@@ -1,0 +1,25 @@
+{
+  "scenario_id": "RD-108",
+  "ok": true,
+  "failures": [],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 44.5,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "rules-change/29-progressive-disclosure",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/20261102-152145-RD-108/fixture/rd-108-context-architecture-reference-read",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-RD-108",
+    "куда поместить этот чеклист и почему"
+  ],
+  "judge": null
+}

@@ -1345,10 +1345,22 @@ def build_rd107(worktree: Path, parent: Path, revision: str, render: RenderFn) -
         stacks=["python"],
         render=render,
         reference_features=["knowledge-capture"],
+        sync=True,
     )
     _write(repo / "README.md", "# capture-playground\n\nSession facts live in docs/.\n")
     _write(repo / "docs" / "decisions" / ".gitkeep", "")
     _write(repo / "docs" / "tasks" / ".gitkeep", "")
+    _write(
+        repo / "docs" / "session-notes.md",
+        "# Session notes (chat export excerpt)\n\n"
+        "## Accepted choice\n\n"
+        "The team decided to store retry constants in src/payments/retry.py and "
+        "cap backoff at five attempts. Reason: queue deadlines; consequence: "
+        "long stalls surface as failed jobs.\n\n"
+        "## Completed task\n\n"
+        "Implemented the retry loop skeleton in src/payments/retry.py with "
+        "regression coverage in tests/test_retry.py. Verification: uv run pytest.\n",
+    )
     _git(repo, "add", "-A")
     _git(repo, "commit", "-q", "-m", "docs: capture scaffolding")
     return repo
@@ -1412,10 +1424,11 @@ def build_rd111(worktree: Path, parent: Path, revision: str, render: RenderFn) -
         repo,
         worktree,
         revision,
-        features=["code-review", "django"],
+        features=["code-review"],
         stacks=["django"],
         render=render,
-        reference_features=["code-review", "django"],
+        reference_features=["code-review"],
+        reference_stacks=["django"],
         sync=True,
     )
     _write(

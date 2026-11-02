@@ -287,8 +287,9 @@ def check_rd120_param(
         src_dir = fixture_path / "src"
         probes = src_dir.rglob("*") if src_dir.exists() else []
         for probe in probes:
-            content = probe.read_text(encoding="utf-8", errors="ignore")
-            if probe.is_file() and encoded_rule in content:
+            if not probe.is_file():
+                continue
+            if encoded_rule in probe.read_text(encoding="utf-8", errors="ignore"):
                 applied = True
                 break
     if not applied:
