@@ -239,7 +239,8 @@ def test_build_rd110_and_rd111_fixtures(tmp_path: Path, monkeypatch) -> None:
     assert "verbouse" in (negative / "src" / "cli.py").read_text(encoding="utf-8")
 
     multi_manifest = (multi / "ai.project.toml").read_text(encoding="utf-8")
-    assert 'reference_features = ["code-review", "django"]' in multi_manifest
+    assert 'reference_features = ["code-review"]' in multi_manifest
+    assert 'reference_stacks = ["django"]' in multi_manifest
     staged = __import__("scripts.git_utils", fromlist=["run_git"]).run_git(
         multi, "diff", "--cached", "--name-only", "HEAD"
     )
