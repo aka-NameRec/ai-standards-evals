@@ -17,6 +17,7 @@ from scorers.llm_judge import (
     judge_report,
     load_rubric,
 )
+from scorers.reference_disclosure import RD_CHECKS
 from scripts.config import EvalConfig
 from scripts.fixtures import build_fixture
 from scripts.oracle import changed_files, diff_patch
@@ -167,9 +168,15 @@ def run_scenario(
     report = result.answer.strip()
     report_path = run_dir / "report.md"
     report_path.write_text(report, encoding="utf-8")
-    check = score_scenario(
-        scenario.scenario_id, report, reviewed_diff, fixture_path
-    )
+    if scenario.scenario_id in RD_CHECKS:
+        # Reference disclosure scenarios score the harness trace (the read
+        # oracle) together with the answer; the generic report shape does not
+        # apply to them.
+        check = RD_CHECKS[scenario.scenario_id](result.stdout, report, fixture_path)
+    else:
+        check = score_scenario(
+            scenario.scenario_id, report, reviewed_diff, fixture_path
+        )
     judge_block, judge_ok = _run_judge(
         config, scenario.scenario_id, run_dir, report, diff_text, fixture_path
     )

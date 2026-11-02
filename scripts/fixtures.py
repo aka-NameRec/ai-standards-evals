@@ -970,9 +970,21 @@ def _init_repo(
     render: RenderFn,
     agents: list[str] | None = None,
     sync: bool = False,
+    reference_features: list[str] | None = None,
+    reference_stacks: list[str] | None = None,
 ) -> None:
     repo.mkdir(parents=True)
-    _write(repo / "ai.project.toml", _manifest(revision, features, stacks, agents or []))
+    _write(
+        repo / "ai.project.toml",
+        _manifest(
+            revision,
+            features,
+            stacks,
+            agents or [],
+            reference_features=reference_features,
+            reference_stacks=reference_stacks,
+        ),
+    )
     _write(repo / "ai" / "project-rules.md", _project_rules())
     render(worktree, repo, revision)
     if agents or sync:
@@ -982,24 +994,39 @@ def _init_repo(
     _git(repo, "commit", "-q", "-m", "chore: project scaffolding")
 
 
-def _manifest(revision: str, features: list[str], stacks: list[str], agents: list[str]) -> str:
-    return (
-        f'ai_standards_version = "{revision}"\n'
-        "\n"
-        f"fragments = {json.dumps(['core/base'])}\n"
-        "\n"
-        f"features = {json.dumps(features)}\n"
-        "\n"
-        f"stacks = {json.dumps(stacks)}\n"
-        "\n"
-        f"local_overrides = {json.dumps(['ai/project-rules.md'])}\n"
-        "\n"
-        "[tooling]\n"
-        f"agents = {json.dumps(agents)}\n"
-        "\n"
-        "[metadata]\n"
-        'project_name = "eval-fixture"\n'
+def _manifest(
+    revision: str,
+    features: list[str],
+    stacks: list[str],
+    agents: list[str],
+    reference_features: list[str] | None = None,
+    reference_stacks: list[str] | None = None,
+) -> str:
+    parts = [
+        f'ai_standards_version = "{revision}"',
+        "",
+        f"fragments = {json.dumps(['core/base'])}",
+        "",
+        f"features = {json.dumps(features)}",
+    ]
+    if reference_features:
+        parts.append(f"reference_features = {json.dumps(reference_features)}")
+    parts.append(f"stacks = {json.dumps(stacks)}")
+    if reference_stacks:
+        parts.append(f"reference_stacks = {json.dumps(reference_stacks)}")
+    parts.extend(
+        [
+            "",
+            f"local_overrides = {json.dumps(['ai/project-rules.md'])}",
+            "",
+            "[tooling]",
+            f"agents = {json.dumps(agents)}",
+            "",
+            "[metadata]",
+            'project_name = "eval-fixture"',
+        ]
     )
+    return "\n".join(parts) + "\n"
 
 
 def _project_rules() -> str:
@@ -1069,6 +1096,388 @@ _READER_CANDIDATE = _READER_OFF_BY_ONE.replace(
 )
 
 
+def build_rd101(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
+    """Reference-mode code review: the diff carries one real correctness defect."""
+    repo = parent / "rd-101-code-review-reference-read"
+    _init_repo(
+        repo,
+        worktree,
+        revision,
+        features=["code-review"],
+        stacks=["python"],
+        render=render,
+        reference_features=["code-review"],
+        sync=True,
+    )
+    _write(
+        repo / "stats.py",
+        '"""Small statistics helpers."""\n'
+        "\n"
+        "\n"
+        "def mean(values):\n"
+        "    total = 0\n"
+        "    for value in values:\n"
+        "        total += value\n"
+        "    return total / len(values)\n",
+    )
+    _write(
+        repo / "helper.py",
+        '"""Percentile helper."""\n'
+        "\n"
+        "\n"
+        "def percentile(values, p):\n"
+        "    \"\"\"Return the p-th percentile value.\"\"\"\n"
+        "    index = int(len(values) * p / 100)\n"
+        "    return sorted(values)[index]\n",
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feat: stats helpers")
+
+    _write(
+        repo / "helper.py",
+        '"""Percentile helper."""\n'
+        "\n"
+        "\n"
+        "def percentile(values, p):\n"
+        "    \"\"\"Return the p-th percentile value.\"\"\"\n"
+        "    index = int(len(values) * p / 100)\n"
+        "    if not values:\n"
+        "        raise ValueError(\"empty values\")\n"
+        "    return sorted(values)[index]\n",
+    )
+    _git(repo, "add", "-A")
+    return repo
+
+
+def build_rd102(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
+    """Reference-mode basic memory: a related decision note must be renamed."""
+    repo = parent / "rd-102-basic-memory-reference-read"
+    _init_repo(
+        repo,
+        worktree,
+        revision,
+        features=["basic-memory"],
+        stacks=["python"],
+        render=render,
+        reference_features=["basic-memory"],
+        sync=True,
+    )
+    _write(
+        repo / "docs" / "decisions" / "old-topic.md",
+        "---\n"
+        "title: 'Old topic decision'\n"
+        "---\n"
+        "\n"
+        "# Old topic decision\n"
+        "\n"
+        "The old topic decision covers retry policy for the checkout service.\n"
+        "\n"
+        "## Observations\n"
+        "\n"
+        "- [fact] Retries back off exponentially up to five attempts.\n"
+        "\n"
+        "## Relations\n"
+        "\n"
+        "- relates_to [[Related note]]\n",
+    )
+    _write(
+        repo / "docs" / "decisions" / "related-note.md",
+        "---\n"
+        "title: 'Related note'\n"
+        "---\n"
+        "\n"
+        "# Related note\n"
+        "\n"
+        "## Observations\n"
+        "\n"
+        "- [fact] The related note tracks queue deadlines.\n"
+        "\n"
+        "## Relations\n"
+        "\n"
+        "- relates_to [[Old topic decision]]\n",
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "docs: decision notes")
+    return repo
+
+
+def build_rd103(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
+    """Reference-mode project memory: resume work from targeted local notes."""
+    repo = parent / "rd-103-project-memory-reference-read"
+    _init_repo(
+        repo,
+        worktree,
+        revision,
+        features=["project-memory"],
+        stacks=["python"],
+        render=render,
+        reference_features=["project-memory"],
+    )
+    _write(repo / ".gitignore", "/docs/local/\n")
+    _write(
+        repo / "docs" / "local" / "context" / "2026-11-01-checkout-service.md",
+        "---\n"
+        "title: Checkout service context\n"
+        "type: context\n"
+        "status: current\n"
+        "updated: 2026-11-01\n"
+        "---\n"
+        "\n"
+        "# Checkout service context\n"
+        "\n"
+        "Goal: make payment retries resilient. Scope: src/payments only.\n",
+    )
+    _write(
+        repo / "docs" / "local" / "progress" / "2026-11-01-checkout-service-progress.md",
+        "---\n"
+        "title: Checkout service progress\n"
+        "type: progress\n"
+        "status: current\n"
+        "updated: 2026-11-01\n"
+        "---\n"
+        "\n"
+        "# Checkout service progress\n"
+        "\n"
+        "- done: retry loop skeleton in src/payments/retry.py.\n"
+        "- current: exponential backoff constants are placeholders.\n"
+        "- next: wire the queue consumer and add regression tests.\n",
+    )
+    _write(repo / "src" / "payments" / "retry.py", "MAX_ATTEMPTS = 3\nDELAY = 1\n")
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "chore: payments skeleton")
+    return repo
+
+
+def build_rd104(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
+    """Reference-mode chroma: semantic search with a stale-index hazard."""
+    repo = parent / "rd-104-chroma-reference-read"
+    _init_repo(
+        repo,
+        worktree,
+        revision,
+        features=["chroma"],
+        stacks=["python"],
+        render=render,
+        reference_features=["chroma"],
+        sync=True,
+    )
+    _write(
+        repo / "src" / "timeouts.py",
+        '"""Timeout handling sites."""\n'
+        "\n"
+        "\n"
+        "def read_timeout() -> int:\n"
+        "    return 30\n"
+        "\n"
+        "\n"
+        "def connect_timeout() -> int:\n"
+        "    return 10\n",
+    )
+    _write(repo / ".ai-standards" / "index-stale.marker", "refresh-failed\n")
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feat: timeout sites")
+    return repo
+
+
+def build_rd105(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
+    """Reference-mode rule engineering: a candidate rule must pass the flow."""
+    repo = parent / "rd-105-rule-engineering-reference-read"
+    _init_repo(
+        repo,
+        worktree,
+        revision,
+        features=["rule-engineering"],
+        stacks=["python"],
+        render=render,
+        reference_features=["rule-engineering"],
+    )
+    _write(
+        repo / "fragments" / "process" / "commit-lint.md",
+        "## Commit Lint\n"
+        "- Use imperative mood in commit subjects.\n",
+    )
+    _write(
+        repo / "registry.toml",
+        "[features]\ncommit-lint = [\"process/commit-lint\"]\n",
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "docs: commit lint fragment")
+    return repo
+
+
+def build_rd106(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
+    """Reference-mode review lenses: a changed module with duplication to clean."""
+    repo = parent / "rd-106-review-lenses-reference-read"
+    _init_repo(
+        repo,
+        worktree,
+        revision,
+        features=["review-lenses"],
+        stacks=["typescript"],
+        render=render,
+        reference_features=["review-lenses"],
+    )
+    _write(
+        repo / "src" / "pricing.ts",
+        "export function blackFriday(price: number): number {\n"
+        "  if (price < 0) throw new Error('negative');\n"
+        "  return price * 0.5;\n"
+        "}\n"
+        "\n"
+        "export function cyberMonday(price: number): number {\n"
+        "  if (price < 0) throw new Error('negative');\n"
+        "  return price * 0.7;\n"
+        "}\n",
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feat: pricing campaigns")
+    return repo
+
+
+def build_rd107(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
+    """Reference-mode knowledge capture: a choice and a task await records."""
+    repo = parent / "rd-107-knowledge-capture-reference-read"
+    _init_repo(
+        repo,
+        worktree,
+        revision,
+        features=["knowledge-capture"],
+        stacks=["python"],
+        render=render,
+        reference_features=["knowledge-capture"],
+    )
+    _write(repo / "README.md", "# capture-playground\n\nSession facts live in docs/.\n")
+    _write(repo / "docs" / "decisions" / ".gitkeep", "")
+    _write(repo / "docs" / "tasks" / ".gitkeep", "")
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "docs: capture scaffolding")
+    return repo
+
+
+def build_rd108(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
+    """Reference-mode context architecture: place a framework checklist."""
+    repo = parent / "rd-108-context-architecture-reference-read"
+    _init_repo(
+        repo,
+        worktree,
+        revision,
+        features=["context-architecture"],
+        stacks=["python"],
+        render=render,
+        reference_features=["context-architecture"],
+    )
+    _write(
+        repo / "proposals" / "framework-checklist.md",
+        "# Proposed: Vue component checklist\n\n"
+        "Applies only while editing Vue single-file components.\n\n"
+        "- Props typed, emits declared.\n"
+        "- No template-side effects.\n",
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "docs: framework checklist proposal")
+    return repo
+
+
+def build_rd110(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
+    """Reference-mode negative probe: an unrelated typo fix on the inline core."""
+    repo = parent / "rd-110-unrelated-task-no-reference-reads"
+    _init_repo(
+        repo,
+        worktree,
+        revision,
+        features=["code-review"],
+        stacks=["python"],
+        render=render,
+        reference_features=["code-review"],
+        reference_stacks=["python"],
+        sync=True,
+    )
+    _write(
+        repo / "src" / "cli.py",
+        '"""CLI entry."""\n'
+        "\n"
+        "\n"
+        "def main() -> None:\n"
+        "    print(\"--verbose: enable verbouse logging\")\n",
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feat: cli entry")
+    return repo
+
+
+def build_rd111(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
+    """Reference-mode multi-reference: a Django diff reviewed against the stack rules."""
+    repo = parent / "rd-111-multi-reference-sequencing"
+    _init_repo(
+        repo,
+        worktree,
+        revision,
+        features=["code-review", "django"],
+        stacks=["django"],
+        render=render,
+        reference_features=["code-review", "django"],
+        sync=True,
+    )
+    _write(
+        repo / "orders" / "views.py",
+        "from django.http import JsonResponse\n"
+        "from orders.models import Order\n"
+        "\n"
+        "\n"
+        "def order_total(request, order_id):\n"
+        "    order = Order.objects.get(pk=order_id)\n"
+        "    return JsonResponse({\"total\": order.total()})\n",
+    )
+    _write(
+        repo / "orders" / "models.py",
+        "from django.db import models\n\n\n"
+        "class Order(models.Model):\n"
+        "    total = models.DecimalField(max_digits=10, decimal_places=2)\n",
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feat: order views")
+
+    _write(
+        repo / "orders" / "views.py",
+        "from django.http import JsonResponse\n"
+        "from orders.models import Order\n"
+        "\n"
+        "\n"
+        "def order_total(request, order_id):\n"
+        "    order = Order.objects.get(pk=order_id)\n"
+        "    return JsonResponse({\"total\": str(order.total()), \"id\": order.pk})\n",
+    )
+    _git(repo, "add", "-A")
+    return repo
+
+
+def build_rd120_param(
+    worktree: Path,
+    parent: Path,
+    revision: str,
+    render: RenderFn,
+    stack: str,
+    probe_relative_path: str,
+    probe_content: str,
+) -> Path:
+    """Reference-mode stack matrix fixture for one registry stack entry."""
+    repo = parent / f"rd-120-{stack}"
+    _init_repo(
+        repo,
+        worktree,
+        revision,
+        features=["response-language-style"],
+        stacks=[stack],
+        render=render,
+        reference_stacks=[stack],
+        sync=True,
+    )
+    _write(repo / probe_relative_path, probe_content)
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "chore: probe file")
+    return repo
+
+
 BUILDERS: dict[str, Callable[[Path, Path, str, RenderFn], Path]] = {
     "CR-001": build_cr001,
     "CR-002": build_cr002,
@@ -1089,4 +1498,14 @@ BUILDERS: dict[str, Callable[[Path, Path, str, RenderFn], Path]] = {
     "ATR-002": build_atr002,
     "TRG-001": build_trg001,
     "TRG-003": build_trg003,
+    "RD-101": build_rd101,
+    "RD-102": build_rd102,
+    "RD-103": build_rd103,
+    "RD-104": build_rd104,
+    "RD-105": build_rd105,
+    "RD-106": build_rd106,
+    "RD-107": build_rd107,
+    "RD-108": build_rd108,
+    "RD-110": build_rd110,
+    "RD-111": build_rd111,
 }
