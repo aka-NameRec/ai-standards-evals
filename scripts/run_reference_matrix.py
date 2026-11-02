@@ -189,7 +189,9 @@ def main(argv: list[str] | None = None) -> int:
         if unknown:
             parser.error(f"no matrix parameter for stacks: {', '.join(unknown)}")
         stamp = datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
-        base_dir = args.reports_dir / f"{stamp}-RD-120"
+        # Render subprocesses run with cwd inside the standards checkout, so
+        # every fixture path must be absolute before it leaves this process.
+        base_dir = (args.reports_dir / f"{stamp}-RD-120").resolve()
         results = [
             _run_parameter(config, worktree, adapter, stack, base_dir) for stack in stacks
         ]
