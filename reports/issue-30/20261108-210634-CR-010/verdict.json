@@ -1,0 +1,25 @@
+{
+  "scenario_id": "CR-010",
+  "ok": true,
+  "failures": [],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 79.4,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "rules-change/30-report-format-stability",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/issue-30/20261108-210634-CR-010/fixture/cr-010-report-metadata",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CR-010",
+    "сделай ревью кода"
+  ],
+  "judge": null
+}
