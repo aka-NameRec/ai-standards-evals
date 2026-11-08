@@ -1,0 +1,25 @@
+{
+  "scenario_id": "CR-012",
+  "ok": true,
+  "failures": [],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 57.0,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "main",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/release-2.10.1/20261108-213523-CR-012/fixture/cr-012-reporting-fallback",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CR-012",
+    "code review"
+  ],
+  "judge": null
+}

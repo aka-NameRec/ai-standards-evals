@@ -1,0 +1,27 @@
+{
+  "scenario_id": "CR-011",
+  "ok": false,
+  "failures": [
+    "missing section: Проверки"
+  ],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 30.0,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "main",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/release-2.10.1/20261108-213452-CR-011/fixture/cr-011-reporting-reference",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CR-011",
+    "code review"
+  ],
+  "judge": null
+}

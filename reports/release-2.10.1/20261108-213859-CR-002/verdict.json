@@ -1,0 +1,27 @@
+{
+  "scenario_id": "CR-002",
+  "ok": false,
+  "failures": [
+    "forbidden heading: Итог"
+  ],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 32.6,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "main",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/release-2.10.1/20261108-213859-CR-002/fixture/cr-002-review-no-valid-findings",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CR-002",
+    "code review"
+  ],
+  "judge": null
+}

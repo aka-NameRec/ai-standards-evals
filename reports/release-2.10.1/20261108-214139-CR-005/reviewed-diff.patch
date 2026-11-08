@@ -1,0 +1,28 @@
+diff --git a/src/csv_export.py b/src/csv_export.py
+new file mode 100644
+index 0000000..fd22bda
+--- /dev/null
++++ b/src/csv_export.py
+@@ -0,0 +1,8 @@
++"""CSV export for period reports."""
++
++
++def format_period(start: str, end: str) -> str:
++    """Render a reporting period label."""
++    if start > end:
++        start, end = end, start
++    return f"{start}..{end}"
+diff --git a/src/json_export.py b/src/json_export.py
+new file mode 100644
+index 0000000..aa159bf
+--- /dev/null
++++ b/src/json_export.py
+@@ -0,0 +1,8 @@
++"""JSON export for period reports."""
++
++
++def format_period(start: str, end: str) -> str:
++    """Render a reporting period label."""
++    if start > end:
++        start, end = end, start
++    return f"{start}..{end}"

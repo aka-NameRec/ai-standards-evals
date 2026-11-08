@@ -1,0 +1,25 @@
+diff --git a/stats.py b/stats.py
+index 26b9f7e..f77f1ed 100644
+--- a/stats.py
++++ b/stats.py
+@@ -3,6 +3,6 @@
+ 
+ def mean(values):
+     total = 0
+-    for data in values:
+-        total += data
++    for payload in values:
++        total += payload
+     return total / len(values)
+diff --git a/tests/test_stats.py b/tests/test_stats.py
+index 2fe10f1..4cdfd6e 100644
+--- a/tests/test_stats.py
++++ b/tests/test_stats.py
+@@ -3,3 +3,7 @@ from stats import mean
+ 
+ def test_mean():
+     assert mean([1, 2, 3]) == 2
++
++
++def test_mean_single_value():
++    assert mean([7]) == 7
