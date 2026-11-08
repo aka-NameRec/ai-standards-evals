@@ -1,0 +1,10 @@
+{
+  "index": 4,
+  "prompt": "check which commits to cherry-pick from the task branch",
+  "expected_should_trigger": true,
+  "engaged": false,
+  "skill_seen": false,
+  "ok": false,
+  "note": "expected activation, skill tool not invoked",
+  "duration_seconds": 35.6
+}

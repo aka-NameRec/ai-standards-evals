@@ -1,0 +1,25 @@
+{
+  "scenario_id": "CP-005",
+  "ok": true,
+  "failures": [],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 60.3,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "feature/27-cherry-pick-assessment",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/regression-2.10.0-candidate/20261108-184307-CP-005/fixture/cp-005-individually-compatible-set",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CP-005",
+    "Оцени перенос коммитов: перенеси оба коммита задачи BL-1030 из develop в staging (флаг feature-x)."
+  ],
+  "judge": null
+}

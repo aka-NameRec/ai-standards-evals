@@ -1,0 +1,23 @@
+diff --git a/tests/test_textkit.py b/tests/test_textkit.py
+index 7966181..6861b50 100644
+--- a/tests/test_textkit.py
++++ b/tests/test_textkit.py
+@@ -3,3 +3,7 @@ from textkit import shout
+ 
+ def test_shout():
+     assert shout("hi") == "HI"
++
++
++def test_shout_keeps_caseless_text():
++    assert shout("123") == "123"
+diff --git a/textkit.py b/textkit.py
+index 772efcf..2f491c9 100644
+--- a/textkit.py
++++ b/textkit.py
+@@ -3,5 +3,4 @@
+ 
+ def shout(text: str) -> str:
+     """Return ``text`` uppercased."""
+-    result = text
+-    return result.upper()
++    return text.upper()

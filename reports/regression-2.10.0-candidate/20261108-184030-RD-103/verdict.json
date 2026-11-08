@@ -1,0 +1,25 @@
+{
+  "scenario_id": "RD-103",
+  "ok": true,
+  "failures": [],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 132.6,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "feature/27-cherry-pick-assessment",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/regression-2.10.0-candidate/20261108-184030-RD-103/fixture/rd-103-project-memory-reference-read",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-RD-103",
+    "продолжи работу над задачей: посмотри, где мы остановились"
+  ],
+  "judge": null
+}

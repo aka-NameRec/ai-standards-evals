@@ -1,0 +1,10 @@
+{
+  "index": 8,
+  "prompt": "утверди релиз на staging",
+  "expected_should_trigger": false,
+  "engaged": false,
+  "skill_seen": false,
+  "ok": true,
+  "note": "",
+  "duration_seconds": 10.2
+}

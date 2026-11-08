@@ -1,0 +1,8 @@
+{
+  "scenario_id": "RD-120[fsd]",
+  "ok": true,
+  "failures": [],
+  "adapter": "kilo",
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "feature/27-cherry-pick-assessment"
+}

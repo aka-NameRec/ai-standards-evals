@@ -1,0 +1,10 @@
+{
+  "index": 1,
+  "prompt": "оцени перенос коммитов из develop в staging",
+  "expected_should_trigger": true,
+  "engaged": true,
+  "skill_seen": true,
+  "ok": true,
+  "note": "",
+  "duration_seconds": 41.2
+}

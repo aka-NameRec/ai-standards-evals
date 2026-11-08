@@ -1,0 +1,10 @@
+diff --git a/orders/views.py b/orders/views.py
+index 86d0f1b..e6d731c 100644
+--- a/orders/views.py
++++ b/orders/views.py
+@@ -4,4 +4,4 @@ from orders.models import Order
+ 
+ def order_total(request, order_id):
+     order = Order.objects.get(pk=order_id)
+-    return JsonResponse({"total": order.total()})
++    return JsonResponse({"total": str(order.total()), "id": order.pk})

@@ -1,0 +1,27 @@
+{
+  "scenario_id": "CP-001",
+  "ok": false,
+  "failures": [
+    "no PASS verdict headline in the report"
+  ],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 67.9,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "feature/27-cherry-pick-assessment",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/regression-2.10.0-candidate/20261108-183634-CP-001/fixture/cp-001-independent-commit-pass",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CP-001",
+    "Оцени перенос коммитов: перенеси из develop в staging коммит «Add leaf util function with unit test» (один коммит, задача BL-1000)."
+  ],
+  "judge": null
+}

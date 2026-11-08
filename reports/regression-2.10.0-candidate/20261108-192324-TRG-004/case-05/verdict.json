@@ -1,0 +1,10 @@
+{
+  "index": 5,
+  "prompt": "перенесём ли задачу BL-1050 в staging, ничего не сломаем?",
+  "expected_should_trigger": true,
+  "engaged": true,
+  "skill_seen": true,
+  "ok": true,
+  "note": "",
+  "duration_seconds": 44.6
+}

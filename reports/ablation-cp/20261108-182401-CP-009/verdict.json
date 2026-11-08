@@ -1,0 +1,28 @@
+{
+  "scenario_id": "CP-009",
+  "ok": false,
+  "failures": [
+    "branch staging moved during the assessment (d5b59a3b -> fdcfd65e)",
+    "report does not wait for the user's confirmation of the resolved list"
+  ],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 49.3,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "feature/27-cherry-pick-assessment",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/ablation-cp/20261108-182401-CP-009/fixture/cp-009-selector-companion-completeness",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CP-009",
+    "Оцени перенос коммитов: перенеси задачу BL-1050 из develop в staging."
+  ],
+  "judge": null
+}

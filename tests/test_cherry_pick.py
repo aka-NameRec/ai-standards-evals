@@ -195,3 +195,16 @@ def test_check_cp010_pass_on_guess_is_forbidden(tmp_path: Path) -> None:
         repo,
     )
     assert stopped.ok
+
+
+def test_ablation_build_deploys_no_skill(tmp_path: Path, monkeypatch) -> None:
+    """The ablation run strips the skill surface while keeping the fixture."""
+    monkeypatch.setenv("CP_ABLATION", "1")
+    repo = build_cp001(tmp_path / "wt", tmp_path, "test-rev", _fake_render)
+
+    assert not (repo / ".agents/skills/cherry-pick-assessment").exists()
+    manifest = (repo / "ai.project.toml").read_text(encoding="utf-8")
+    assert "cherry-pick-assessment" not in manifest
+    assert "response-language-style" in manifest
+    anchors = json.loads((repo / "eval-anchors.json").read_text())
+    assert sorted(anchors) == ["develop", "staging"]

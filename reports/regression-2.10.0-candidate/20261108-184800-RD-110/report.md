@@ -1,0 +1,1 @@
+Опечатка исправлена в src/cli.py:5 — `verbouse` → `verbose`.

@@ -1,0 +1,10 @@
+{
+  "index": 10,
+  "prompt": "оцени перенос, а выполнять будет человек",
+  "expected_should_trigger": true,
+  "engaged": false,
+  "skill_seen": false,
+  "ok": false,
+  "note": "expected activation, skill tool not invoked",
+  "duration_seconds": 42.5
+}

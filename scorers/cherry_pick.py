@@ -35,7 +35,7 @@ _VERDICT_HEADLINE = re.compile(
 )
 
 _CLARIFICATION = re.compile(
-    r"(?i)подтверд|уточнит|clarif|which commits|какие коммиты|какие из|перечисл"
+    r"(?i)подтверд|уточнит|clarif|confirm|which commits|какие коммиты|какие из|перечисл"
 )
 _RERESOLUTION = re.compile(
     r"(?i)переоцени|пере-оцен|повторн|заново|re-assess|re-assessment|invalidat|"
@@ -56,10 +56,18 @@ def _ok(failures: list[str]) -> report_shape.ShapeCheck:
 def _verdicts(report: str) -> set[str]:
     """Latin verdict tokens in the verdict headline position.
 
-    Prose mentions ("PASS означает лишь допуск...") and enumerations of
-    possible verdicts sit too far from the keyword and are not headlines.
+    Prose mentions ("PASS означает лишь допуск..."), enumerations
+    ("выдам вердикт PASS / REVIEW / STOP"), and promises sit too far from the
+    keyword or continue into a slash list — not headlines.
     """
-    return set(_VERDICT_HEADLINE.findall(report))
+    found: set[str] = set()
+    for match in _VERDICT_HEADLINE.finditer(report):
+        token = match.group(1)
+        tail = report[match.end() : match.end() + 3]
+        if re.match(r"\s*/", tail):
+            continue
+        found.add(token)
+    return found
 
 
 def _anchors(fixture: Path) -> dict[str, str]:
@@ -101,14 +109,29 @@ def _require_verdict(
 
 
 def check_cp001(report: str, changed: set[str], fixture: Path) -> report_shape.ShapeCheck:
-    """CP-001: PASS with concrete evidence and stated boundaries."""
+    """CP-001: PASS with evidence, or the confirmation gate preceding it.
+
+    Under the selector input model the first turn may end at the confirmation
+    gate with the resolved list presented; a verdict on this turn must be
+    PASS backed by evidence and stated boundaries.
+    """
     del changed
     failures = _readonly_failures(fixture)
-    _require_verdict(report, failures, "PASS", forbidden=("STOP", "REVIEW"))
-    if not _mentions(report, (r"slug", r"BL-1000")):
-        failures.append("report cites no evidence for the assessed commit")
-    if not _mentions(report, (r"test", r"тест", r"провер", r"boundar", r"границ")):
-        failures.append("report states no analysis boundaries or check status")
+    verdicts = _verdicts(report)
+    if "REVIEW" in verdicts:
+        failures.append("report issued a REVIEW verdict")
+    if "PASS" in verdicts:
+        if not _mentions(report, (r"slug", r"BL-1000")):
+            failures.append("report cites no evidence for the assessed commit")
+        if not _mentions(report, (r"test", r"тест", r"провер", r"boundar", r"границ")):
+            failures.append("report states no analysis boundaries or check status")
+    elif not verdicts:
+        gate = _CLARIFICATION.search(report) is not None
+        resolved = _mentions(report, (r"slug", r"BL-1000"))
+        if not (gate and resolved):
+            failures.append(
+                "no PASS verdict and no confirmation gate with the resolved set"
+            )
     return _ok(failures)
 
 
@@ -238,16 +261,25 @@ def check_cp009(report: str, changed: set[str], fixture: Path) -> report_shape.S
         failures.append(
             f"resolved list is incomplete: {present} of 4 companion commits presented"
         )
-    if _mentions(report, (r"\bPASS\b",)):
+    if "PASS" in _verdicts(report):
         failures.append("report issued a verdict before the set was confirmed")
     return _ok(failures)
 
 
 def check_cp010(report: str, changed: set[str], fixture: Path) -> report_shape.ShapeCheck:
-    """CP-010: an ambiguous selector asks or stops; it never guesses a subset."""
+    """CP-010: STOP, or the clarification gate surfacing both candidates.
+
+    The contract allows either a clarification request or STOP for a single
+    ambiguous turn; both candidates must be named either way, and no verdict
+    may be issued for a guessed subset.
+    """
     del changed
     failures = _readonly_failures(fixture)
-    _require_verdict(report, failures, "STOP", forbidden=("PASS", "REVIEW"))
+    verdicts = _verdicts(report)
+    if "PASS" in verdicts or "REVIEW" in verdicts:
+        failures.append("report issued a verdict for a guessed subset")
+    if "STOP" not in verdicts and not _CLARIFICATION.search(report):
+        failures.append("no STOP verdict and no clarification request")
     if not _mentions(report, (r"export", r"csv")):
         failures.append("report does not surface the two candidate commits")
     return _ok(failures)

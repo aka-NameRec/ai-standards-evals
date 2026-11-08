@@ -1,0 +1,8 @@
+{
+  "scenario_id": "TRG-001",
+  "ok": true,
+  "standards_revision": "feature/27-cherry-pick-assessment",
+  "failures": [],
+  "passed": 12,
+  "cases": 12
+}

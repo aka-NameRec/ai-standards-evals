@@ -1,0 +1,6 @@
+{
+  "scenario_id": "CP-001",
+  "ok": true,
+  "failures": [],
+  "note": "scorer recalibrated for the confirmation-gate turn; agent run unchanged"
+}

@@ -1,0 +1,10 @@
+{
+  "index": 2,
+  "prompt": "проверь cherry-pick до выполнения",
+  "expected_should_trigger": true,
+  "engaged": true,
+  "skill_seen": true,
+  "ok": true,
+  "note": "",
+  "duration_seconds": 31.8
+}

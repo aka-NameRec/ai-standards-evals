@@ -1,0 +1,10 @@
+{
+  "index": 11,
+  "prompt": "какие коммиты нужны для переноса задачи BL-1050?",
+  "expected_should_trigger": true,
+  "engaged": false,
+  "skill_seen": false,
+  "ok": false,
+  "note": "expected activation, skill tool not invoked",
+  "duration_seconds": 20.5
+}

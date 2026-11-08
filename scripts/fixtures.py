@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
@@ -1491,6 +1492,18 @@ def build_rd120_param(
     return repo
 
 
+ABLATION_ENV = "CP_ABLATION"
+
+
+def _ablated() -> bool:
+    """True when the with-skill/without-skill comparison runs the bare base.
+
+    The ablation varies only the deployed skill surface: the standards
+    revision, the prompts, the model, and the harness stay constant.
+    """
+    return bool(os.environ.get(ABLATION_ENV))
+
+
 def _write_anchors(repo: Path, branches: tuple[str, ...] = ("develop", "staging")) -> Path:
     """Record branch heads the read-only scorer asserts against after the run."""
     heads = {branch: run_git(repo, "rev-parse", branch).strip() for branch in branches}
@@ -1518,12 +1531,15 @@ def _init_diverged_repo(
         repo,
         worktree,
         revision,
-        features=["cherry-pick-assessment"],
+        # The manifest validator requires a non-empty feature list; the
+        # neutral language-style feature carries no cherry-pick content, so
+        # the ablated fixture still deploys no skill surface.
+        features=["response-language-style"] if _ablated() else ["cherry-pick-assessment"],
         stacks=["python"],
         render=render,
-        agents=["kilo"],
-        sync=True,
-        reference_features=["cherry-pick-assessment"],
+        agents=[] if _ablated() else ["kilo"],
+        sync=not _ablated(),
+        reference_features=[] if _ablated() else ["cherry-pick-assessment"],
     )
     run_git(repo, "branch", "-m", "main", "develop")
 
@@ -2008,16 +2024,17 @@ def build_cp010(worktree: Path, parent: Path, revision: str, render: RenderFn) -
 def build_trg004(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
     """Project with the cherry-pick-assessment skill deployed for activation cases."""
     repo = parent / "trg-004-cherry-pick-assessment-triggers"
+    ablated = _ablated()
     _init_repo(
         repo,
         worktree,
         revision,
-        features=["cherry-pick-assessment"],
+        features=["response-language-style"] if ablated else ["cherry-pick-assessment"],
         stacks=["python"],
         render=render,
-        agents=["kilo"],
-        sync=True,
-        reference_features=["cherry-pick-assessment"],
+        agents=[] if ablated else ["kilo"],
+        sync=not ablated,
+        reference_features=[] if ablated else ["cherry-pick-assessment"],
     )
     run_git(repo, "branch", "staging")
     run_git(repo, "branch", "-m", "main", "develop")

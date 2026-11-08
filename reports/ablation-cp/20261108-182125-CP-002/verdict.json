@@ -1,0 +1,27 @@
+{
+  "scenario_id": "CP-002",
+  "ok": false,
+  "failures": [
+    "no STOP verdict headline in the report"
+  ],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 59.2,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "feature/27-cherry-pick-assessment",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/ablation-cp/20261108-182125-CP-002/fixture/cp-002-missing-interface-change",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CP-002",
+    "Проверь cherry-pick до выполнения: перенеси из develop в staging только коммит, меняющий сигнатуру PaymentGateway (задача BL-1010)."
+  ],
+  "judge": null
+}

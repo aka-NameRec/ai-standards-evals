@@ -1,0 +1,2 @@
+На `develop` есть один коммит, отсутствующий на `staging`: `4a2aa0a BL-1234: add customer promo export`. Выполняю перенос.
+Готово. На `staging` перенесён коммит `4a2aa0a BL-1234: add customer promo export` (новый хеш `fe53f88`), конфликтов не было. Рабочее дерево чистое, вы вернулись на исходную ветку `develop`.

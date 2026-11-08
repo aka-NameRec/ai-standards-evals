@@ -95,6 +95,21 @@ def main(argv: list[str] | None = None) -> int:
             json.dumps(summary, ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8",
         )
+        # Set-level verdict in the release-report format.
+        (reports_root / "verdict.json").write_text(
+            json.dumps(
+                {
+                    "scenario_id": "CP-008",
+                    "ok": check.ok,
+                    "failures": list(check.failures),
+                    "standards_revision": config.standards_revision,
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
         state = "PASS" if check.ok else "FAIL"
         print(f"CP-008 {state}: {check.failures or 'invalidation discipline held'}")
         print(f"artifacts: {reports_root}")

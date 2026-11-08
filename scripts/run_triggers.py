@@ -117,6 +117,27 @@ def main(argv: list[str] | None = None) -> int:
         json.dumps(summary, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
+    # Set-level verdict in the release-report format: collect_runs picks it up
+    # by rglob and keys it by scenario_id.
+    (reports_root / "verdict.json").write_text(
+        json.dumps(
+            {
+                "scenario_id": args.trigger_set_id,
+                "ok": not failures,
+                "standards_revision": config.standards_revision,
+                "failures": [
+                    f"case {item['index']} ({item['prompt']}): {item['note']}"
+                    for item in failures
+                ],
+                "passed": summary["passed"],
+                "cases": summary["cases"],
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
     print(f"{summary['passed']}/{summary['cases']} passed — {reports_root}")
     return 0 if not failures else 1
 

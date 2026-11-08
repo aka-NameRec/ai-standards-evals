@@ -1,0 +1,38 @@
+{
+  "trigger_set": "TRG-004",
+  "cases": 11,
+  "passed": 4,
+  "failed": 7,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "feature/27-cherry-pick-assessment",
+  "failures": [
+    {
+      "prompt": "оцени перенос коммитов из develop в staging",
+      "note": "expected activation, skill tool not invoked"
+    },
+    {
+      "prompt": "проверь cherry-pick до выполнения",
+      "note": "expected activation, skill tool not invoked"
+    },
+    {
+      "prompt": "assess cherry-pick safety for task BL-1234",
+      "note": "expected activation, skill tool not invoked"
+    },
+    {
+      "prompt": "check which commits to cherry-pick from the task branch",
+      "note": "expected activation, skill tool not invoked"
+    },
+    {
+      "prompt": "перенесём ли задачу BL-1050 в staging, ничего не сломаем?",
+      "note": "expected activation, skill tool not invoked"
+    },
+    {
+      "prompt": "оцени перенос, а выполнять будет человек",
+      "note": "expected activation, skill tool not invoked"
+    },
+    {
+      "prompt": "какие коммиты нужны для переноса задачи BL-1050?",
+      "note": "expected activation, skill tool not invoked"
+    }
+  ]
+}

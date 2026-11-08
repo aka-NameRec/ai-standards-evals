@@ -1,0 +1,11 @@
+diff --git a/helper.py b/helper.py
+index 55870ec..2e0322e 100644
+--- a/helper.py
++++ b/helper.py
+@@ -4,4 +4,6 @@
+ def percentile(values, p):
+     """Return the p-th percentile value."""
+     index = int(len(values) * p / 100)
++    if not values:
++        raise ValueError("empty values")
+     return sorted(values)[index]

@@ -1,0 +1,10 @@
+{
+  "scenario_id": "TRG-003",
+  "ok": false,
+  "standards_revision": "feature/27-cherry-pick-assessment",
+  "failures": [
+    "case: зафиксируй знания стандартным образом: skill invoked on a negative case"
+  ],
+  "passed": 10,
+  "cases": 11
+}

@@ -1,0 +1,25 @@
+{
+  "scenario_id": "CP-003",
+  "ok": true,
+  "failures": [],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 107.5,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "feature/27-cherry-pick-assessment",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/regression-2.10.0-candidate/20261108-183915-CP-003/fixture/cp-003-equivalent-change-already-present",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CP-003",
+    "Оцени перенос коммитов: перенеси фикс из develop в staging (задача BL-1020, один коммит)."
+  ],
+  "judge": null
+}
