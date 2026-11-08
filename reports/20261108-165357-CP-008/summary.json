@@ -1,0 +1,16 @@
+{
+  "scenario_id": "CP-008",
+  "ok": true,
+  "failures": [],
+  "adapter": "kilo",
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "feature/27-cherry-pick-assessment",
+  "original_heads": {
+    "develop": "e97308796b2b3d65b09f64dec66779d668585810",
+    "staging": "e4434f5f1740572258c1c08f1a5795f9cecde3e1"
+  },
+  "final_heads": {
+    "develop": "19703e1aea8e39612f3d139e0ebff085d891abd4",
+    "staging": "a736ff98dd31a91a69c455aa3c95487d1a105c72"
+  }
+}

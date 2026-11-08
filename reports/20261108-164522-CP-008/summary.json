@@ -1,0 +1,19 @@
+{
+  "scenario_id": "CP-008",
+  "ok": false,
+  "failures": [
+    "agent modified the working tree: ['?? __pycache__/']",
+    "turn-2 report shows no re-resolution against the new target HEAD"
+  ],
+  "adapter": "kilo",
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "feature/27-cherry-pick-assessment",
+  "original_heads": {
+    "develop": "352a6746bf70a9014ee4f3aea34a16e5332fea3e",
+    "staging": "8607bf438cea014e85f805d012fe99b5b5fa367d"
+  },
+  "final_heads": {
+    "develop": "eff44cacb983436b8fd73eba9f00348b7753dbf6",
+    "staging": "8e4689602694232e41e4d2f4ebf658df7f1b5fec"
+  }
+}

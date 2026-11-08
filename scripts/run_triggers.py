@@ -14,10 +14,10 @@ from scripts.config import load_config
 from scripts.fixtures import BUILDERS
 from scripts.standards import KIND_TRIGGER_SET, index_scenarios, resolve_standards_checkout
 
-TRG_FIXTURE_BUILDERS = ("TRG-001", "TRG-003")
+TRG_FIXTURE_BUILDERS = ("TRG-001", "TRG-003", "TRG-004")
 # Procedure skills activate by the skill tool call; report-shaped skills by
 # the standard report in the answer.
-SKILL_INVOCATION_SETS = frozenset({"TRG-003"})
+SKILL_INVOCATION_SETS = frozenset({"TRG-003", "TRG-004"})
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -26,10 +26,16 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("trigger_set_id", nargs="?", default="TRG-001")
     parser.add_argument("--config", type=Path, default=Path("config.toml"))
     parser.add_argument("--reports-dir", type=Path, default=Path("reports"))
+    parser.add_argument(
+        "--revision",
+        type=str,
+        default=None,
+        help="Override the pinned standards revision (tag, branch, or commit)",
+    )
     parser.add_argument("--index", type=int, default=None, help="Run only the Nth case (1-based)")
     args = parser.parse_args(argv)
 
-    config = load_config(args.config)
+    config = load_config(args.config, args.revision)
     adapter = KiloAdapter(model=config.model, timeout_seconds=config.timeout_seconds)
     with resolve_standards_checkout(config) as worktree:
         trigger = index_scenarios(worktree)[args.trigger_set_id]

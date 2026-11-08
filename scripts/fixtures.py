@@ -1491,6 +1491,550 @@ def build_rd120_param(
     return repo
 
 
+def _write_anchors(repo: Path, branches: tuple[str, ...] = ("develop", "staging")) -> Path:
+    """Record branch heads the read-only scorer asserts against after the run."""
+    heads = {branch: run_git(repo, "rev-parse", branch).strip() for branch in branches}
+    _write(repo / "eval-anchors.json", json.dumps(heads, indent=2, sort_keys=True) + "\n")
+    return repo
+
+
+def _update_anchors(repo: Path, branches: tuple[str, ...] = ("develop", "staging")) -> None:
+    """Re-record branch heads after the harness itself moved them (CP-008)."""
+    _write_anchors(repo, branches)
+
+
+def _init_diverged_repo(
+    repo: Path,
+    worktree: Path,
+    revision: str,
+    render: RenderFn,
+) -> None:
+    """Scaffold a project whose develop branch diverged from staging.
+
+    The cherry-pick-assessment skill deploys for kilo; the reference-mode
+    pointer and the deployed reference file stay agent-independent.
+    """
+    _init_repo(
+        repo,
+        worktree,
+        revision,
+        features=["cherry-pick-assessment"],
+        stacks=["python"],
+        render=render,
+        agents=["kilo"],
+        sync=True,
+        reference_features=["cherry-pick-assessment"],
+    )
+    run_git(repo, "branch", "-m", "main", "develop")
+
+
+def _diverge_staging(repo: Path, message: str) -> None:
+    """Branch staging off the current develop head and give it one own commit."""
+    run_git(repo, "branch", "staging")
+    run_git(repo, "checkout", "-q", "staging")
+    _write(
+        repo / "RELEASE.md",
+        "# Release notes\n\n- 1.0.0 initial stabilization line.\n",
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", message)
+    run_git(repo, "checkout", "-q", "develop")
+
+
+def build_cp001(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
+    """One self-contained leaf commit on develop, absent from staging."""
+    repo = parent / "cp-001-independent-commit-pass"
+    _init_diverged_repo(repo, worktree, revision, render)
+    _diverge_staging(repo, "chore: staging release notes")
+    _write(
+        repo / "slug.py",
+        '"""URL slug helper."""\n'
+        "\n"
+        "\n"
+        "def slugify(text):\n"
+        '    """Lowercase the text and join words with dashes."""\n'
+        '    return "-".join(text.lower().split())\n',
+    )
+    _write(
+        repo / "tests" / "test_slug.py",
+        "from slug import slugify\n"
+        "\n"
+        "\n"
+        "def test_slugify():\n"
+        '    assert slugify("Hello World") == "hello-world"\n',
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "BL-1000: add slug util with unit test")
+    return _write_anchors(repo)
+
+
+def build_cp002(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
+    """Interface change on develop with its caller update left behind."""
+    repo = parent / "cp-002-missing-interface-change"
+    _init_diverged_repo(repo, worktree, revision, render)
+    _write(
+        repo / "gateway.py",
+        '"""Payment gateway boundary."""\n'
+        "\n"
+        "\n"
+        "class PaymentGateway:\n"
+        "    def charge(self, amount, currency):\n"
+        '        """Charge the amount in the currency."""\n'
+        "        raise NotImplementedError\n",
+    )
+    _write(
+        repo / "service.py",
+        '"""Checkout service."""\n'
+        "\n"
+        "\n"
+        "def checkout(gateway, amount, currency):\n"
+        '    """Charge through the gateway."""\n'
+        "    return gateway.charge(amount, currency)\n",
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feat: payment gateway boundary")
+    _diverge_staging(repo, "chore: staging release notes")
+    _write(
+        repo / "gateway.py",
+        '"""Payment gateway boundary."""\n'
+        "\n"
+        "\n"
+        "class PaymentGateway:\n"
+        "    def charge(self, amount, currency, merchant_id):\n"
+        '        """Charge the amount in the currency for the merchant."""\n'
+        "        raise NotImplementedError\n",
+    )
+    _git(repo, "add", "-A")
+    _git(
+        repo,
+        "commit", "-q", "-m",
+        "BL-1010: extend PaymentGateway.charge signature with merchant id",
+    )
+    _write(
+        repo / "service.py",
+        '"""Checkout service."""\n'
+        "\n"
+        "\n"
+        "def checkout(gateway, amount, currency):\n"
+        '    """Charge through the gateway."""\n'
+        '    return gateway.charge(amount, currency, merchant_id="default-merchant")\n',
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "BL-1010: pass merchant id at the checkout caller")
+    return _write_anchors(repo)
+
+
+def build_cp003(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
+    """The same formatting fix already applied to staging under a hotfix message."""
+    repo = parent / "cp-003-equivalent-change-already-present"
+    _init_diverged_repo(repo, worktree, revision, render)
+    _write(
+        repo / "money.py",
+        '"""Money formatting."""\n'
+        "\n"
+        "\n"
+        "def format_money(cents):\n"
+        '    """Format an integer cents amount."""\n'
+        '    return f"{cents // 100}.{cents % 100:02d}"\n',
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feat: money formatting")
+    _diverge_staging(repo, "chore: staging release notes")
+    fixed = (
+        '"""Money formatting."""\n'
+        "\n"
+        "\n"
+        "def format_money(cents):\n"
+        '    """Format an integer cents amount."""\n'
+        '    sign = "-" if cents < 0 else ""\n'
+        "    cents = abs(cents)\n"
+        '    return f"{sign}{cents // 100}.{cents % 100:02d}"\n'
+    )
+    run_git(repo, "checkout", "-q", "staging")
+    _write(repo / "money.py", fixed)
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "hotfix: correct format_money rounding for negative invoices")
+    run_git(repo, "checkout", "-q", "develop")
+    _write(repo / "money.py", fixed)
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "BL-1020: fix format_money for negative amounts")
+    return _write_anchors(repo)
+
+
+def build_cp004(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
+    """Event payload change whose consumer repository is not accessible."""
+    repo = parent / "cp-004-kafka-consumer-unavailable"
+    _init_diverged_repo(repo, worktree, revision, render)
+    _write(
+        repo / "events" / "order_created.py",
+        '"""OrderCreated event payload."""\n'
+        "\n"
+        "\n"
+        "class OrderCreated:\n"
+        "\n"
+        "    def __init__(self, order_id, total):\n"
+        "        self.order_id = order_id\n"
+        "        self.total = total\n",
+    )
+    _write(
+        repo / "docs" / "integrations" / "consumers.md",
+        "# OrderCreated consumers\n"
+        "\n"
+        "- delivery-service consumes the payload to schedule shipping;\n"
+        "  repository: ../delivery-service (access restricted in this environment).\n",
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feat: order created event")
+    _diverge_staging(repo, "chore: staging release notes")
+    _write(
+        repo / "events" / "order_created.py",
+        '"""OrderCreated event payload."""\n'
+        "\n"
+        "\n"
+        "class OrderCreated:\n"
+        "\n"
+        "    def __init__(self, order_id, total, merchant_id):\n"
+        "        self.order_id = order_id\n"
+        "        self.total = total\n"
+        "        self.merchant_id = merchant_id\n",
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "MKT-2000: add merchant_id to the OrderCreated payload")
+    return _write_anchors(repo)
+
+
+def build_cp005(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
+    """Two individually applicable flag commits that contradict the target reader."""
+    repo = parent / "cp-005-individually-compatible-set"
+    _init_diverged_repo(repo, worktree, revision, render)
+    _write(
+        repo / "settings.py",
+        '"""Runtime settings."""\n'
+        "\n"
+        "DEFAULT_DISCOUNT_RATE = 0.0\n",
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feat: runtime settings")
+    _diverge_staging(repo, "chore: staging release notes")
+    run_git(repo, "checkout", "-q", "staging")
+    _write(
+        repo / "billing.py",
+        '"""Invoice line computation."""\n'
+        "\n"
+        "from settings import DEFAULT_FEATURE_X\n"
+        "\n"
+        "\n"
+        "def invoice_line(amount):\n"
+        "    # BL-1009: promotions assume feature-x stays opt-in (default off)\n"
+        "    if DEFAULT_FEATURE_X:\n"
+        "        amount *= 0.9\n"
+        "    return amount\n",
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "BL-1009: invoice lines keep feature-x opt-in")
+    run_git(repo, "checkout", "-q", "develop")
+    _write(
+        repo / "settings.py",
+        '"""Runtime settings."""\n'
+        "\n"
+        "DEFAULT_DISCOUNT_RATE = 0.0\n"
+        "DEFAULT_FEATURE_X = False\n",
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "BL-1030: introduce feature-x flag with the default off")
+    _write(
+        repo / "settings.py",
+        '"""Runtime settings."""\n'
+        "\n"
+        "DEFAULT_DISCOUNT_RATE = 0.0\n"
+        "DEFAULT_FEATURE_X = True\n",
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "BL-1030: enable feature-x by default")
+    return _write_anchors(repo)
+
+def build_cp006(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
+    """Merge commit whose parents changed the same lines differently."""
+    repo = parent / "cp-006-ambiguous-merge-commit"
+    _init_diverged_repo(repo, worktree, revision, render)
+    _write(
+        repo / "pricing.py",
+        '"""Pricing helpers."""\n'
+        "\n"
+        "\n"
+        "def discount(amount):\n"
+        '    """Return the discounted amount."""\n'
+        "    return amount\n",
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feat: pricing helpers")
+    _diverge_staging(repo, "chore: staging release notes")
+    # Fork both feature branches at the base commit so develop's own rework
+    # of the same lines collides with the merged branch.
+    run_git(repo, "branch", "feature-a", "develop")
+    run_git(repo, "branch", "feature-b", "develop")
+    _write(
+        repo / "pricing.py",
+        '"""Pricing helpers."""\n'
+        "\n"
+        "\n"
+        "def discount(amount):\n"
+        '    """Rounded discount for the call site."""\n'
+        "    return round(amount * 0.05, 2)\n",
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "develop: rework discount call site")
+    run_git(repo, "checkout", "-q", "feature-a")
+    _write(
+        repo / "pricing.py",
+        '"""Pricing helpers."""\n'
+        "\n"
+        "\n"
+        "def discount(amount):\n"
+        '    """Tiered discount."""\n'
+        "    if amount >= 1000:\n"
+        "        return amount * 0.9\n"
+        "    return amount\n",
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feature-a: tiered discount")
+    run_git(repo, "checkout", "-q", "feature-b")
+    _write(
+        repo / "pricing.py",
+        '"""Pricing helpers."""\n'
+        "\n"
+        "\n"
+        "def discount(amount):\n"
+        '    """Capped discount."""\n'
+        "    capped = min(amount * 0.15, 200)\n"
+        "    return amount - capped\n",
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feature-b: capped discount")
+    run_git(repo, "checkout", "-q", "develop")
+    try:
+        run_git(repo, "merge", "feature-a")
+        raise FixtureError("cp-006: expected a pricing.py merge conflict")
+    except GitError:
+        status = run_git(repo, "status", "--porcelain")
+        if "UU pricing.py" not in status:
+            raise FixtureError("cp-006: pricing.py is not in a conflicted state") from None
+    _write(
+        repo / "pricing.py",
+        '"""Pricing helpers."""\n'
+        "\n"
+        "\n"
+        "def discount(amount):\n"
+        '    """Tiered discount with a cap."""\n'
+        "    discounted = amount * 0.9 if amount >= 1000 else amount\n"
+        "    return discounted - min(discounted * 0.15, 200)\n",
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "merge: feature-a into develop with conflict resolutions")
+    parents = run_git(repo, "rev-list", "--parents", "-n", "1", "develop").split()
+    if len(parents) != 3:
+        raise FixtureError("cp-006: develop head is not a two-parent merge commit")
+    return _write_anchors(repo)
+
+
+def build_cp007(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
+    """Discount change covered by unit tests while the integration flow needs an env."""
+    repo = parent / "cp-007-missing-integration-check"
+    _init_diverged_repo(repo, worktree, revision, render)
+    _write(
+        repo / "discounts.py",
+        '"""Discount calculation."""\n'
+        "\n"
+        "\n"
+        "def calculate_discount(amount, tier):\n"
+        '    """Return the discount for the tier."""\n'
+        "    return 0\n",
+    )
+    _write(
+        repo / "tests" / "test_discounts.py",
+        "from discounts import calculate_discount\n"
+        "\n"
+        "\n"
+        "def test_no_tier_means_no_discount():\n"
+        "    assert calculate_discount(100, None) == 0\n",
+    )
+    _write(
+        repo / "tests" / "integration" / "test_order_flow.py",
+        "import os\n"
+        "\n"
+        "import pytest\n"
+        "\n"
+        "pytestmark = pytest.mark.skipif(\n"
+        '    not os.environ.get("INTEGRATION_ENV"),\n'
+        '    reason="requires the integration environment",\n'
+        ")\n"
+        "\n"
+        "\n"
+        "def test_order_flow_applies_discounts():\n"
+        "    raise NotImplementedError\n",
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feat: discount skeleton with integration stub")
+    _diverge_staging(repo, "chore: staging release notes")
+    _write(
+        repo / "discounts.py",
+        '"""Discount calculation."""\n'
+        "\n"
+        "\n"
+        "def calculate_discount(amount, tier):\n"
+        '    """Return the tiered discount for the amount."""\n'
+        '    rates = {"silver": 0.05, "gold": 0.1}\n'
+        "    return amount * rates.get(tier, 0)\n",
+    )
+    _write(
+        repo / "tests" / "test_discounts.py",
+        "from discounts import calculate_discount\n"
+        "\n"
+        "\n"
+        "def test_no_tier_means_no_discount():\n"
+        "    assert calculate_discount(100, None) == 0\n"
+        "\n"
+        "\n"
+        "def test_gold_tier_discount():\n"
+        "    assert calculate_discount(100, \"gold\") == 10\n",
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "BL-1040: apply tiered discount calculation")
+    return _write_anchors(repo)
+
+
+def build_cp008(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
+    """Pass-worthy commit whose target head and set change between turns."""
+    repo = parent / "cp-008-invalidation-on-change"
+    _init_diverged_repo(repo, worktree, revision, render)
+    _write(
+        repo / "slug.py",
+        '"""URL slug helper."""\n'
+        "\n"
+        "\n"
+        "def slugify(text):\n"
+        '    """Lowercase the text and join words with dashes."""\n'
+        '    return "-".join(text.lower().split())\n',
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "feat: slug helper")
+    _diverge_staging(repo, "chore: staging release notes")
+    _write(
+        repo / "tests" / "test_slug.py",
+        "from slug import slugify\n"
+        "\n"
+        "\n"
+        "def test_slugify():\n"
+        '    assert slugify("Hello World") == "hello-world"\n',
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "BL-1000: add slug util with unit test")
+    return _write_anchors(repo)
+
+
+def build_cp009(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
+    """A task whose history carries a draft, its revert, a fix, and the main change."""
+    repo = parent / "cp-009-selector-companion-completeness"
+    _init_diverged_repo(repo, worktree, revision, render)
+    _diverge_staging(repo, "chore: staging release notes")
+    _write(
+        repo / "promo.py",
+        '"""Promo code validation draft."""\n'
+        "\n"
+        "\n"
+        "def validate(code):\n"
+        "    return bool(code)\n",
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "BL-1050: draft promo code validation")
+    _git(repo, "revert", "--no-edit", "HEAD")
+    _write(
+        repo / "promo.py",
+        '"""Promo code validation."""\n'
+        "\n"
+        "\n"
+        "def validate(code, campaigns):\n"
+        '    """Validate the code against known campaigns."""\n'
+        "    return code in campaigns\n",
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "BL-1050: add promo code validation")
+    _write(
+        repo / "promo.py",
+        '"""Promo code validation."""\n'
+        "\n"
+        "\n"
+        "def validate(code, campaigns):\n"
+        '    """Validate the code against known campaigns; empty codes fail."""\n'
+        "    if not code:\n"
+        "        return False\n"
+        "    return code in campaigns\n",
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "BL-1050: handle empty promo codes")
+    return _write_anchors(repo)
+
+
+def build_cp010(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
+    """Two unrelated commits sharing one task id by mistake."""
+    repo = parent / "cp-010-ambiguous-selector"
+    _init_diverged_repo(repo, worktree, revision, render)
+    _diverge_staging(repo, "chore: staging release notes")
+    _write(
+        repo / "export.py",
+        '"""Promo export endpoint."""\n'
+        "\n"
+        "\n"
+        "def export_promos(codes):\n"
+        '    """Return the export payload."""\n'
+        '    return {"codes": list(codes)}\n',
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "BL-1060: add promo export endpoint")
+    _write(
+        repo / "csv.py",
+        '"""CSV helper extracted from the import module."""\n'
+        "\n"
+        "\n"
+        "def rows_to_csv(rows):\n"
+        '    """Join rows into CSV text."""\n'
+        '    return "\\n".join(",".join(row) for row in rows)\n',
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "BL-1060: extract csv helper")
+    return _write_anchors(repo)
+
+
+def build_trg004(worktree: Path, parent: Path, revision: str, render: RenderFn) -> Path:
+    """Project with the cherry-pick-assessment skill deployed for activation cases."""
+    repo = parent / "trg-004-cherry-pick-assessment-triggers"
+    _init_repo(
+        repo,
+        worktree,
+        revision,
+        features=["cherry-pick-assessment"],
+        stacks=["python"],
+        render=render,
+        agents=["kilo"],
+        sync=True,
+        reference_features=["cherry-pick-assessment"],
+    )
+    run_git(repo, "branch", "staging")
+    run_git(repo, "branch", "-m", "main", "develop")
+    _write(
+        repo / "promo.py",
+        '"""Promo code validation."""\n'
+        "\n"
+        "\n"
+        "def validate(code, campaigns):\n"
+        '    """Validate the code against known campaigns."""\n'
+        "    return code in campaigns\n",
+    )
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "BL-1234: add customer promo export")
+    return repo
+
+
 BUILDERS: dict[str, Callable[[Path, Path, str, RenderFn], Path]] = {
     "CR-001": build_cr001,
     "CR-002": build_cr002,
@@ -1521,4 +2065,15 @@ BUILDERS: dict[str, Callable[[Path, Path, str, RenderFn], Path]] = {
     "RD-108": build_rd108,
     "RD-110": build_rd110,
     "RD-111": build_rd111,
+    "CP-001": build_cp001,
+    "CP-002": build_cp002,
+    "CP-003": build_cp003,
+    "CP-004": build_cp004,
+    "CP-005": build_cp005,
+    "CP-006": build_cp006,
+    "CP-007": build_cp007,
+    "CP-008": build_cp008,
+    "CP-009": build_cp009,
+    "CP-010": build_cp010,
+    "TRG-004": build_trg004,
 }

@@ -1,0 +1,10 @@
+{
+  "index": 3,
+  "prompt": "assess cherry-pick safety for task BL-1234",
+  "expected_should_trigger": true,
+  "engaged": true,
+  "skill_seen": true,
+  "ok": true,
+  "note": "",
+  "duration_seconds": 51.1
+}

@@ -1,0 +1,25 @@
+{
+  "scenario_id": "CP-007",
+  "ok": true,
+  "failures": [],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 132.5,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "feature/27-cherry-pick-assessment",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/20261108-165410-CP-007/fixture/cp-007-missing-integration-check",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CP-007",
+    "Оцени перенос коммитов: перенеси из develop в staging правку расчёта скидок (задача BL-1040)."
+  ],
+  "judge": null
+}

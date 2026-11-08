@@ -1,0 +1,28 @@
+{
+  "scenario_id": "CP-010",
+  "ok": false,
+  "failures": [
+    "report issued a PASS verdict",
+    "report issued a REVIEW verdict"
+  ],
+  "adapter": "kilo",
+  "returncode": 0,
+  "duration_seconds": 80.2,
+  "model": "zai-coding-plan/glm-5.3-flash",
+  "standards_revision": "feature/27-cherry-pick-assessment",
+  "command": [
+    "kilo",
+    "run",
+    "--dir",
+    "/home/shtirliz/workspace/myself/ai-standards-evals/reports/20261108-165749-CP-010/fixture/cp-010-ambiguous-selector",
+    "--auto",
+    "--format",
+    "json",
+    "--model",
+    "zai-coding-plan/glm-5.3-flash",
+    "--title",
+    "eval-CP-010",
+    "Оцени перенос коммитов: перенеси задачу BL-1060 из develop в staging."
+  ],
+  "judge": null
+}

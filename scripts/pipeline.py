@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import cast
 
 from agents.base import AgentAdapter
-from scorers import report_shape, review_findings
+from scorers import cherry_pick, report_shape, review_findings
 from scorers.llm_judge import (
     RUBRICS_DIR,
     HttpxJsonClient,
@@ -95,6 +95,15 @@ _SCENARIO_CHECKS: dict[str, Callable[[str, set[str], Path], report_shape.ShapeCh
     "PM-001": review_findings.check_pm001,
     "ATR-001": review_findings.check_atr001,
     "ATR-002": review_findings.check_atr002,
+    "CP-001": cherry_pick.check_cp001,
+    "CP-002": cherry_pick.check_cp002,
+    "CP-003": cherry_pick.check_cp003,
+    "CP-004": cherry_pick.check_cp004,
+    "CP-005": cherry_pick.check_cp005,
+    "CP-006": cherry_pick.check_cp006,
+    "CP-007": cherry_pick.check_cp007,
+    "CP-009": cherry_pick.check_cp009,
+    "CP-010": cherry_pick.check_cp010,
 }
 
 
